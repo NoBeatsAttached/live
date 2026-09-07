@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#040609" />
+<title>PR0CESS // QUEUE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+@font-face{
+  font-family:'Code';
+  src:url(data:font/woff2;base64,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) format('woff2');
+  font-display:swap;
+}
+/* PR0CESS // QUEUE — styles v2 "PRISM" (art direction: glitch chroma ref) */
+:root{
+  --void:#050506;
+  --panel:#0B0C0F;
+  --panel-2:#121419;
+  --line:#212429;
+  --text:#EDEDEB;
+  --dim:#B4B9BF;
+  --dimmer:#676C74;
+  --electric:#3A93D6;     /* bible blue */
+  --electric-soft:#0C1E2E;
+  --hot:#D8455F;          /* destructive / armed only */
+  --hot-soft:#241016;
+  --prism:linear-gradient(90deg,#EDEDEB,#B4B9BF 28%,#3A93D6 58%,#9FC4E0 78%,#EDEDEB);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--void);color:var(--text);
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;letter-spacing:.01em;position:relative}
+/* scan lines over everything, very low key */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.14) 2px 3px)}
+body.overlay::after{background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.10) 2px 3px)}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea{font-family:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:24px 18px 80px}
+.amber{color:var(--electric)} .bad{color:var(--hot)} .good{color:var(--electric)}
+
+/* masthead with prism rule + RGB-split wordmark */
+.mast{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-bottom:14px;margin-bottom:22px;position:relative}
+.mast::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:var(--line);opacity:1}
+.brand{font-weight:800;font-size:15px;letter-spacing:.14em;text-transform:uppercase;}
+.brand .z{color:var(--electric)}
+.brand small{display:block;font-weight:400;font-size:10px;letter-spacing:.34em;color:var(--dim);
+  margin-top:3px;text-shadow:none}
+.statuspill{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:5px 10px;border:1px solid var(--line);border-radius:2px;white-space:nowrap}
+.statuspill.open{color:var(--electric);border-color:#14506b;text-shadow:0 0 8px rgba(58,147,214,.5)}
+.statuspill.open::before{content:"● "}
+.statuspill.closed{color:var(--hot);border-color:#5a1428;text-shadow:0 0 8px rgba(216,69,95,.5)}
+.statuspill.closed::before{content:"● "}
+
+.modenav{display:flex;gap:2px;margin-bottom:20px}
+.modenav a{flex:1;text-align:center;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);padding:9px 4px;border:1px solid var(--line);border-radius:2px;text-decoration:none}
+.modenav a.on{color:var(--void);background:var(--electric);border-color:var(--electric);font-weight:700;
+  box-shadow:0 0 14px rgba(58,147,214,.35)}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:6px}
+.field label .req{color:var(--electric)}
+input[type=text],input[type=url],input[type=password],textarea{
+  width:100%;background:var(--panel);border:1px solid var(--line);border-radius:2px;
+  color:var(--text);padding:11px 12px;font-size:13.5px}
+textarea{resize:vertical;min-height:64px;line-height:1.55}
+input::placeholder,textarea::placeholder{color:var(--dimmer)}
+input:focus,textarea:focus{outline:none;border-color:var(--electric);
+  box-shadow:0 0 0 1px var(--electric),0 0 14px rgba(58,147,214,.25)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:7px 11px;
+  border:1px solid var(--line);border-radius:2px;color:var(--dim);background:var(--panel)}
+.chip.on{color:var(--electric);border-color:#14506b;background:var(--electric-soft);
+  box-shadow:0 0 10px rgba(58,147,214,.2)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  background:var(--electric);color:var(--void);font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  font-size:13px;padding:14px;border-radius:2px;margin-top:6px;box-shadow:0 0 18px rgba(58,147,214,.3)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{background:var(--dimmer);color:#0d1622;cursor:not-allowed;box-shadow:none}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:700;box-shadow:none}
+.btn.ghost:hover{color:var(--text);border-color:var(--dim)}
+
+.hint{font-size:11px;color:var(--dim);line-height:1.6;margin-top:14px}
+.hint b{color:var(--text);font-weight:500}
+
+.rack{display:flex;flex-direction:column;gap:8px}
+.strip{display:flex;align-items:stretch;background:var(--panel);border:1px solid var(--line);
+  border-radius:3px;overflow:hidden}
+.strip .num{flex:0 0 42px;display:flex;align-items:center;justify-content:center;font-weight:800;
+  font-size:15px;color:var(--dim);background:var(--panel-2);border-right:1px solid var(--line)}
+.strip .body{flex:1;min-width:0;padding:11px 13px}
+.strip .who{font-weight:700;font-size:14px}
+.strip .title{font-size:12.5px;color:var(--text);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip .meta{font-size:10.5px;color:var(--dim);margin-top:5px;letter-spacing:.04em;
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.strip .meta .tag{color:var(--electric);text-transform:uppercase;letter-spacing:.1em}
+.strip .meta a{color:var(--electric);text-decoration:none}
+.strip .note{font-size:11.5px;color:var(--dim);margin-top:7px;line-height:1.5;
+  padding-top:7px;border-top:1px dashed var(--line)}
+.strip .acts{flex:0 0 auto;display:flex;flex-direction:column;border-left:1px solid var(--line)}
+.strip .acts button{flex:1;padding:0 13px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);border-bottom:1px solid var(--line);min-width:78px}
+.strip .acts button:last-child{border-bottom:none}
+.strip .acts button:hover{color:var(--text);background:var(--panel-2)}
+.strip .acts button.go:hover{color:var(--electric)}
+.strip .acts button.kill:hover{color:var(--hot)}
+.skiptag{color:var(--hot);font-size:10px;letter-spacing:.1em}
+
+/* ARMED = the hot state, like the reference's red-hot cores */
+.strip.live{border-color:var(--hot);background:var(--hot-soft);
+  box-shadow:0 0 22px rgba(216,69,95,.18)}
+.strip.live .num{background:var(--hot);color:var(--void)}
+.strip.live .who{color:var(--hot);text-shadow:0 0 10px rgba(216,69,95,.5)}
+.meter{height:4px;background:var(--line);border-radius:2px;margin-top:9px;overflow:hidden}
+.meter i{display:block;height:100%;width:60%;background:var(--prism);
+  animation:vu 1.1s ease-in-out infinite alternate}
+@keyframes vu{from{width:22%}to{width:92%}}
+@media (prefers-reduced-motion:reduce){
+  .meter i,.ovl .mtr i{animation:none;width:70%}
+  .ovl .now .h{animation:none}
+}
+
+.seclabel{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);
+  margin:26px 0 11px;display:flex;align-items:center;gap:10px}
+.seclabel::after{content:"";flex:1;height:1px;background:var(--line)}
+.seclabel .ct{color:var(--electric)}
+
+.dashbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}
+.dashbar .spacer{flex:1}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:2px;padding:8px 11px}
+.toggle b{font-weight:700}
+.miniact{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+  border:1px solid var(--line);border-radius:2px;padding:8px 11px}
+.miniact:hover{color:var(--text);border-color:var(--dim)}
+.miniact.danger:hover{color:var(--hot);border-color:#5a1428}
+
+.empty{border:1px dashed var(--line);border-radius:3px;padding:30px 18px;text-align:center;
+  color:var(--dim);font-size:12.5px;line-height:1.7}
+.empty b{color:var(--text);font-weight:500;display:block;margin-bottom:4px;letter-spacing:.04em}
+.confirm{border:1px solid var(--electric);background:var(--electric-soft);border-radius:3px;
+  padding:22px;text-align:center;box-shadow:0 0 26px rgba(58,147,214,.15)}
+.confirm .big{font-weight:800;font-size:22px;letter-spacing:.06em;color:var(--electric);}
+.confirm .sub{font-size:12px;color:var(--text);margin-top:8px;line-height:1.6}
+.confirm .pos{font-size:48px;font-weight:800;color:var(--electric);line-height:1;margin:14px 0 6px;
+  text-shadow:-2px 0 rgba(216,69,95,.6),2px 0 rgba(58,147,214,.6)}
+
+/* ---- OVERLAY: full send ---- */
+body.overlay{background:transparent}
+.ovl{padding:26px}
+.ovl .lab{font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--electric);
+  text-shadow:0 0 14px rgba(58,147,214,.7)}
+.ovl .now{font-weight:800;font-size:36px;color:#fff;margin-top:6px;
+  text-shadow:0 2px 18px rgba(0,0,0,.9)}
+.ovl .now .h{color:#fff;display:inline-block;
+  text-shadow:-3px 0 rgba(216,69,95,.9),3px 0 rgba(58,147,214,.9),0 2px 18px rgba(0,0,0,.9);
+  animation:chroma 6s steps(1) infinite}
+@keyframes chroma{
+  0%,92%{transform:translateX(0)}
+  93%{transform:translateX(-2px)}
+  94%{transform:translateX(2px)}
+  95%,100%{transform:translateX(0)}
+}
+.ovl .trk{font-size:18px;color:#fff;margin-top:4px;opacity:.92;text-shadow:0 2px 14px rgba(0,0,0,.9)}
+.ovl .mtr{height:6px;width:340px;max-width:80vw;background:rgba(255,255,255,.12);
+  border-radius:3px;margin-top:16px;overflow:hidden}
+.ovl .mtr i{display:block;height:100%;width:70%;background:var(--prism);
+  box-shadow:0 0 18px rgba(58,147,214,.7);animation:vu 1.05s ease-in-out infinite alternate}
+.ovl .next{margin-top:18px;font-size:14px;letter-spacing:.06em;color:#fff;opacity:.85;
+  text-shadow:0 2px 12px rgba(0,0,0,.9)}
+.ovl .next b{color:var(--electric);font-weight:700}
+
+.gate{max-width:420px;margin:60px auto;text-align:center}
+.gate .g-brand{font-weight:800;font-size:18px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px;}
+.gate .g-brand .z{color:var(--electric)}
+.gate p{color:var(--dim);font-size:12px;line-height:1.7;margin:10px 0 22px}
+.gate .err{color:var(--hot);font-size:11.5px;margin-top:14px}
+
+.foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+.ovl .now.closednow{color:var(--hot);
+  text-shadow:-3px 0 rgba(58,147,214,.7),3px 0 rgba(216,69,95,.9),0 2px 18px rgba(0,0,0,.9)}
+
+/* ---- brand font: display moments only ---- */
+.brand{font-size:16px;letter-spacing:.2em;color:#fff}
+.gate .g-brand{font-size:17px;letter-spacing:.12em;color:#fff}
+.brand, .gate .g-brand,
+.confirm .big, .confirm .pos,
+.ovl .lab, .ovl .now{
+  font-family:'Code','JetBrains Mono',ui-monospace,monospace;
+}
+
+</style>
+
+<style>
+/* ═══ G-REX SYSTEM RESKIN ═══════════════════════════════════════
+   Palette remapped to the grexofficial.com brand-bible tokens.
+   Black / white / silver, dark blue secondary. No neon, no rave.
+   Grain replaces scanlines. OBS overlay views are excluded so
+   nothing lands on stream.
+   ═════════════════════════════════════════════════════════════ */
+body:not(.overlay)::after{
+  content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+::selection{background:#3A93D6;color:#050506}
+</style>
+
+<style>
+/* ═══ PR0CESS_LIVE WORDMARK — canonical lockup ══════════════════
+   Code font · .2em tracking · white · blue zero · blue // divider.
+   Identical across hub, battle, queue, project fix and timer.
+   ═════════════════════════════════════════════════════════════ */
+.brand,.logo,.wordmark,.g-brand,.fbrand,.footmark{
+  font-family:'Code','JetBrains Mono',ui-monospace,monospace;
+  font-weight:400;
+  letter-spacing:.2em;
+  color:#fff;
+}
+.brand,.wordmark,.g-brand{font-size:16px}
+.brand .z,.logo .z,.wordmark .z,.g-brand .z,.fbrand .z{color:var(--electric,#3A93D6)}
+.wordmark span,.brand small,.g-brand small{
+  color:var(--dim);font-weight:400;letter-spacing:.2em;
+}
+.wordmark span .z{color:var(--electric,#3A93D6)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+window.PQ_CONFIG = {
+  SUPABASE_URL:      "https://tewcgwhumtmjvfxcvbxl.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn",
+
+  BRAND:      "PR0CESS",
+  BRAND_TAIL: "QUEUE",
+  BRAND_SUB:  "PR0CESS_LIVE // FEEDBACK STREAMS",
+  GENRES: ["Tearout","Midtempo","Experimental","Hybrid Trap","Riddim","Other"]
+};
+
+</script>
+<script>
+/* PR0CESS // QUEUE — Supabase edition. Edit config.js, not this file. */
+(function(){
+"use strict";
+
+var CFG = window.PQ_CONFIG || {};
+var BRAND=CFG.BRAND||"PR0CESS_LIVE", BRAND_TAIL=CFG.BRAND_TAIL||"QUEUE", BRAND_SUB=CFG.BRAND_SUB||"";
+var GENRES=CFG.GENRES||["Other"];
+var CONFIGURED = CFG.SUPABASE_URL && CFG.SUPABASE_URL.indexOf("PASTE")!==0 && window.supabase;
+var sb = CONFIGURED ? window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY) : null;
+
+var app=document.getElementById("app");
+function esc(s){return (s||"").replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function route(){return location.hash.replace("#","").split("?")[0]||"submit";}
+function wordmark(){ return BRAND.replace("0",'<span class="z">0</span>')+' <span class="z">//</span> '+BRAND_TAIL; }
+
+/* ---------------- state ---------------- */
+var State={open:true,items:[]};
+var listeners=[]; var pollT=null;
+function onState(fn){listeners.push(fn);fn();}
+function emit(){listeners.forEach(function(fn){fn();});}
+function current(){return State.items.filter(function(i){return i.status==="reviewing";})[0]||null;}
+function queued(){return State.items.filter(function(i){return i.status==="queued";}).sort(function(a,b){return a.sort_key-b.sort_key;});}
+function reviewed(){return State.items.filter(function(i){return i.status==="done"||i.status==="skipped";});}
+
+function refresh(){
+  if(!sb) return Promise.resolve();
+  return Promise.all([
+    sb.from("queue").select("*"),
+    sb.from("session").select("open").eq("id",1).single()
+  ]).then(function(res){
+    if(!res[0].error) State.items=res[0].data||[];
+    if(!res[1].error && res[1].data) State.open=!!res[1].data.open;
+    emit();
+  });
+}
+function startLive(){
+  if(!sb) return;
+  refresh();
+  try{
+    sb.channel("pq")
+      .on("postgres_changes",{event:"*",schema:"public",table:"queue"},refresh)
+      .on("postgres_changes",{event:"*",schema:"public",table:"session"},refresh)
+      .subscribe();
+  }catch(e){}
+  clearInterval(pollT); pollT=setInterval(refresh, 7000); // safety net if realtime hiccups
+}
+
+/* ---------------- admin (PIN) ---------------- */
+var PIN = localStorage.getItem("pq_pin")||"";
+var ROLE = localStorage.getItem("pq_role")||"";
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function isOwner(){ return ROLE==="owner"; }
+function admin(cmd,id){
+  return sb.rpc("pq_admin",{p_pin:PIN,p_cmd:cmd,p_id:id||null}).then(function(r){
+    if(r.error){
+      if(/bad pin/i.test(r.error.message)){ PIN=""; ROLE=""; localStorage.removeItem("pq_pin"); localStorage.removeItem("pq_role"); render(); }
+      else if(/not allowed/i.test(r.error.message)){ alert("That action is crew-only."); }
+      else alert("Action failed: "+r.error.message);
+    }
+    return refresh();
+  });
+}
+
+/* ---------------- shared UI ---------------- */
+function nav(active){
+  function link(h,l){return '<a href="#'+h+'" class="'+(active===h?'on':'')+'">'+l+'</a>';}
+  return '<div class="modenav">'+link('submit','Submit')+link('queue','Dashboard')+(PIN?link('overlay','OBS Overlay'):'')+'</div>';
+}
+function pill(){
+  if(!CONFIGURED) return '<span class="statuspill closed">not connected</span>';
+  var cls=State.open?"open":"closed";
+  return '<span class="statuspill '+cls+'">'+(State.open?"Open":"Closed")+' · '+queued().length+' waiting</span>';
+}
+function stripView(it,n,kind,acts){
+  var cls=kind==="live"?"strip live":"strip";
+  var style=it.status==="skipped"?' style="opacity:.55"':(kind==="done"?' style="opacity:.7"':'');
+  return '<div class="'+cls+'"'+style+'><div class="num">'+n+'</div><div class="body">'+
+    '<div class="who">'+esc(it.handle)+(it.status==="skipped"?' <span class="skiptag">SKIPPED</span>':'')+'</div>'+
+    '<div class="title">'+esc(it.title)+'</div>'+
+    '<div class="meta">'+(it.genre?'<span class="tag">'+esc(it.genre)+'</span>':'')+
+      '<a href="'+esc(it.link)+'" target="_blank" rel="noopener">open link ↗</a></div>'+
+    (it.note?'<div class="note">'+esc(it.note)+'</div>':'')+
+    (kind==="live"?'<div class="meter"><i></i></div>':'')+
+  '</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</div>';
+}
+function notConfigured(){
+  app.innerHTML='<div class="wrap"><div class="gate"><div class="g-brand">'+wordmark()+'</div>'+
+  '<p>Not connected yet. Open <b>config.js</b> and paste your Supabase URL and anon key (Settings → API), then reload.</p></div></div>';
+}
+
+/* ---------------- SUBMIT ---------------- */
+function renderSubmit(){
+  if(!CONFIGURED){ notConfigured(); return; }
+  app.innerHTML='<div class="wrap">'+
+    '<div class="mast"><div class="brand">'+wordmark()+'<small>'+esc(BRAND_SUB)+'</small></div><span id="pill"></span></div>'+
+    nav('submit')+'<div id="formzone"></div>'+
+    '<div class="foot"><span>v1.2.0</span><span>'+wordmark()+'</span></div></div>';
+  var built=false;
+  onState(function(){
+    var p=document.getElementById("pill"); if(p) p.innerHTML=pill();
+    var fz=document.getElementById("formzone"); if(!fz) return;
+    if(!State.open){ built=false;
+      fz.innerHTML='<div class="empty"><b>The queue is closed right now.</b>G-REX isn\'t taking submissions at the moment. Catch the next feedback stream on PR0CESS_LIVE.</div>';
+      return; }
+    if(built) return; built=true;
+    buildForm(fz);
+  });
+}
+function buildForm(fz){
+  var genre="";
+  fz.innerHTML=
+    '<div class="field"><label>Producer / handle <span class="req">*</span></label><input id="f-handle" type="text" maxlength="40" placeholder="@yourhandle" autocomplete="off"></div>'+
+    '<div class="field"><label>Track title <span class="req">*</span></label><input id="f-title" type="text" maxlength="80" placeholder="what\'s it called"></div>'+
+    '<div class="field"><label>Link <span class="req">*</span></label><input id="f-link" type="url" placeholder="SoundCloud or Dropbox link that plays"></div>'+
+    '<div class="field"><label>Genre</label><div class="chips" id="f-genre">'+GENRES.map(function(g){return '<button type="button" class="chip" data-g="'+esc(g)+'">'+esc(g)+'</button>';}).join("")+'</div></div>'+
+    '<div class="field"><label>What do you want feedback on?</label><textarea id="f-note" maxlength="240" placeholder="optional — point him at the part you\'re unsure about"></textarea></div>'+
+    '<button class="btn" id="f-send">Send to queue</button>'+
+    '<div class="hint" id="f-err"></div>'+
+    '<div class="hint"><b>One rule:</b> no YouTube, no Spotify. SoundCloud (private is fine) or Dropbox — anything that plays the raw track. Test your link in an incognito tab: if it plays there, it plays for G-REX. Multiple tracks are cool, just don\'t dump a pile in a row — let the queue breathe. Heavy, weird, unfinished all welcome.</div>';
+
+  fz.querySelectorAll("#f-genre .chip").forEach(function(c){ c.onclick=function(){
+    fz.querySelectorAll("#f-genre .chip").forEach(function(x){x.classList.remove("on");});
+    c.classList.add("on"); genre=c.getAttribute("data-g");
+  };});
+
+  document.getElementById("f-send").onclick=function(){
+    var handle=document.getElementById("f-handle").value.trim();
+    var title=document.getElementById("f-title").value.trim();
+    var link=document.getElementById("f-link").value.trim();
+    var note=document.getElementById("f-note").value.trim();
+    var err=document.getElementById("f-err");
+    if(!/^https?:\/\//i.test(link) && /^(www\.|soundcloud\.|dropbox\.)/i.test(link)) link="https://"+link;
+    if(!handle||!title){ err.innerHTML='<b class="bad">Need a handle and a title.</b>'; return; }
+    if(!/^https?:\/\//i.test(link)){ err.innerHTML='<b class="bad">Paste the full link — it should start with http(s)://</b>'; return; }
+    if(/youtube\.com|youtu\.be|spotify\.com/i.test(link)){ err.innerHTML='<b class="bad">No YouTube or Spotify — drop a SoundCloud or Dropbox link.</b>'; return; }
+    var btn=document.getElementById("f-send"); btn.disabled=true; btn.textContent="Sending…";
+
+    sb.from("queue").insert({handle:handle,title:title,link:link,note:note||null,genre:genre||null})
+    .then(function(r){
+      if(r.error) throw r.error;
+      return sb.from("queue").select("id",{count:"exact",head:true}).eq("status","queued");
+    }).then(function(r){
+      var pos=r.count||1;
+      fz.innerHTML='<div class="confirm"><div class="big">You\'re in.</div><div class="pos">#'+pos+'</div>'+
+        '<div class="sub"><b class="amber">'+esc(handle)+'</b> — "'+esc(title)+'"<br>Position in queue. Keep the stream open — G-REX pulls from the top.</div>'+
+        '<button class="btn ghost" style="margin-top:18px" onclick="location.reload()">Done</button></div>';
+    }).catch(function(e){
+      btn.disabled=false; btn.textContent="Send to queue";
+      var m=(e&&e.message)||"";
+      if(/row-level|policy|violates/i.test(m)) err.innerHTML='<b class="bad">Submissions just closed.</b>';
+      else err.innerHTML='<b class="bad">Couldn\'t send — try again in a second.</b>';
+    });
+  };
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function renderDashboard(){
+  if(!CONFIGURED){ notConfigured(); return; }
+  if(!PIN){ renderPinGate(); return; }
+  app.innerHTML='<div class="wrap">'+
+    '<div class="mast"><div class="brand">'+wordmark()+'<small>DASHBOARD'+(isOwner()?'':' &middot; MOD')+'</small></div><span id="pill"></span></div>'+
+    nav('queue')+
+    '<div class="dashbar"><button class="toggle" id="d-toggle"></button><div class="spacer"></div>'+
+    (isOwner()?'<button class="miniact" id="d-clear">Clear reviewed</button>':'')+
+    '<button class="miniact danger" id="d-lock">Lock</button></div>'+
+    '<div id="d-now"></div>'+
+    '<div class="seclabel">Up next <span class="ct" id="d-upct"></span></div>'+
+    '<div id="d-queue" class="rack"></div>'+
+    '<div class="seclabel">Reviewed</div>'+
+    '<div id="d-done" class="rack"></div>'+
+    '<div class="foot"><span>v1.2.0</span><span>LIVE</span></div></div>';
+  var dc=document.getElementById("d-clear"); if(dc) dc.onclick=function(){ admin("clear_reviewed"); };
+  document.getElementById("d-lock").onclick=function(){ PIN=""; ROLE=""; localStorage.removeItem("pq_pin"); localStorage.removeItem("pq_role"); render(); };
+  onState(function(){
+    var p=document.getElementById("pill"); if(p) p.innerHTML=pill();
+    var dt=document.getElementById("d-toggle");
+    if(dt){ dt.innerHTML='Submissions: <b class="'+(State.open?'amber':'bad')+'">'+(State.open?'OPEN':'CLOSED')+'</b>'+(isOwner()?(' · tap to '+(State.open?'close':'open')):'');
+      if(isOwner()) dt.onclick=function(){ admin(State.open?"close":"open"); }; }
+    var c=current(), list=queued(), done=reviewed();
+    var upct=document.getElementById("d-upct"); if(upct) upct.textContent=list.length;
+    var now=document.getElementById("d-now"); if(!now) return;
+    now.innerHTML = c ? stripView(c,"▸","live",(isOwner()?'<button class="go" data-a="done" data-id="'+c.id+'">Done</button>':''))
+      : '<div class="empty"><b>Nothing armed.</b>Hit Review on a strip below to put it on the overlay.</div>';
+    document.getElementById("d-queue").innerHTML = list.length ?
+      list.map(function(it,i){return stripView(it,i+1,"plain",
+        (isOwner()?'<button class="go" data-a="review" data-id="'+it.id+'">Review</button>':'')+
+        '<button data-a="bump" data-id="'+it.id+'">Bump ↑</button>'+
+        '<button data-a="skip" data-id="'+it.id+'">Skip</button>'+
+        '<button class="kill" data-a="delete" data-id="'+it.id+'">✕</button>');}).join("")
+      : '<div class="empty">'+(State.open?"Queue's empty — waiting on submissions.":"Closed and empty.")+'</div>';
+    document.getElementById("d-done").innerHTML = done.length ?
+      done.slice().reverse().map(function(it){return stripView(it,"·","done",
+        '<button data-a="requeue" data-id="'+it.id+'">Re-queue</button>'+
+        '<button class="kill" data-a="delete" data-id="'+it.id+'">✕</button>');}).join("")
+      : '<div class="empty" style="padding:18px">Nothing reviewed yet this session.</div>';
+    app.querySelectorAll("[data-a]").forEach(function(b){ b.onclick=function(){ admin(b.getAttribute("data-a"), b.getAttribute("data-id")); }; });
+  });
+}
+function renderPinGate(){
+  app.innerHTML='<div class="wrap"><div class="gate"><div class="g-brand">'+wordmark()+'</div>'+
+    '<p>Crew or mod PIN gets you in. Crew runs the session; mods keep the queue clean.</p>'+
+    '<input id="pin" type="password" placeholder="PIN" style="text-align:center;max-width:260px;margin:0 auto;display:block">'+
+    '<button class="btn" id="unlock" style="max-width:260px;margin:14px auto 0">Unlock</button>'+
+    '<div class="err" id="g-err"></div></div></div>';
+  function go(){
+    var v=document.getElementById("pin").value.trim();
+    getRole(v).then(function(role){
+      if(role==="owner"||role==="mod"){ PIN=v; ROLE=role; localStorage.setItem("pq_pin",v); localStorage.setItem("pq_role",role); render(); }
+      else document.getElementById("g-err").textContent="Wrong PIN.";
+    });
+  }
+  document.getElementById("unlock").onclick=go;
+  document.getElementById("pin").onkeydown=function(e){ if(e.key==="Enter") go(); };
+}
+
+/* ---------------- OVERLAY ---------------- */
+function renderOverlay(){
+  if(!CONFIGURED){ notConfigured(); return; }
+  document.body.classList.add("overlay");
+  app.innerHTML='<div class="ovl" id="ovl"></div>';
+  onState(function(){
+    var c=current(), list=queued(), next=list[0], o=document.getElementById("ovl"); if(!o) return;
+    if(!c){
+      if(!State.open){
+        o.innerHTML='<div class="lab">'+BRAND+' // '+BRAND_TAIL+'</div>'+
+          '<div class="now closednow">QUEUE CLOSED</div>'+
+          (list.length?'<div class="next">'+list.length+' still waiting</div>':''); return;
+      }
+      o.innerHTML='<div class="lab">'+BRAND+' // '+BRAND_TAIL+'</div>'+
+        '<div class="now">'+(list.length?(list.length+" in the queue"):"queue is open")+'</div>'+
+        (next?'<div class="next">UP NEXT &nbsp; <b>'+esc(next.handle)+'</b></div>':''); return;
+    }
+    o.innerHTML='<div class="lab">Now reviewing</div>'+
+      '<div class="now"><span class="h">'+esc(c.handle)+'</span></div>'+
+      '<div class="trk">"'+esc(c.title)+'"'+(c.genre?(' · '+esc(c.genre)):'')+'</div>'+
+      '<div class="mtr"><i></i></div>'+
+      (next?'<div class="next">UP NEXT &nbsp; <b>'+esc(next.handle)+'</b> &nbsp;·&nbsp; '+list.length+' waiting</div>'
+           :'<div class="next">'+list.length+' waiting</div>');
+  });
+}
+
+/* ---------------- mount ---------------- */
+function render(){
+  document.body.classList.remove("overlay");
+  listeners=[];
+  var r=route();
+  if(r==="queue") renderDashboard();
+  else if(r==="overlay") renderOverlay();
+  else renderSubmit();
+  emit();
+}
+window.addEventListener("hashchange",render);
+render();
+startLive();
+
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>PR0CESS_LIVE // TICKER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+:root{
+  --void:#050506; --panel:#0B0C0F; --panel2:#121419;
+  --line:#212429; --line2:#2E3238;
+  --text:#EDEDEB; --dim:#B4B9BF; --dimmer:#676C74;
+  --acc:#3A93D6; --hot:#D8455F;
+  --h:58px; --fs:17px; --pad:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{font-family:'JetBrains Mono',ui-monospace,monospace;-webkit-font-smoothing:antialiased}
+
+/* ============ OVERLAY ============ */
+body.ov{background:transparent;width:100%;height:100%;overflow:hidden}
+#bar{position:fixed;left:0;right:0;display:flex;align-items:stretch;height:var(--h);
+  background:#050506;
+  border-bottom:1px solid var(--line);opacity:0;transition:opacity .5s ease}
+#bar.in{opacity:1}
+body[data-pos="top"] #bar{top:0}
+body[data-pos="bottom"] #bar{bottom:0;border-bottom:none;border-top:1px solid var(--line);
+  background:#050506}
+#pin{display:flex;align-items:center;gap:var(--pad);padding:0 var(--pad);flex:none;
+  position:relative;z-index:2;background:#050506;
+  box-shadow:14px 0 18px -6px #050506}
+#pin.off{display:none}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex:none;
+  box-shadow:0 0 8px rgba(58,147,214,.75);animation:p 2.4s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.35}}
+.brand{font-family:'Code',ui-monospace,monospace;font-size:var(--fs);letter-spacing:.2em;
+  color:#fff;line-height:1;white-space:nowrap}
+.brand .z{color:var(--acc)}
+.rule{width:1px;height:18px;background:var(--line);flex:none}
+.sched{font-size:var(--fs);letter-spacing:.14em;color:var(--text);font-weight:700;
+  line-height:1;white-space:nowrap}
+#tickwrap{flex:1;min-width:0;overflow:hidden;position:relative;display:flex;align-items:center}
+#track{display:flex;flex:none;will-change:transform}
+#track.run{animation:scroll var(--dur,55s) linear infinite}
+@keyframes scroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.seq{display:flex;flex:none;align-items:center}
+.item{font-size:var(--fs);letter-spacing:.14em;color:var(--dim);font-weight:500;
+  white-space:nowrap;padding-left:var(--pad);line-height:1}
+.item b{color:var(--text);font-weight:700}
+.item i{color:var(--acc);font-style:normal;font-weight:700}
+.sep{color:var(--acc);opacity:.55;padding-left:var(--pad);font-weight:700;font-size:var(--fs);
+  line-height:1;flex:none}
+#tickwrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:48px;
+  background:linear-gradient(90deg,rgba(5,5,6,0),#050506);pointer-events:none}
+
+/* ============ DECK ============ */
+body.deck{background:var(--void);color:var(--text);min-height:100vh;padding-bottom:40px}
+.wrap{max-width:640px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:center;gap:12px;padding:6px 0 16px;border-bottom:1px solid var(--line);margin-bottom:18px}
+header .brand{font-size:16px}
+.stat{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:11px;
+  letter-spacing:.16em;color:var(--dimmer)}
+.led{width:7px;height:7px;border-radius:50%;background:var(--dimmer)}
+.led.on{background:var(--acc);box-shadow:0 0 8px rgba(58,147,214,.8)}
+label{display:block;font-size:10px;letter-spacing:.22em;color:var(--dimmer);margin:0 0 7px}
+input[type=text],textarea{width:100%;background:var(--panel);border:1px solid var(--line2);
+  color:var(--text);font:500 15px/1.4 'JetBrains Mono',monospace;padding:13px 14px;border-radius:9px;
+  letter-spacing:.04em}
+input:focus,textarea:focus{outline:none;border-color:var(--acc)}
+button{font:700 13px/1 'JetBrains Mono',monospace;letter-spacing:.16em;border:1px solid var(--line2);
+  background:var(--panel2);color:var(--text);padding:15px 16px;border-radius:9px;cursor:pointer}
+button:active{transform:translateY(1px)}
+.pri{background:var(--acc);border-color:var(--acc);color:#04121d}
+.row{display:flex;gap:9px;margin-top:10px}
+.row button{flex:none}
+.row input{flex:1}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}
+ul{list-style:none}
+li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:none}
+li .txt{flex:1;min-width:0;font-size:13.5px;letter-spacing:.05em;word-break:break-word;line-height:1.4}
+li.off .txt{color:var(--dimmer);text-decoration:line-through}
+li .mini{padding:9px 9px;font-size:11px;border-radius:8px;flex:none;min-width:34px}
+li .del{color:var(--hot);border-color:#3a2229}
+.hint{font-size:11px;color:var(--dimmer);letter-spacing:.06em;line-height:1.6;margin-top:9px}
+.big{width:100%;padding:19px;font-size:14px;letter-spacing:.2em;margin-top:4px}
+#gate{max-width:340px;margin:16vh auto;padding:0 20px;text-align:center}
+#gate .brand{font-size:20px;margin-bottom:26px;display:block}
+#err{color:var(--hot);font-size:12px;letter-spacing:.08em;min-height:18px;margin-top:12px}
+.sub{font-size:11px;letter-spacing:.16em;color:var(--dimmer);margin-bottom:14px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div id="bar" style="display:none">
+  <div id="pin">
+    <div class="dot"></div>
+    <div class="brand">PR<span class="z">0</span>CESS_LIVE</div>
+  </div>
+  <div id="tickwrap"><div id="track"></div></div>
+</div>
+
+<!-- GATE -->
+<div id="gate" style="display:none">
+  <span class="brand">PR<span class="z">0</span>CESS_LIVE // TICKER</span>
+  <div class="sub">CREW ACCESS</div>
+  <input type="password" id="pinbox" inputmode="numeric" placeholder="PIN"
+    style="width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);
+    font:700 20px 'JetBrains Mono',monospace;padding:15px;border-radius:9px;text-align:center;letter-spacing:.4em" />
+  <button class="pri big" id="unlock">UNLOCK</button>
+  <div id="err"></div>
+</div>
+
+<!-- DECK -->
+<div class="wrap" id="deck" style="display:none">
+  <header>
+    <span class="brand">PR<span class="z">0</span>CESS_LIVE // TICKER</span>
+    <div class="stat"><span class="led" id="led"></span><span id="statTxt">OFFLINE</span></div>
+  </header>
+
+  <div class="card">
+    <label>ADD MESSAGE — GOES TO THE END OF THE LOOP</label>
+    <input type="text" id="newMsg" placeholder="GUEST IN THE BUILDING — @HANDLE" autocomplete="off" />
+    <div class="row"><button class="pri" id="add" style="flex:1">ADD TO LOOP</button></div>
+    <div class="hint">**bold** for white · [brackets] for blue · pushes live the second you add it</div>
+  </div>
+
+  <div class="card">
+    <label>LOOP — <span id="cnt">0</span> ACTIVE</label>
+    <ul id="list"></ul>
+  </div>
+
+  <div class="card">
+    <label>PINNED LEFT (ALWAYS ON SCREEN)</label>
+    <input type="text" id="sched" autocomplete="off" />
+    <label style="margin-top:16px">SCROLL SPEED — <span id="spdVal">55</span> PX/SEC</label>
+    <input type="range" id="spd" min="30" max="140" step="5" />
+    <button class="big" id="push">FORCE PUSH TO OVERLAY</button>
+    <div class="hint">Overlay URL — add as a Browser Source, 1920×1080:</div>
+    <input type="text" id="ovurl" readonly onclick="this.select()"
+      style="width:100%;margin-top:8px;background:var(--panel);border:1px solid var(--line2);
+      color:var(--dim);font:400 12px 'JetBrains Mono',monospace;padding:11px;border-radius:8px" />
+    <button class="big" id="copyov" style="margin-top:8px">COPY OBS LINK</button>
+  </div>
+
+  <button class="big" id="lock" style="color:var(--dimmer)">LOCK DECK</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var CHANNEL="ch-4vt8be2qmr7y";            /* own channel — never collides with the slam deck */
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{realtime:{params:{eventsPerSecond:10}}});
+
+/* own storage keys — deliberately NOT pq_* or slam_* */
+var PIN=localStorage.getItem("tk_pin")||"", ROLE=localStorage.getItem("tk_role")||"";
+var IS_OVERLAY=(location.hash.replace("#","").toLowerCase()==="overlay");
+var q=new URLSearchParams(location.search);
+var channel=null, overlayUp=false;
+
+var DEFAULTS={
+  msgs:[
+    {t:"FOLLOW [\u2192] **MON & WED 5PM \u00b7 TUE 4PM ET**",on:1},
+    {t:"BEAT BATTLE EVERY WEDNESDAY \u2014 **OPEN TO ANYONE**",on:1},
+    {t:"**MON & WED 5PM \u00b7 TUE 4PM \u00b7 ET**",on:1},
+    {t:"BEAT BATTLE LEAGUE SEASON 1 \u2014 **STANDINGS LIVE**",on:1},
+    {t:"G-REX \u2014 **GREXOFFICIAL.COM**",on:1},
+    {t:"JOIN THE DISCORD [!DISCORD]",on:1},
+    {t:"CHECK OUT THE HUB [!PROCESSHUB]",on:1}
+  ],
+  sched:"MON & WED 5PM \u00b7 TUE 4PM \u00b7 ET",
+  speed:55
+};
+function loadState(){
+  try{ var s=JSON.parse(localStorage.getItem("tk_state")||"null"); if(s&&s.msgs) return s; }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULTS));
+}
+function saveState(s){ try{ localStorage.setItem("tk_state",JSON.stringify(s)); }catch(e){} }
+var ST=loadState();
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmt(s){
+  return esc(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\[([^\]]+)\]/g,"<i>$1</i>");
+}
+
+/* ---------------- CONNECT ---------------- */
+function connect(){
+  var key=IS_OVERLAY?"overlay":("deck-"+Math.random().toString(36).slice(2,7));
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:key}}});
+
+  channel.on("broadcast",{event:"state"},function(m){
+    if(!IS_OVERLAY) return;
+    if(m.payload&&m.payload.msgs){ ST=m.payload; saveState(ST); renderOverlay(); }
+  });
+  /* a fresh overlay asks any open deck for the current loop */
+  channel.on("broadcast",{event:"req"},function(){
+    if(IS_OVERLAY) return;
+    try{ channel.send({type:"broadcast",event:"state",payload:ST}); }catch(e){}
+  });
+  channel.on("presence",{event:"sync"},function(){
+    if(IS_OVERLAY) return;
+    var st=channel.presenceState(), found=false;
+    Object.keys(st).forEach(function(k){ st[k].forEach(function(m){ if(m.role==="overlay") found=true; }); });
+    overlayUp=found; paintStatus();
+  });
+  channel.subscribe(function(status){
+    if(status==="SUBSCRIBED"){
+      channel.track({role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
+      if(IS_OVERLAY){ try{ channel.send({type:"broadcast",event:"req",payload:{}}); }catch(e){} }
+      else paintStatus();
+    }
+    if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
+      overlayUp=false; if(!IS_OVERLAY) paintStatus();
+      setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} connect(); },3000);
+    }
+  });
+}
+
+/* ---------------- OVERLAY ---------------- */
+var bar,track,tickwrap;
+function renderOverlay(){
+  var live=ST.msgs.filter(function(m){return m.on;});
+  if(!live.length) live=[{t:"**"+(ST.sched||DEFAULTS.sched)+"**"}];
+  var sep=q.get("sep")||"\u25c6";
+
+  function seq(){
+    var d=document.createElement("div"); d.className="seq";
+    live.forEach(function(m){
+      var it=document.createElement("div"); it.className="item"; it.innerHTML=fmt(m.t); d.appendChild(it);
+      var sp=document.createElement("div"); sp.className="sep"; sp.textContent=sep; d.appendChild(sp);
+    });
+    return d;
+  }
+  track.classList.remove("run");
+  track.innerHTML="";
+  var a=seq(); track.appendChild(a); track.appendChild(seq());
+
+  requestAnimationFrame(function(){
+    var w=a.getBoundingClientRect().width||1200;
+    var pps=parseFloat(q.get("speed")||ST.speed||55);
+    track.style.setProperty("--dur",Math.max(8,w/pps)+"s");
+    void track.offsetWidth;
+    track.classList.add("run");
+    bar.classList.add("in");
+  });
+}
+function bootOverlay(){
+  document.body.className="ov";
+  document.body.dataset.pos=(q.get("pos")||"top").toLowerCase();
+  var s=parseFloat(q.get("scale")||"1");
+  if(s&&s!==1){
+    document.body.style.setProperty("--h",(58*s)+"px");
+    document.body.style.setProperty("--fs",(17*s)+"px");
+    document.body.style.setProperty("--pad",(20*s)+"px");
+  }
+  if(q.get("pinned")==="0") document.getElementById("pin").classList.add("off");
+  bar=document.getElementById("bar"); bar.style.display="flex";
+  track=document.getElementById("track"); tickwrap=document.getElementById("tickwrap");
+  renderOverlay();          /* cached state paints instantly, before the socket is up */
+  connect();
+}
+
+/* ---------------- DECK ---------------- */
+function paintStatus(){
+  var led=document.getElementById("led"), t=document.getElementById("statTxt");
+  if(!led) return;
+  led.className="led"+(overlayUp?" on":"");
+  t.textContent=overlayUp?"OVERLAY LIVE":"OVERLAY OFF";
+}
+function pushState(){
+  saveState(ST);
+  if(channel){ try{ channel.send({type:"broadcast",event:"state",payload:ST}); }catch(e){} }
+}
+function paintList(){
+  var ul=document.getElementById("list"); ul.innerHTML="";
+  ST.msgs.forEach(function(m,i){
+    var li=document.createElement("li"); if(!m.on) li.className="off";
+    var tx=document.createElement("div"); tx.className="txt"; tx.innerHTML=fmt(m.t); li.appendChild(tx);
+
+    var up=document.createElement("button"); up.className="mini"; up.textContent="\u2191";
+    up.title="move up";
+    up.onclick=function(){ if(i>0){ var x=ST.msgs.splice(i,1)[0]; ST.msgs.splice(i-1,0,x); paintList(); pushState(); } };
+    li.appendChild(up);
+
+    var dn=document.createElement("button"); dn.className="mini"; dn.textContent="\u2193";
+    dn.title="move down";
+    dn.onclick=function(){ if(i<ST.msgs.length-1){ var x=ST.msgs.splice(i,1)[0]; ST.msgs.splice(i+1,0,x); paintList(); pushState(); } };
+    li.appendChild(dn);
+
+    var ed=document.createElement("button"); ed.className="mini"; ed.textContent="EDIT";
+    ed.title="edit this line";
+    ed.onclick=function(){ startEdit(li,tx,m); };
+    li.appendChild(ed);
+
+    var tg=document.createElement("button"); tg.className="mini"; tg.textContent=m.on?"ON":"OFF";
+    tg.onclick=function(){ m.on=m.on?0:1; paintList(); pushState(); };
+    li.appendChild(tg);
+
+    var dl=document.createElement("button"); dl.className="mini del"; dl.textContent="\u2715";
+    dl.onclick=function(){ ST.msgs.splice(i,1); paintList(); pushState(); };
+    li.appendChild(dl);
+
+    ul.appendChild(li);
+  });
+  document.getElementById("cnt").textContent=ST.msgs.filter(function(m){return m.on;}).length;
+}
+
+/* inline edit — swaps the row text for a field, saves on Enter or blur */
+function startEdit(li,tx,m){
+  if(li.querySelector("input.editfield"))return;
+  var inp=document.createElement("input");
+  inp.type="text"; inp.className="editfield"; inp.value=m.t;
+  inp.style.cssText="flex:1;min-width:0;background:var(--void);border:1px solid var(--acc);"+
+    "color:var(--text);font:inherit;font-size:13px;letter-spacing:.06em;padding:7px 9px;outline:none";
+  tx.style.display="none";
+  li.insertBefore(inp,tx.nextSibling);
+  inp.focus(); inp.select();
+  var done=false;
+  function save(commit){
+    if(done)return; done=true;
+    if(commit){
+      var v=inp.value.trim();
+      if(v) m.t=v;
+    }
+    if(inp.parentNode) inp.parentNode.removeChild(inp);
+    tx.style.display="";
+    paintList();
+    if(commit) pushState();
+  }
+  inp.onkeydown=function(e){
+    if(e.key==="Enter"){ e.preventDefault(); save(true); }
+    if(e.key==="Escape"){ e.preventDefault(); save(false); }
+  };
+  inp.onblur=function(){ save(true); };
+}
+function wireOvLink(){
+  var f=document.getElementById("ovurl"); if(!f)return;
+  var u=location.origin+location.pathname+"#overlay";
+  f.value=u;
+  var b=document.getElementById("copyov");
+  if(b) b.onclick=function(){
+    f.select();
+    var ok=false;
+    try{ ok=document.execCommand("copy"); }catch(e){}
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(function(){},function(){});
+    b.textContent=ok?"COPIED":"SELECT + CTRL-C";
+    setTimeout(function(){ b.textContent="COPY OBS LINK"; },1800);
+  };
+}
+
+function bootDeck(){
+  wireOvLink();
+  document.body.className="deck";
+  document.getElementById("deck").style.display="block";
+  document.getElementById("sched").value=ST.sched||DEFAULTS.sched;
+  document.getElementById("spd").value=ST.speed||55;
+  document.getElementById("spdVal").textContent=ST.speed||55;
+  paintList(); paintStatus(); connect();
+
+  function addMsg(){
+    var el=document.getElementById("newMsg"), v=el.value.trim();
+    if(!v) return;
+    ST.msgs.push({t:v,on:1});     /* always appended to the end */
+    el.value=""; paintList(); pushState();
+  }
+  document.getElementById("add").onclick=addMsg;
+  document.getElementById("newMsg").addEventListener("keydown",function(e){ if(e.key==="Enter") addMsg(); });
+
+  document.getElementById("sched").addEventListener("change",function(){
+    ST.sched=this.value; pushState();
+  });
+  document.getElementById("spd").addEventListener("input",function(){
+    document.getElementById("spdVal").textContent=this.value;
+  });
+  document.getElementById("spd").addEventListener("change",function(){
+    ST.speed=parseInt(this.value,10); pushState();
+  });
+  document.getElementById("push").onclick=function(){
+    pushState(); this.textContent="PUSHED"; var b=this;
+    setTimeout(function(){ b.textContent="FORCE PUSH TO OVERLAY"; },1200);
+  };
+  document.getElementById("lock").onclick=function(){
+    localStorage.removeItem("tk_pin"); localStorage.removeItem("tk_role"); location.reload();
+  };
+}
+
+/* ---------------- GATE ---------------- */
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function bootGate(){
+  document.body.className="deck";
+  document.getElementById("gate").style.display="block";
+  var inp=document.getElementById("pinbox"), err=document.getElementById("err"), btn=document.getElementById("unlock");
+  function tryPin(){
+    var v=inp.value.trim(); if(!v) return;
+    btn.textContent="CHECKING"; err.textContent="";
+    getRole(v).then(function(role){
+      if(role){
+        localStorage.setItem("tk_pin",v); localStorage.setItem("tk_role",role);
+        document.getElementById("gate").style.display="none"; bootDeck();
+      } else { err.textContent="NOT RECOGNISED"; btn.textContent="UNLOCK"; inp.value=""; }
+    }).catch(function(){ err.textContent="CONNECTION FAILED"; btn.textContent="UNLOCK"; });
+  }
+  btn.onclick=tryPin;
+  inp.addEventListener("keydown",function(e){ if(e.key==="Enter") tryPin(); });
+}
+
+/* ---------------- BOOT ---------------- */
+if(IS_OVERLAY) bootOverlay();
+else if(PIN && ROLE) bootDeck();
+else bootGate();
+})();
+</script>
+</body>
+</html>

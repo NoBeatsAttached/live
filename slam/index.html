@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#030303" />
+<title>PR0CESS_LIVE // SLAM DECK</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAzklEQVR4nGNkZmZmoCVgoqnpoxaMDAtYsIraHP7z88VDdgl5rOTpUGXiLcDug78/vuJBFPkA4nZmDm5mDu7jrvyYsswc3BA1RPoD3Qf4XUqGP9B9AHE7BKG5He4zTFkq+IDsmCDsA0y3U9kHFKYlwj5ATlGQVEQTH+CSpcgHyKGPy38U+QB/fJDpA0yAmZ9JAug+wJ8cyQgidB8gB8IRW3yyVPABpmoyfMCItdliufsjnvrgXKwekaZj8QGmS8kuJPD5gIpg6Ff6oxYMvAUAR5QXjHuOjbQAAAAASUVORK5CYII=" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--void:#030303;--panel:#0A0A0A;--panel-2:#101010;--line:#1E1E1E;--line2:#2B2B2B;
+  --text:#EDEDED;--dim:#8C8C8C;--dimmer:#4A4A4A;--electric:#3FC6FF;--hot:#FF2E5F;}
+html,body{height:100%}
+body{background:var(--void);color:var(--text);font-family:'JetBrains Mono',ui-monospace,monospace}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;
+  background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.22) 2px 3px)}
+
+body.overlay{background:transparent;overflow:hidden}
+body.overlay::after{display:none}
+body.overlay #app{display:none}
+
+#stage{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10}
+body:not(.overlay) #stage{display:none}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9}
+body:not(.overlay) #flash{display:none}
+#flash.hit{animation:flashHit .1s ease-out both}
+@keyframes flashHit{0%{opacity:.40}100%{opacity:0}}
+
+.shot{position:absolute;display:block;width:var(--w);height:auto;filter:drop-shadow(0 18px 40px rgba(0,0,0,.55))}
+.shot.slam{left:50%;top:50%;transform:translate(-50%,-50%)}
+.shot.slam.in{animation:slamIn .40s cubic-bezier(.16,1.5,.32,1) both}
+.shot.slam.out{animation:slamOut .26s cubic-bezier(.5,0,.75,0) both}
+@keyframes slamIn{0%{transform:translate(-50%,-50%) scale(5) rotate(-9deg);opacity:0}
+  40%{opacity:1}62%{transform:translate(-50%,-50%) scale(.86) rotate(3deg);opacity:1}
+  80%{transform:translate(-50%,-50%) scale(1.07) rotate(-1.5deg)}
+  100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}
+@keyframes slamOut{0%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
+
+.shot.drop{left:50%;top:14%;transform:translate(-50%,0)}
+.shot.drop.in{animation:dropIn .62s cubic-bezier(.3,1.4,.5,1) both}
+.shot.drop.out{animation:dropOut .34s cubic-bezier(.6,0,.9,.2) both}
+@keyframes dropIn{0%{transform:translate(-50%,-160vh) rotate(-6deg)}
+  70%{transform:translate(-50%,4vh) rotate(2deg)}100%{transform:translate(-50%,0) rotate(0)}}
+@keyframes dropOut{0%{transform:translate(-50%,0);opacity:1}
+  100%{transform:translate(-50%,150vh) rotate(12deg);opacity:.4}}
+
+.shot.corner{right:3vw;bottom:5vh;transform-origin:100% 100%}
+.shot.corner.in{animation:cornerIn .34s cubic-bezier(.16,1.5,.32,1) both}
+.shot.corner.out{animation:cornerOut .24s ease-in both}
+@keyframes cornerIn{0%{transform:scale(0) rotate(14deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes cornerOut{0%{transform:scale(1);opacity:1}100%{transform:scale(.2) translateX(40%);opacity:0}}
+
+.shot.fade{left:50%;top:50%;transform:translate(-50%,-50%)}
+.shot.fade.in{animation:fadeIn .55s ease-out both}
+.shot.fade.out{animation:fadeOut .55s ease-in both}
+@keyframes fadeIn{0%{opacity:0;transform:translate(-50%,-50%) scale(1.04)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes fadeOut{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.02)}}
+
+.shot.sweep{top:50%;left:0}
+.shot.sweep.in{animation:sweepGo var(--hold) linear both}
+@keyframes sweepGo{0%{transform:translate(-110vw,-50%) rotate(-4deg)}
+  100%{transform:translate(110vw,-50%) rotate(4deg)}}
+
+.wrap{max-width:680px;margin:0 auto;padding:5vh 20px 44px;display:flex;flex-direction:column;gap:18px}
+.mast{text-align:center}
+.brand{font-family:'Code','JetBrains Mono',monospace;font-size:clamp(15px,3.2vw,21px);letter-spacing:.2em;color:#FFF}
+.brand .z{color:var(--electric)}
+
+.status{display:flex;align-items:center;gap:9px;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:11px 2px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dimmer);flex:none}
+.dot.live{background:var(--electric);box-shadow:0 0 0 0 rgba(63,198,255,.7);animation:pulse 2s infinite}
+.dot.dead{background:var(--hot)}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(63,198,255,0)}100%{box-shadow:0 0 0 0 rgba(63,198,255,0)}}
+.status .who{margin-left:auto;color:var(--electric)}
+
+.setlab{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{background:var(--panel);border:1px solid var(--line2);color:var(--dim);font:inherit;font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;padding:9px 13px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--electric);color:var(--electric)}
+.chip[aria-pressed="true"]{border-color:var(--electric);color:var(--electric);background:rgba(63,198,255,.08)}
+
+#board{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:8px}
+.tile{position:relative;background:var(--panel);border:1px solid var(--line2);aspect-ratio:1/1;cursor:pointer;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;padding:9px;transition:.12s}
+.tile:hover{border-color:var(--electric)}
+.tile img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none}
+.tile .noimg{font-size:9px;letter-spacing:.14em;color:var(--dimmer);text-align:center;line-height:1.6}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(3,3,3,.95) 55%);
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:15px 5px 5px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .arm{position:absolute;left:0;bottom:0;height:2px;background:var(--electric);width:0}
+.tile.fired{border-color:var(--electric)}
+.tile.fired .arm{width:100%;transition:width var(--cd) linear}
+.tile.locked{opacity:.32;pointer-events:none}
+.tile .del{position:absolute;top:0;right:0;width:26px;height:26px;background:var(--hot);color:#000;
+  border:none;font:inherit;font-size:13px;font-weight:700;line-height:26px;cursor:pointer;display:none}
+body.editing .tile .del{display:block}
+body.editing .tile{border-color:var(--hot)}
+
+.tile.add{border-style:dashed;border-color:var(--line2);flex-direction:column;gap:5px}
+.tile.add .plus{font-size:22px;color:var(--electric);line-height:1}
+.tile.add .t{font-size:9px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+
+.empty-board{border:1px dashed var(--line2);padding:26px 18px;text-align:center}
+.empty-board p{font-size:11px;letter-spacing:.1em;color:var(--dim);line-height:1.8}
+
+#kill{width:100%;background:transparent;border:1px solid var(--hot);color:var(--hot);font:inherit;font-weight:700;
+  font-size:11px;letter-spacing:.26em;text-transform:uppercase;padding:15px;cursor:pointer;transition:.15s}
+#kill:hover{background:var(--hot);color:#000}
+
+#log{border-top:1px solid var(--line);padding-top:12px}
+#log .line{display:flex;gap:12px;font-size:10px;letter-spacing:.1em;color:var(--dim);padding:4px 0}
+#log .line .t{color:var(--electric);flex:none}
+#log .line .n{text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#log .empty{font-size:10px;letter-spacing:.16em;color:var(--dimmer);text-transform:uppercase;padding:4px 0}
+
+.gatebox{max-width:280px;margin:0 auto;width:100%}
+.gatebox input{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;
+  font-size:15px;padding:12px;text-align:center}
+.gatebox input:focus{outline:none;border-color:var(--electric)}
+.act{background:var(--electric);color:#000;border:none;font:inherit;font-weight:700;font-size:13px;
+  letter-spacing:.1em;text-transform:uppercase;padding:14px 30px;cursor:pointer;transition:.15s}
+.act:hover{filter:brightness(1.12)}
+.act.ghost{background:transparent;border:1px solid var(--line2);color:var(--text);font-weight:500}
+.act.ghost:hover{border-color:var(--electric);color:var(--electric);filter:none}
+.hint{font-size:12px;color:var(--dim);line-height:1.6}
+.help{text-align:center;border-top:1px solid var(--line);padding-top:16px}
+.help a{color:var(--electric);text-decoration:none}
+.help .sub{color:var(--dim);margin-left:16px}
+
+/* add / edit sheet */
+#sheet{position:fixed;inset:0;background:rgba(3,3,3,.92);z-index:200;display:none;
+  align-items:flex-start;justify-content:center;overflow-y:auto;padding:6vh 18px 40px}
+#sheet.open{display:flex}
+.card{width:100%;max-width:380px;background:var(--panel-2);border:1px solid var(--line2);padding:22px}
+.card h2{font-family:'Code','JetBrains Mono',monospace;font-size:14px;letter-spacing:.2em;margin-bottom:18px;font-weight:400}
+.fld{margin-bottom:15px}
+.fld label{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.fld input[type=text],.fld input[type=url],.fld textarea{width:100%;background:var(--void);border:1px solid var(--line2);
+  color:var(--text);font:inherit;font-size:13px;padding:11px}
+.fld input:focus,.fld textarea:focus{outline:none;border-color:var(--electric)}
+.fld textarea{min-height:90px;resize:vertical;font-size:11px}
+.fld input[type=range]{width:100%;accent-color:var(--electric)}
+.sizeval{float:right;color:var(--electric);font-size:11px}
+.prev{height:120px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  margin-bottom:15px;background:var(--void);overflow:hidden}
+.prev img{max-width:100%;max-height:100%;object-fit:contain}
+.prev .ph{font-size:10px;letter-spacing:.16em;color:var(--dimmer);text-transform:uppercase}
+.cardbtns{display:flex;gap:8px;margin-top:6px}
+.cardbtns .act{flex:1;padding:13px 10px;font-size:12px}
+.err{color:var(--hot);font-size:11px;letter-spacing:.08em;min-height:15px;margin-top:4px}
+
+@media (prefers-reduced-motion:reduce){body:not(.overlay) *{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<div id="stage"></div>
+<div id="app"></div>
+<div id="sheet"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* PR0CESS_LIVE // SLAM DECK
+   (no hash) -> PIN-gated control deck.  #overlay -> transparent OBS source.
+   Nothing in here needs editing. The board is built from inside the app. */
+(function(){
+"use strict";
+
+var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var CHANNEL="ch-7qm2xk9vp4wd";
+var COOLDOWN=2500;
+
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{realtime:{params:{eventsPerSecond:20}}});
+var app=document.getElementById("app");
+var sheet=document.getElementById("sheet");
+var stage=document.getElementById("stage");
+var flash=document.getElementById("flash");
+
+/* own storage keys — deliberately NOT pq_* so this can never log you out of the timer */
+var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_role")||"";
+var IS_OVERLAY=(location.hash.replace("#","").toLowerCase()==="overlay");
+var channel=null, overlayUp=false, editing=false;
+var pickStyle=null, pickHold=2500, shots=[];
+
+function loadBoard(){ try{ return JSON.parse(localStorage.getItem("slam_board")||"[]"); }catch(e){ return []; } }
+function saveBoard(b){ localStorage.setItem("slam_board",JSON.stringify(b)); }
+var BOARD=loadBoard();
+
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+
+function connect(){
+  var key=IS_OVERLAY?"overlay":("deck-"+Math.random().toString(36).slice(2,7));
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:key}}});
+  channel.on("broadcast",{event:"slam"},function(m){ if(IS_OVERLAY) fire(m.payload); });
+  channel.on("broadcast",{event:"clear"},function(){ if(IS_OVERLAY) stage.innerHTML=""; });
+  channel.on("presence",{event:"sync"},function(){
+    if(IS_OVERLAY)return;
+    var st=channel.presenceState(), found=false;
+    Object.keys(st).forEach(function(k){ st[k].forEach(function(m){ if(m.role==="overlay") found=true; }); });
+    overlayUp=found; paintStatus();
+  });
+  channel.subscribe(function(status){
+    if(status==="SUBSCRIBED"){
+      channel.track({role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
+      if(!IS_OVERLAY) paintStatus();
+    }
+    if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
+      overlayUp=false; if(!IS_OVERLAY) setStatus(false,"Reconnecting");
+      setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} connect(); },3000);
+    }
+  });
+}
+
+/* ---------------- OVERLAY ---------------- */
+function fire(p){
+  if(!p||!p.src)return;
+  var style=p.style||"slam", hold=Math.max(400,p.hold||2500);
+  var img=document.createElement("img");
+  img.className="shot "+style;
+  img.style.setProperty("--w",(p.size||32)+"vw");
+  img.style.setProperty("--hold",hold+"ms");
+  img.onerror=function(){ if(img.parentNode) img.parentNode.removeChild(img); };
+  img.src=p.src;
+  stage.appendChild(img);
+  if(style==="slam"){ flash.classList.remove("hit"); void flash.offsetWidth; flash.classList.add("hit"); }
+  requestAnimationFrame(function(){ img.classList.add("in"); });
+  if(style==="sweep"){
+    setTimeout(function(){ if(img.parentNode) img.parentNode.removeChild(img); },hold+150);
+  }else{
+    setTimeout(function(){
+      img.classList.remove("in"); img.classList.add("out");
+      setTimeout(function(){ if(img.parentNode) img.parentNode.removeChild(img); },640);
+    },hold);
+  }
+}
+
+/* ---------------- DECK ---------------- */
+function setStatus(live,text){
+  var d=document.getElementById("dot"), s=document.getElementById("stat");
+  if(!d||!s)return;
+  d.className="dot "+(live?"live":"dead"); s.textContent=text;
+}
+function paintStatus(){ setStatus(overlayUp, overlayUp?"Overlay live":"Overlay not open"); }
+
+function renderDeck(){
+  document.body.className="";
+  if(!PIN||!ROLE){ renderGate(); return; }
+  app.innerHTML=
+  '<div class="wrap">'+
+    '<div class="mast"><div class="brand">PR<span class="z">0</span>CESS_LIVE <span class="z">//</span> SLAM DECK</div></div>'+
+    '<div class="status"><span class="dot" id="dot"></span><span id="stat">Connecting</span><span class="who" id="who"></span></div>'+
+    '<div><div class="setlab">Entrance</div><div class="chips" id="styles"></div></div>'+
+    '<div><div class="setlab">Hold</div><div class="chips" id="holds"></div></div>'+
+    '<div><div class="setlab">Board <a href="#" id="editlink" style="color:var(--electric);text-decoration:none;margin-left:10px;font-size:9px">edit</a></div><div id="boardzone"></div></div>'+
+    '<button id="kill">Clear the screen</button>'+
+    '<div id="log"><div class="empty">No shots yet</div></div>'+
+    '<div class="hint help">In OBS: Browser source, 1920\u00D71080, dragged to the top of the scene.'+
+      '<br><input id="ovurl" readonly onclick="this.select()" style="width:100%;max-width:420px;margin:10px auto 0;display:block;'+
+      'background:var(--panel);border:1px solid var(--line2);color:var(--dim);font:inherit;font-size:11px;padding:9px;text-align:center">'+
+      '<a href="#" id="copyov" style="display:inline-block;margin-top:9px">copy OBS link</a>'+
+      '<a href="#overlay" target="_blank" class="sub">open overlay \u2197</a>'+
+      '<a href="#" id="sharelink" class="sub">share board</a>'+
+      '<a href="#" id="lock" class="sub">lock</a></div>'+
+  '</div>';
+  document.getElementById("who").textContent=ROLE;
+  buildChips(); buildBoard(); paintLog();
+
+  document.getElementById("kill").onclick=function(){
+    if(channel){ try{ channel.send({type:"broadcast",event:"clear",payload:{}}); }catch(e){} }
+    addLog("Cleared"); if(navigator.vibrate) navigator.vibrate([12,40,12]);
+  };
+  document.getElementById("editlink").onclick=function(e){
+    e.preventDefault(); editing=!editing;
+    document.body.classList.toggle("editing",editing);
+    this.textContent=editing?"done":"edit";
+  };
+  document.getElementById("sharelink").onclick=function(e){ e.preventDefault(); openShare(); };
+  (function(){
+    var f=document.getElementById("ovurl"); if(!f)return;
+    var u=location.origin+location.pathname+"#overlay";
+    f.value=u;
+    var b=document.getElementById("copyov");
+    if(b) b.onclick=function(e){
+      e.preventDefault(); f.select();
+      var ok=false; try{ ok=document.execCommand("copy"); }catch(err){}
+      if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(function(){},function(){});
+      b.textContent=ok?"copied":"select + ctrl-c";
+      setTimeout(function(){ b.textContent="copy OBS link"; },1800);
+    };
+  })();
+  document.getElementById("lock").onclick=function(e){ e.preventDefault();
+    PIN="";ROLE="";localStorage.removeItem("slam_pin");localStorage.removeItem("slam_role");render(); };
+  connect();
+}
+
+function buildChips(){
+  var sWrap=document.getElementById("styles");
+  [["As set",null],["Slam","slam"],["Fade","fade"],["Drop","drop"],["Corner","corner"],["Fly by","sweep"]].forEach(function(pair){
+    var b=document.createElement("button");
+    b.className="chip"; b.textContent=pair[0];
+    b.setAttribute("aria-pressed",String(pickStyle===pair[1]));
+    b.onclick=function(){ pickStyle=pair[1];
+      Array.prototype.forEach.call(sWrap.children,function(c){c.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true"); };
+    sWrap.appendChild(b);
+  });
+  var hWrap=document.getElementById("holds");
+  [["1s",1000],["2.5s",2500],["5s",5000],["10s",10000]].forEach(function(pair){
+    var b=document.createElement("button");
+    b.className="chip"; b.textContent=pair[0];
+    b.setAttribute("aria-pressed",String(pickHold===pair[1]));
+    b.onclick=function(){ pickHold=pair[1];
+      Array.prototype.forEach.call(hWrap.children,function(c){c.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true"); };
+    hWrap.appendChild(b);
+  });
+}
+
+function buildBoard(){
+  var zone=document.getElementById("boardzone");
+  if(!zone)return;
+  zone.innerHTML="";
+  if(!BOARD.length){
+    var e=document.createElement("div");
+    e.className="empty-board";
+    e.innerHTML='<p>Nothing on the board yet.<br>Add your first meme to start firing.</p>'+
+      '<button class="act" id="firstadd" style="margin-top:16px">Add a meme</button>';
+    zone.appendChild(e);
+    document.getElementById("firstadd").onclick=function(){ openEditor(null); };
+    return;
+  }
+  var board=document.createElement("div");
+  board.id="board";
+  BOARD.forEach(function(s,i){
+    var t=document.createElement("div");
+    t.className="tile"; t.style.setProperty("--cd",COOLDOWN+"ms");
+    var im=document.createElement("img"); im.alt="";
+    im.onerror=function(){
+      if(im.parentNode) im.parentNode.removeChild(im);
+      var d=document.createElement("div"); d.className="noimg"; d.textContent="LINK DEAD"; t.insertBefore(d,t.firstChild);
+    };
+    im.src=s.src; t.appendChild(im);
+    var cap=document.createElement("div"); cap.className="cap"; cap.textContent=s.label; t.appendChild(cap);
+    var arm=document.createElement("div"); arm.className="arm"; t.appendChild(arm);
+    var del=document.createElement("button"); del.className="del"; del.textContent="\u2715";
+    del.onclick=function(ev){ ev.stopPropagation(); BOARD.splice(i,1); saveBoard(BOARD); buildBoard(); };
+    t.appendChild(del);
+    t.onclick=function(){ if(editing) openEditor(i); else shoot(s,t); };
+    board.appendChild(t);
+  });
+  var add=document.createElement("div");
+  add.className="tile add";
+  add.innerHTML='<div class="plus">+</div><div class="t">Add</div>';
+  add.onclick=function(){ openEditor(null); };
+  board.appendChild(add);
+  zone.appendChild(board);
+}
+
+function shoot(s,tile){
+  if(tile.classList.contains("locked"))return;
+  var payload={src:s.src,style:pickStyle||s.style||"slam",size:s.size||32,hold:pickHold};
+  if(channel){ try{ channel.send({type:"broadcast",event:"slam",payload:payload}); }catch(e){} }
+  tile.classList.add("locked","fired"); void tile.offsetWidth;
+  setTimeout(function(){ tile.classList.remove("locked","fired"); },COOLDOWN);
+  addLog(s.label);
+  if(navigator.vibrate) navigator.vibrate(18);
+}
+
+function addLog(name){
+  var d=new Date(); function p(n){return (n<10?"0":"")+n;}
+  shots.unshift({t:p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds()),name:name});
+  shots.splice(8); paintLog();
+}
+function paintLog(){
+  var logEl=document.getElementById("log"); if(!logEl)return;
+  if(!shots.length){ logEl.innerHTML='<div class="empty">No shots yet</div>'; return; }
+  logEl.innerHTML="";
+  shots.forEach(function(s){
+    var l=document.createElement("div"); l.className="line";
+    var a=document.createElement("span"); a.className="t"; a.textContent=s.t;
+    var b=document.createElement("span"); b.className="n"; b.textContent=s.name;
+    l.appendChild(a); l.appendChild(b); logEl.appendChild(l);
+  });
+}
+
+/* ---------------- add / edit sheet ---------------- */
+function openEditor(idx){
+  var cur=(idx===null)?{label:"",src:"",style:"slam",size:34}:BOARD[idx];
+  sheet.innerHTML=
+  '<div class="card">'+
+    '<h2>'+(idx===null?"ADD MEME":"EDIT MEME")+'</h2>'+
+    '<div class="prev" id="prev"><span class="ph">Preview</span></div>'+
+    '<div class="fld"><label>Image link</label><input type="url" id="f_src" placeholder="https://\u2026 .png .gif .jpg"></div>'+
+    '<div class="fld"><label>Name on the tile</label><input type="text" id="f_label" maxlength="18" placeholder="Cooked"></div>'+
+    '<div class="fld"><label>Entrance</label><div class="chips" id="f_style"></div></div>'+
+    '<div class="fld"><label>Size <span class="sizeval" id="f_sizeval"></span></label><input type="range" id="f_size" min="10" max="80"></div>'+
+    '<div class="err" id="f_err"></div>'+
+    '<div class="cardbtns"><button class="act ghost" id="f_cancel">Cancel</button><button class="act" id="f_save">Save</button></div>'+
+  '</div>';
+  sheet.classList.add("open");
+
+  var fSrc=document.getElementById("f_src"), fLab=document.getElementById("f_label"),
+      fSize=document.getElementById("f_size"), fVal=document.getElementById("f_sizeval"),
+      prev=document.getElementById("prev"), err=document.getElementById("f_err");
+  var chosen=cur.style;
+  fSrc.value=cur.src; fLab.value=cur.label; fSize.value=cur.size; fVal.textContent=cur.size+"%";
+
+  var sw=document.getElementById("f_style");
+  [["Slam","slam"],["Fade","fade"],["Drop","drop"],["Corner","corner"],["Fly by","sweep"]].forEach(function(p){
+    var b=document.createElement("button"); b.className="chip"; b.textContent=p[0];
+    b.setAttribute("aria-pressed",String(chosen===p[1]));
+    b.onclick=function(){ chosen=p[1];
+      Array.prototype.forEach.call(sw.children,function(c){c.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true"); };
+    sw.appendChild(b);
+  });
+
+  function paintPrev(){
+    var u=fSrc.value.trim();
+    if(!u){ prev.innerHTML='<span class="ph">Preview</span>'; return; }
+    prev.innerHTML="";
+    var im=document.createElement("img");
+    im.onerror=function(){ prev.innerHTML='<span class="ph">Can\u2019t load that link</span>'; };
+    im.src=u; prev.appendChild(im);
+  }
+  fSrc.addEventListener("input",paintPrev);
+  fSrc.addEventListener("paste",function(){ setTimeout(paintPrev,60); });
+  paintPrev();
+  fSize.addEventListener("input",function(){ fVal.textContent=fSize.value+"%"; });
+
+  document.getElementById("f_cancel").onclick=function(){ sheet.classList.remove("open"); };
+  document.getElementById("f_save").onclick=function(){
+    var u=fSrc.value.trim(), l=fLab.value.trim();
+    if(!u){ err.textContent="Paste an image link first."; return; }
+    if(!/^https?:\/\//i.test(u)){ err.textContent="Link has to start with https://"; return; }
+    if(!l) l="Untitled";
+    var rec={label:l,src:u,style:chosen,size:parseInt(fSize.value,10)};
+    if(idx===null) BOARD.push(rec); else BOARD[idx]=rec;
+    saveBoard(BOARD); sheet.classList.remove("open"); buildBoard();
+  };
+}
+
+function openShare(){
+  sheet.innerHTML=
+  '<div class="card">'+
+    '<h2>SHARE BOARD</h2>'+
+    '<div class="fld"><label>Your board code</label><textarea id="s_out" readonly></textarea></div>'+
+    '<p class="hint" style="margin-bottom:16px">Send this to a mod. They paste it below on their phone and get the same tiles.</p>'+
+    '<div class="fld"><label>Paste a code to load it</label><textarea id="s_in" placeholder="Paste here"></textarea></div>'+
+    '<div class="err" id="s_err"></div>'+
+    '<div class="cardbtns"><button class="act ghost" id="s_close">Close</button><button class="act" id="s_load">Load board</button></div>'+
+  '</div>';
+  sheet.classList.add("open");
+  document.getElementById("s_out").value=JSON.stringify(BOARD);
+  document.getElementById("s_close").onclick=function(){ sheet.classList.remove("open"); };
+  document.getElementById("s_load").onclick=function(){
+    var v=document.getElementById("s_in").value.trim();
+    try{
+      var parsed=JSON.parse(v);
+      if(!Array.isArray(parsed)) throw 0;
+      BOARD=parsed; saveBoard(BOARD); sheet.classList.remove("open"); buildBoard();
+    }catch(e){ document.getElementById("s_err").textContent="That code isn\u2019t valid."; }
+  };
+}
+
+/* ---------------- gate ---------------- */
+function renderGate(){
+  document.body.className="";
+  app.innerHTML='<div class="wrap"><div class="mast"><div class="brand">PR<span class="z">0</span>CESS_LIVE <span class="z">//</span> SLAM DECK</div></div>'+
+    '<div class="gatebox"><p class="hint" style="text-align:center;margin-bottom:14px">Crew PIN to run the deck.</p>'+
+    '<input id="pin" type="password" placeholder="PIN">'+
+    '<button class="act" id="unlock" style="width:100%;margin-top:12px">Unlock</button>'+
+    '<div class="hint" id="gerr" style="text-align:center;margin-top:8px"></div></div></div>';
+  function go(){
+    var v=document.getElementById("pin").value.trim(); if(!v)return;
+    document.getElementById("gerr").textContent="Checking\u2026";
+    getRole(v).then(function(role){
+      if(role==="owner"||role==="mod"){
+        PIN=v;ROLE=role;
+        localStorage.setItem("slam_pin",v);localStorage.setItem("slam_role",role);
+        render();
+      }else{
+        document.getElementById("gerr").textContent="Wrong PIN.";
+        document.getElementById("pin").value="";
+      }
+    }).catch(function(){ document.getElementById("gerr").textContent="Can\u2019t reach the server."; });
+  }
+  document.getElementById("unlock").onclick=go;
+  document.getElementById("pin").onkeydown=function(e){ if(e.key==="Enter") go(); };
+}
+
+function render(){
+  IS_OVERLAY=(location.hash.replace("#","").toLowerCase()==="overlay");
+  editing=false; sheet.classList.remove("open");
+  if(channel){ try{ sb.removeChannel(channel); }catch(e){} channel=null; }
+  if(IS_OVERLAY){ document.body.className="overlay"; connect(); } else renderDeck();
+}
+window.addEventListener("hashchange",render);
+render();
+})();
+</script>
+</body>
+</html>

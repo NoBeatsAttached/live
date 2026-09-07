@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#030303" />
+<title>PR0CESS_LIVE</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAzklEQVR4nGNkZmZmoCVgoqnpoxaMDAtYsIraHP7z88VDdgl5rOTpUGXiLcDug78/vuJBFPkA4nZmDm5mDu7jrvyYsswc3BA1RPoD3Qf4XUqGP9B9AHE7BKG5He4zTFkq+IDsmCDsA0y3U9kHFKYlwj5ATlGQVEQTH+CSpcgHyKGPy38U+QB/fJDpA0yAmZ9JAug+wJ8cyQgidB8gB8IRW3yyVPABpmoyfMCItdliufsjnvrgXKwekaZj8QGmS8kuJPD5gIpg6Ff6oxYMvAUAR5QXjHuOjbQAAAAASUVORK5CYII=" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --void:#050506;--panel:#0B0C0F;--panel-2:#121419;
+  --line:#212429;--line2:#2E3238;
+  --text:#EDEDEB;--dim:#B4B9BF;--dimmer:#676C74;
+  --electric:#3A93D6;--hot:#D8455F;--gold:#B4B9BF;
+}
+body{background:var(--void);color:var(--text);font-family:'JetBrains Mono',ui-monospace,monospace;
+  min-height:100vh;display:flex;flex-direction:column;position:relative;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;
+  background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.22) 2px 3px)}
+.wrap{flex:1;width:100%;max-width:920px;margin:0 auto;padding:7vh 24px 40px;
+  display:flex;flex-direction:column}
+
+/* masthead */
+.mast{text-align:center;margin-bottom:6vh}
+.logo{font-family:'Code','JetBrains Mono',monospace;font-size:clamp(26px,6vw,44px);
+  letter-spacing:.22em;color:#FFF;line-height:1}
+.logo .z{color:var(--electric)}
+.tag{font-size:11px;letter-spacing:.34em;color:var(--dim);text-transform:uppercase;margin-top:14px}
+.mast::after{content:"";display:block;width:60px;height:2px;
+  background:linear-gradient(90deg,var(--electric),transparent);margin:20px auto 0}
+
+/* tiles */
+.tiles{display:flex;flex-direction:column;gap:16px;flex:1}
+.tile{display:block;text-decoration:none;color:inherit;position:relative;
+  background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  border:1px solid var(--line2);padding:30px 28px;transition:border-color .18s,transform .18s;
+  overflow:hidden}
+.tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--tilecol);opacity:.8;transition:width .18s}
+.tile:hover{border-color:var(--tilecol);transform:translateX(3px)}
+.tile:hover::before{width:6px}
+.tile .tnum{position:absolute;right:22px;top:20px;font-size:11px;color:var(--dimmer);letter-spacing:.2em}
+.tile h2{font-family:'Code','JetBrains Mono',monospace;font-size:clamp(20px,4.5vw,30px);
+  letter-spacing:.06em;color:#FFF;margin-bottom:8px}
+.tile .sub{font-size:12.5px;color:var(--dim);letter-spacing:.04em;line-height:1.5;max-width:80%}
+.tile .go{position:absolute;right:24px;bottom:22px;font-size:12px;letter-spacing:.18em;
+  color:var(--tilecol);text-transform:uppercase}
+.tile.battle{--tilecol:var(--hot)}
+.tile.queue{--tilecol:var(--electric)}
+.tile.fix{--tilecol:var(--gold)}
+.tile.timer{--tilecol:var(--electric)}
+.tile.slam{--tilecol:var(--electric)}
+.tile.obs{--tilecol:var(--hot)}
+.tile.ticker{--tilecol:var(--electric)}
+.tile.clips{--tilecol:var(--electric)}
+.crewtag{display:block;text-align:center;margin-top:20px}
+.crewtag a{color:var(--dimmer);font-size:11px;letter-spacing:.16em;text-decoration:none;text-transform:uppercase}
+.crewtag a:hover{color:var(--electric)}
+#crewform{display:flex;flex-direction:column;align-items:center;gap:8px}
+#crewpin{background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;
+  font-size:15px;padding:10px 14px;text-align:center;width:160px;letter-spacing:.3em}
+#crewpin:focus{outline:none;border-color:var(--electric);box-shadow:0 0 0 1px var(--electric)}
+.crewbtn{background:var(--electric);color:#000;border:none;font:inherit;font-weight:700;font-size:12px;
+  letter-spacing:.12em;text-transform:uppercase;padding:10px 22px;cursor:pointer}
+.crewbtn:hover{filter:brightness(1.12)}
+.crewerr{font-size:11px;color:var(--hot);min-height:14px;letter-spacing:.1em}
+.tile.soon{opacity:.55;pointer-events:none}
+.tile.soon .go{color:var(--dim)}
+
+/* footer */
+.foot{border-top:1px solid var(--line);margin-top:6vh;padding-top:22px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot .fbrand{font-family:'Code','JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;color:var(--dim)}
+.foot .fbrand .z{color:var(--electric)}
+.socials{display:flex;align-items:center;gap:10px}
+.soc{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;
+  border:1px solid var(--line2);color:var(--dim);transition:color .18s,border-color .18s,transform .18s}
+.soc svg{width:19px;height:19px}
+.soc:hover{transform:translateY(-2px)}
+.soc.twitch:hover{color:#9146FF;border-color:#9146FF}
+.soc.ig:hover{color:#E1306C;border-color:#E1306C}
+.soc.tiktok:hover{color:#25F4EE;border-color:#25F4EE}
+.soc.yt:hover{color:#FF0000;border-color:#FF0000}
+@media(max-width:560px){.foot{justify-content:center}.socials{width:100%;justify-content:center}}
+@media(max-width:560px){.tile .sub{max-width:100%}.tile .go{position:static;display:block;margin-top:14px}}
+</style>
+
+<style>
+/* ═══ G-REX SYSTEM RESKIN ═══════════════════════════════════════
+   Palette remapped to the grexofficial.com brand-bible tokens.
+   Black / white / silver, dark blue secondary. No neon, no rave.
+   Grain replaces scanlines. OBS overlay views are excluded so
+   nothing lands on stream.
+   ═════════════════════════════════════════════════════════════ */
+body:not(.overlay)::after{
+  content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+::selection{background:#3A93D6;color:#050506}
+</style>
+
+<style>
+/* ═══ PR0CESS_LIVE WORDMARK — canonical lockup ══════════════════
+   Code font · .2em tracking · white · blue zero · blue // divider.
+   Identical across hub, battle, queue, project fix and timer.
+   ═════════════════════════════════════════════════════════════ */
+.brand,.logo,.wordmark,.g-brand,.fbrand,.footmark{
+  font-family:'Code','JetBrains Mono',ui-monospace,monospace;
+  font-weight:400;
+  letter-spacing:.2em;
+  color:#fff;
+}
+.brand,.wordmark,.g-brand{font-size:16px}
+.brand .z,.logo .z,.wordmark .z,.g-brand .z,.fbrand .z{color:var(--electric,#3A93D6)}
+.wordmark span,.brand small,.g-brand small{
+  color:var(--dim);font-weight:400;letter-spacing:.2em;
+}
+.wordmark span .z{color:var(--electric,#3A93D6)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mast">
+    <div class="logo">PR<span class="z">0</span>CESS_LIVE</div>
+    <div class="tag">G-REX // Detroit</div>
+  </div>
+
+  <div class="tiles">
+
+    <a class="tile battle" href="battle/" target="_blank" rel="noopener">
+      <span class="tnum">01</span>
+      <h2>BEAT BATTLE</h2>
+      <div class="sub">G's &amp; VIP's weekly bracket. Enter your track, battle live, defend the crown.</div>
+      <span class="go">Enter &rarr;</span>
+    </a>
+
+    <a class="tile queue" href="queue/" target="_blank" rel="noopener">
+      <span class="tnum">02</span>
+      <h2>THE QUEUE</h2>
+      <div class="sub">Drop your track for live feedback on stream. SoundCloud or Dropbox, straight to G-REX.</div>
+      <span class="go">Submit &rarr;</span>
+    </a>
+
+    <a class="tile fix" href="fix/" target="_blank" rel="noopener">
+      <span class="tnum">03</span>
+      <h2>PROJECT FIX</h2>
+      <div class="sub">Send in your project, get it fixed and doctored live on stream.</div>
+      <span class="go">Send it &rarr;</span>
+    </a>
+
+    <a class="tile timer crewonly" id="timertile" href="timer/" style="display:none" target="_blank" rel="noopener">
+      <span class="tnum">✦</span>
+      <h2>STREAM TIMER</h2>
+      <div class="sub">Crew only — live countdown / count-up overlay control.</div>
+      <span class="go">Open &rarr;</span>
+    </a>
+
+    <a class="tile slam crewonly" id="slamtile" href="slam/" style="display:none" target="_blank" rel="noopener">
+      <span class="tnum">✦</span>
+      <h2>SLAM DECK</h2>
+      <div class="sub">Crew only — fire memes onto the stream in real time.</div>
+      <span class="go">Open &rarr;</span>
+    </a>
+
+    <a class="tile obs owneronly" id="obstile" href="slam/obs.html" style="display:none" target="_blank" rel="noopener">
+      <span class="tnum">◆</span>
+      <h2>OBS CONTROL</h2>
+      <div class="sub">Owner only — move sources, switch scenes, drop things on his screen.</div>
+      <span class="go">Open &rarr;</span>
+    </a>
+
+    <a class="tile ticker crewonly" id="tickertile" href="slam/ticker.html" style="display:none" target="_blank" rel="noopener">
+      <span class="tnum">≡</span>
+      <h2>TICKER</h2>
+      <div class="sub">Crew only — push messages to the scrolling bar on stream.</div>
+      <span class="go">Open &rarr;</span>
+    </a>
+
+    <a class="tile clips crewonly" id="clipstile" href="slam/clips.html" style="display:none" target="_blank" rel="noopener">
+      <span class="tnum">▶</span>
+      <h2>CLIP PLAYER</h2>
+      <div class="sub">Crew only — the reel that plays if the stream drops.</div>
+      <span class="go">Open &rarr;</span>
+    </a>
+
+  </div>
+
+  <div class="crewonly" id="obslinks" style="display:none;max-width:900px;margin:34px auto 0;
+    border:1px solid var(--line);padding:20px 22px">
+    <div style="font-size:11px;letter-spacing:.24em;color:var(--dimmer);margin-bottom:14px">OBS BROWSER SOURCE LINKS</div>
+    <div id="lnks"></div>
+  </div>
+
+  <div class="crewtag">
+    <a href="#" id="crewlink">crew access</a>
+    <div id="crewform" style="display:none;margin-top:12px">
+      <input id="crewpin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" />
+      <button id="crewgo" class="crewbtn">Enter</button>
+      <div id="crewerr" class="crewerr"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="fbrand">PR<span class="z">0</span>CESS_LIVE</div>
+    <div class="socials">
+      <a class="soc twitch" href="https://twitch.tv/GREXBEATZ" target="_blank" rel="noopener" aria-label="Twitch" title="Twitch">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 2 3 6v13h4v3h3l3-3h4l5-5V2H4zm16 11-3 3h-4l-3 3v-3H7V4h13v9zm-6-6h-2v5h2V7zm-5 0H7v5h2V7z"/></svg>
+      </a>
+      <a class="soc ig" href="https://www.instagram.com/pr0cess_live/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.2" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="soc tiktok" href="https://www.tiktok.com/@pr0cess_live" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 3c.3 2.1 1.5 3.6 3.5 4v2.6c-1.3.1-2.5-.3-3.6-1v6.2c0 3.3-2.4 5.9-5.6 5.9S5.2 18.1 5.2 14.9c0-3 2.1-5.3 5-5.5v2.8c-1.3.2-2.2 1.2-2.2 2.6 0 1.5 1.1 2.6 2.5 2.6s2.6-1.1 2.6-2.9V3h3.4z"/></svg>
+      </a>
+      <a class="soc yt" href="http://youtube.com/@PR0CESS_LIVE" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.3 5 12 5 12 5s-4.3 0-7.2.3c-.4.1-1.2.1-2 .9-.6.6-.8 2-.8 2S1.8 9.8 1.8 11.5v1c0 1.6.2 3.3.2 3.3s.2 1.4.8 2c.8.8 1.8.8 2.3.9 1.6.2 6.9.3 6.9.3s4.3 0 7.2-.3c.4-.1 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.3v-1C22.2 9.8 22 8.2 22 8.2zM9.9 14.6V9.4l4.6 2.6-4.6 2.6z"/></svg>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+  var sb = window.supabase.createClient(
+    "https://tewcgwhumtmjvfxcvbxl.supabase.co",
+    "sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn"
+  );
+  var crew = document.getElementById("crewlink");
+  function buildLinks(){
+    var base=location.origin+location.pathname.replace(/[^\/]*$/,"")+"slam/";
+    var rows=[["FOLLOW BAR","follow.html","440 \u00d7 200"],
+              ["TICKER","ticker.html#overlay","1920 \u00d7 1080"],
+              ["SLAM OVERLAY","index.html#overlay","1920 \u00d7 1080"],
+              ["CLIP PLAYER (BRB scene)","clips.html#overlay","1920 \u00d7 1080"]];
+    var w=document.getElementById("lnks"); if(!w)return;
+    w.innerHTML="";
+    rows.forEach(function(r){
+      var d=document.createElement("div");
+      d.style.cssText="display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);flex-wrap:wrap";
+      var n=document.createElement("span");
+      n.style.cssText="font-size:12px;letter-spacing:.1em;color:var(--text);width:210px;flex:none";
+      n.textContent=r[0];
+      var i=document.createElement("input");
+      i.readOnly=true; i.value=base+r[1];
+      i.onclick=function(){ this.select(); };
+      i.style.cssText="flex:1;min-width:240px;background:#0A0A0A;border:1px solid var(--line2);color:var(--dim);font:inherit;font-size:11px;padding:8px 10px";
+      var s2=document.createElement("span");
+      s2.style.cssText="font-size:11px;color:var(--dimmer);width:86px;flex:none";
+      s2.textContent=r[2];
+      var cp=document.createElement("button");
+      cp.textContent="COPY";
+      cp.style.cssText="flex:none;background:transparent;border:1px solid var(--line2);color:var(--dim);"+
+        "font:inherit;font-size:10px;letter-spacing:.16em;padding:9px 15px;cursor:pointer";
+      cp.onmouseover=function(){ this.style.borderColor="var(--electric)"; this.style.color="var(--electric)"; };
+      cp.onmouseout=function(){ if(this.textContent==="COPY"){ this.style.borderColor="var(--line2)"; this.style.color="var(--dim)"; } };
+      cp.onclick=function(){
+        var btn=this, url=i.value;
+        function done(){
+          btn.textContent="COPIED";
+          btn.style.borderColor="var(--electric)"; btn.style.color="var(--electric)";
+          setTimeout(function(){ btn.textContent="COPY";
+            btn.style.borderColor="var(--line2)"; btn.style.color="var(--dim)"; },1600);
+        }
+        if(navigator.clipboard&&navigator.clipboard.writeText){
+          navigator.clipboard.writeText(url).then(done,function(){ i.select(); document.execCommand("copy"); done(); });
+        }else{ i.select(); try{ document.execCommand("copy"); }catch(e){} done(); }
+      };
+      d.appendChild(n); d.appendChild(i); d.appendChild(s2); d.appendChild(cp);
+      w.appendChild(d);
+    });
+  }
+
+  function reveal(role){
+    buildLinks();
+    var i, c=document.querySelectorAll(".crewonly");
+    for(i=0;i<c.length;i++) c[i].style.display="";
+    if(role==="owner"){
+      var o=document.querySelectorAll(".owneronly");
+      for(i=0;i<o.length;i++) o[i].style.display="";
+    }
+    crew.style.display="none";
+    var f=document.getElementById("crewform"); if(f) f.style.display="none";
+  }
+  // if a PIN is already saved from another site, verify it's still valid then show
+  var saved = localStorage.getItem("pq_pin");
+  if(saved){
+    sb.rpc("pq_role",{p_pin:saved}).then(function(r){
+      if(!r.error && (r.data==="owner"||r.data==="mod")) reveal(r.data);
+    });
+  }
+  var form = document.getElementById("crewform");
+  var field = document.getElementById("crewpin");
+  var errbox = document.getElementById("crewerr");
+  crew.addEventListener("click",function(e){
+    e.preventDefault();
+    crew.style.display="none";
+    form.style.display="flex";
+    field.focus();
+  });
+  function submit(){
+    var p = field.value.trim();
+    if(!p) return;
+    errbox.textContent="";
+    sb.rpc("pq_role",{p_pin:p}).then(function(r){
+      if(!r.error && (r.data==="owner"||r.data==="mod")){
+        localStorage.setItem("pq_pin",p);
+        localStorage.setItem("pq_role",r.data);
+        reveal(r.data);
+      } else {
+        errbox.textContent="Wrong PIN";
+        field.value="";
+        field.focus();
+      }
+    });
+  }
+  document.getElementById("crewgo").addEventListener("click",submit);
+  field.addEventListener("keydown",function(e){ if(e.key==="Enter") submit(); });
+})();
+</script>
+</body>
+</html>

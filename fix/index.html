@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT FIX // PR0CESS_LIVE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+
+  :root{
+    --bg:#050506;
+    --panel:#0B0C0F;
+    --panel-2:#121419;
+    --line:#212429;
+    --text:#EDEDEB;
+    --dim:#B4B9BF;
+    --amber:#3A93D6;
+    --amber-dim:#1B4A70;
+    --teal:#B4B9BF;
+    --red:#D8455F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.6}
+  a{color:var(--teal)}
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px 80px}
+
+  /* transport bar */
+  .transport{
+    display:flex;align-items:center;gap:14px;
+    border-bottom:1px solid var(--line);
+    padding:14px 20px;margin:0 -20px 40px;
+    background:linear-gradient(180deg,#101314,#0c0e0f);
+    position:sticky;top:0;z-index:5;
+  }
+  .led{width:10px;height:10px;border-radius:50%;background:#3a413e;flex:none}
+  .led.open{background:var(--amber);box-shadow:0 0 10px var(--amber);animation:pulse 1.6s ease-in-out infinite}
+  .led.closed{background:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @media (prefers-reduced-motion: reduce){.led.open{animation:none}}
+  .wordmark{font-family:'Archivo',system-ui,sans-serif;font-weight:700;letter-spacing:.06em;font-size:15px;white-space:nowrap}
+  .wordmark span{color:var(--dim);font-weight:500}
+  .timecode{margin-left:auto;font-size:13px;color:var(--amber);letter-spacing:.08em;white-space:nowrap}
+  .timecode.closed{color:var(--red)}
+
+  .eyebrow{font-size:11px;letter-spacing:.25em;color:var(--dim);text-transform:uppercase;margin-bottom:10px}
+  h1{font-family:'Archivo',system-ui,sans-serif;font-weight:700;font-size:clamp(30px,7vw,44px);letter-spacing:.01em;line-height:1.1;margin-bottom:14px}
+  h1 em{font-style:normal;color:var(--amber)}
+  .lede{color:var(--dim);max-width:52ch;margin-bottom:36px}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:26px;margin-bottom:22px}
+  .panel h2{font-family:'Archivo',system-ui,sans-serif;font-size:17px;margin-bottom:6px}
+  .panel .sub{color:var(--dim);font-size:13px;margin-bottom:18px}
+
+  .btn{
+    display:inline-block;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;
+    background:var(--amber);color:#161000;border:none;border-radius:4px;
+    padding:12px 22px;cursor:pointer;letter-spacing:.04em;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .btn[disabled]{background:var(--amber-dim);color:#33280f;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);font-weight:500}
+  .btn.ghost:hover{color:var(--text);border-color:var(--dim)}
+
+  label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin:18px 0 6px}
+  input[type=text],input[type=url],textarea{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;
+    color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;padding:11px 12px;
+  }
+  input:focus,textarea:focus{outline:none;border-color:var(--amber)}
+  textarea{min-height:88px;resize:vertical}
+  .hint{font-size:12px;color:var(--dim);margin-top:6px}
+
+  .dropzone{
+    border:1px dashed var(--line);border-radius:4px;background:var(--panel-2);
+    padding:22px;text-align:center;color:var(--dim);cursor:pointer;
+  }
+  .dropzone:hover{border-color:var(--amber);color:var(--text)}
+  .dropzone.hasfile{border-style:solid;border-color:var(--teal);color:var(--teal)}
+  .dropzone input{display:none}
+
+  .status{border-left:3px solid var(--line);padding:12px 16px;margin-top:20px;font-size:13px;display:none;background:var(--panel-2);border-radius:0 4px 4px 0}
+  .status.err{display:block;border-left-color:var(--red);color:#ffb4af}
+  .status.ok{display:block;border-left-color:var(--teal);color:var(--teal)}
+  .status.busy{display:block;border-left-color:var(--amber);color:var(--amber)}
+
+  .bigstate{text-align:center;padding:44px 20px}
+  .bigstate .glyph{font-size:34px;margin-bottom:12px}
+  .bigstate h2{font-family:'Archivo',system-ui,sans-serif;font-size:22px;margin-bottom:8px}
+  .bigstate p{color:var(--dim);max-width:44ch;margin:0 auto}
+
+  .userline{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--dim);margin-bottom:22px}
+  .userline b{color:var(--teal);font-weight:500}
+  .userline button{background:none;border:none;color:var(--dim);font-family:inherit;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+  .userline button:hover{color:var(--text)}
+  .hidden{display:none!important}
+  ol.prep{margin:0;padding-left:22px;color:var(--dim);font-size:13px;line-height:1.6}
+  ol.prep li{margin-bottom:12px;padding-left:4px}
+  ol.prep li:last-child{margin-bottom:0}
+  ol.prep b{color:var(--text)}
+  footer{margin-top:60px;text-align:center}
+  .footmark{font-family:'Archivo',system-ui,sans-serif;font-weight:700;font-size:12px;letter-spacing:.22em;color:#4d5652}
+  .subcallout{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+  .subcallout a{color:var(--amber);font-weight:700;text-decoration:none;white-space:nowrap}
+  .subcallout a:hover{text-decoration:underline}
+</style>
+
+<style>
+/* ═══ G-REX SYSTEM RESKIN ═══════════════════════════════════════
+   Palette remapped to the grexofficial.com brand-bible tokens.
+   Black / white / silver, dark blue secondary. No neon, no rave.
+   ═════════════════════════════════════════════════════════════ */
+body:not(.overlay)::after{
+  content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+::selection{background:#3A93D6;color:#050506}
+</style>
+
+<style>
+/* ═══ PR0CESS_LIVE WORDMARK — canonical lockup ══════════════════
+   Code font · .2em tracking · white · blue zero · blue // divider.
+   Identical across hub, battle, queue, project fix and timer.
+   ═════════════════════════════════════════════════════════════ */
+.brand,.logo,.wordmark,.g-brand,.fbrand,.footmark{
+  font-family:'Code','JetBrains Mono',ui-monospace,monospace;
+  font-weight:400;
+  letter-spacing:.2em;
+  color:#fff;
+}
+.brand,.wordmark,.g-brand{font-size:16px}
+.brand .z,.logo .z,.wordmark .z,.g-brand .z,.fbrand .z{color:var(--electric,#3A93D6)}
+.wordmark span,.brand small,.g-brand small{
+  color:var(--dim);font-weight:400;letter-spacing:.2em;
+}
+.wordmark span .z{color:var(--electric,#3A93D6)}
+
+.packvid{margin-top:26px;border:1px solid var(--line2);background:var(--panel-2);border-radius:12px;overflow:hidden}
+.packvid-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}
+.packvid-tag{font-size:10px;letter-spacing:.2em;color:var(--void,#050506);background:var(--amber);padding:4px 9px;border-radius:5px;font-weight:800}
+.packvid-title{font-size:14px;color:var(--text)}
+.packvid-meta{margin-left:auto;font-size:12px;color:var(--dim)}
+.packvid-player{display:block;width:100%;height:auto;background:#000}
+@media(max-width:560px){.packvid-meta{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="transport">
+    <div class="led" id="led"></div>
+    <div class="wordmark">PR<span class="z">0</span>CESS_LIVE <span><span class="z">//</span> PROJECT FIX</span></div>
+    <div class="timecode" id="timecode">--:--:--:--</div>
+  </div>
+
+  <div class="eyebrow">VIP submissions</div>
+  <h1>Send G-REX your stuck project. <em>Watch him fix it live.</em></h1>
+  <p class="lede">Ableton projects only. Upload an MP3 render of the track you're stuck on — G-REX listens through every submission and picks the project(s) he'll open up and doctor on stream. Active subs (VIPs) only.</p>
+
+  <div class="panel" style="border-left:3px solid var(--amber)">
+    <h2>Read first — prep your project</h2>
+    <p class="sub" style="margin-bottom:16px">If you get picked, we need your actual Ableton project — prepped so it opens clean on G-REX's machine. If it's not prepped, it won't open right and we move to the next winner. Here's the whole checklist:</p>
+
+    <ol class="prep">
+      <li><b>Bounce your MIDI and any non-Ableton plugins to audio.</b> G-REX doesn't have your VSTs (Serum, Vital, Kontakt, etc.), so those tracks need to become audio first. Two ways, whichever you know: <b>(a) Freeze &amp; Flatten</b> — right-click the track name → Freeze Track, then right-click again → Flatten. Or <b>(b) bounce/export the track to audio</b> and drag it back in — either one turns the VST's sound into a plain audio clip anyone can open. Do this for every track running a third-party plugin or instrument. Want the notes visible too? Duplicate the track and mute the MIDI copy before you bounce the other one.</li>
+      <li><b>Leave stock Ableton devices alone.</b> Anything built into Ableton (Operator, Wavetable, stock effects) opens fine on his end — only third-party stuff needs bouncing.</li>
+      <li><b>Pack it into one file — this is the step people miss.</b> Don't zip a folder, and don't send a bare <code style="background:var(--panel-2);padding:1px 5px;border-radius:3px">.als</code> — it'll open with "samples missing" on his machine. In Ableton: <b>View → File Manager → Manage Project</b> <span style="color:var(--dim)">(older versions: File → Manage Files)</span>. Look at the <b>External Files</b> section: if it lists anything, that's your samples living outside the project — hit <b>Collect and Save</b> first. Once that section is clear, hit <b>Create Pack</b> at the bottom, name it, and save. You get one <code style="background:var(--panel-2);padding:1px 5px;border-radius:3px">.alp</code> file with the whole project inside, about half the size.</li>
+      <li><b>Upload &amp; share.</b> Drop the <code style="background:var(--panel-2);padding:1px 5px;border-radius:3px">.alp</code> on Google Drive or Dropbox, set sharing to <b>"anyone with the link,"</b> and paste that link in the form below. <span style="color:var(--dim)">(If Create Pack gives you trouble, a zipped project folder still works — just run File → Collect All and Save first, then zip the whole folder.)</span></li>
+    </ol>
+
+    <div class="packvid">
+      <div class="packvid-head">
+        <span class="packvid-tag">WATCH</span>
+        <span class="packvid-title">Packing your project &mdash; step 3, done right</span>
+        <span class="packvid-meta">56 sec &middot; no sound needed</span>
+      </div>
+      <video class="packvid-player" controls preload="metadata" playsinline poster="pack-walkthrough-poster.jpg">
+        <source src="pack-walkthrough.mp4" type="video/mp4">
+        Your browser can&rsquo;t play this video &mdash; follow the written steps above.
+      </video>
+    </div>
+
+    <p class="sub" style="margin:16px 0 0"><b style="color:var(--amber)">Stuck on the Freeze/Flatten part?</b> Ask in Discord and we'll walk you through it.</p>
+  </div>
+
+  <!-- STATE: logged out -->
+  <div class="panel" id="loginPanel">
+    <h2>Step 1 — Log in with Twitch</h2>
+    <p class="sub">We use your Twitch login to confirm your sub to GREXBEATZ. That's it — no posting, no access to anything else.</p>
+    <p class="sub" style="margin-bottom:18px;color:var(--amber)">Heads up: your Twitch account needs a <b>verified email</b> to log in. If login fails, that's usually why — verify it at twitch.tv → Settings → Security and Privacy, then come back.</p>
+    <button class="btn" id="loginBtn">LOG IN WITH TWITCH</button>
+    <div class="status" id="loginStatus"></div>
+    <div class="subcallout">Not a sub yet? PROJECT FIX is VIP-only. <a href="https://www.twitch.tv/subs/grexbeatz" target="_blank" rel="noopener">Sub to GREXBEATZ →</a></div>
+  </div>
+
+  <!-- STATE: logged in -->
+  <div id="appArea" class="hidden">
+    <div class="userline">
+      <span>LOGGED IN AS <b id="whoami">…</b></span>
+      <button id="logoutBtn">log out</button>
+    </div>
+
+    <div id="adminBar" class="hidden" style="display:flex;gap:14px;align-items:center;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:4px;padding:9px 14px;margin-bottom:22px;background:var(--panel-2)">
+      <span style="color:var(--amber);font-weight:700">ADMIN</span>
+      <a href="admin.html">Control Room</a>
+      <a href="overlay.html" target="_blank" rel="noopener">Stream Overlay</a>
+    </div>
+
+    <!-- window closed -->
+    <div class="panel bigstate hidden" id="closedPanel">
+      <div class="glyph">⏸</div>
+      <h2>Submissions are closed</h2>
+      <p id="closedMsg">There's no open submission window right now. Watch the streams and Discord for the next one.</p>
+    </div>
+
+    <!-- already submitted -->
+    <div class="panel bigstate hidden" id="donePanel">
+      <div class="glyph">✔</div>
+      <h2>You're in</h2>
+      <p id="doneMsg">Your submission is locked in for this window. One entry per VIP — tune in to see if G-REX picks your project.</p>
+      <p style="margin-top:16px"><button class="btn ghost hidden" id="editBtn">EDIT SUBMISSION</button></p>
+    </div>
+
+    <!-- needs fresh twitch session -->
+    <div class="panel bigstate hidden" id="refreshPanel">
+      <div class="glyph">↻</div>
+      <h2>Quick re-login needed</h2>
+      <p>Your Twitch session went stale, so we can't verify your sub. Log out and back in — takes five seconds.</p>
+      <p style="margin-top:16px"><button class="btn" id="reloginBtn">LOG BACK IN</button></p>
+    </div>
+
+    <!-- submission form -->
+    <div class="panel hidden" id="formPanel">
+      <h2 id="winTitle">Submit your project</h2>
+      <p class="sub" id="winDeadline"></p>
+
+      <label for="trackName">Track name *</label>
+      <input type="text" id="trackName" maxlength="80" placeholder="e.g. UNTITLED CLUB TOOL v7">
+
+      <label>MP3 render * <span style="text-transform:none;letter-spacing:0">(max 15 MB)</span></label>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="audioFile" accept=".mp3,audio/mpeg">
+        <span id="dropText">Click to choose your .mp3 (or drag it here)</span>
+      </div>
+      <p class="hint">Ableton only. Export from Ableton: File → Export Audio/Video → MP3, 320 kbps. Render the whole arrangement, rough is fine — that's the point.</p>
+
+      <label for="note">Note for G-REX <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea id="note" maxlength="500" placeholder="e.g. stuck on the drop — second half falls flat and I don't know why"></textarea>
+
+      <label for="projectLink">Link to your full project folder <span style="text-transform:none;letter-spacing:0">(optional, but do it)</span></label>
+      <input type="url" id="projectLink" maxlength="300" placeholder="Google Drive / Dropbox link to your .alp project pack">
+      <p class="hint">Prepped per the rules at the top of the page: MIDI + third-party VSTs bounced, packed as a single .alp via Manage Project → Create Pack, uploaded to Drive/Dropbox with sharing set to "anyone with the link." No link and you're picked = we DM you scrambling.</p>
+
+      <div style="margin-top:26px">
+        <button class="btn" id="submitBtn">SUBMIT PROJECT</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <footer><span class="footmark">PR0CESS_LIVE</span></footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://cdkzbbrakewvhmejzryj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Rba1RBrB7u0_79fUzEUYhw_Wm_Ev_42";
+const MAX_MB = 15;
+/* ========================================== */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// If Twitch login failed, the error comes back written into the URL — grab it
+// before anything clears it, so we can actually show the person what happened.
+const authError = (() => {
+  try {
+    const p = new URLSearchParams(location.hash.replace(/^#/, ""));
+    return p.get("error_description") || p.get("error") || "";
+  } catch (e) { return ""; }
+})();
+const $ = id => document.getElementById(id);
+let session = null, currentWindow = null, countdownTimer = null, mySub = null, editMode = false;
+
+sb.auth.onAuthStateChange((_event, s) => {
+  if (s && s.provider_token) sessionStorage.setItem("twitch_token", s.provider_token);
+});
+
+function twitchToken() {
+  return (session && session.provider_token) || sessionStorage.getItem("twitch_token") || "";
+}
+
+async function init() {
+  const { data } = await sb.auth.getSession();
+  session = data.session;
+  render();
+}
+
+async function render() {
+  if (!session) {
+    $("loginPanel").classList.remove("hidden");
+    $("appArea").classList.add("hidden");
+    if (authError) {
+      const el = $("loginStatus");
+      el.className = "status err";
+      el.textContent = "Twitch login failed: " + authError +
+        (/email/i.test(authError)
+          ? " — this usually means the email on your Twitch account isn't verified. Go to twitch.tv → Settings → Security and Privacy, verify your email, then try again."
+          : "");
+    }
+    setTransport(null);
+    loadWindowPublic(); // still show countdown to logged-out visitors
+    return;
+  }
+  $("loginPanel").classList.add("hidden");
+  $("appArea").classList.remove("hidden");
+  const meta = session.user.user_metadata || {};
+  $("whoami").textContent = (meta.nickname || meta.name || meta.full_name || "twitch user").toUpperCase();
+  sb.rpc("is_admin").then(({ data: isAdmin }) => {
+    if (isAdmin) $("adminBar").classList.remove("hidden");
+  });
+  await loadWindow();
+}
+
+async function loadWindowPublic() {
+  const now = new Date().toISOString();
+  const { data } = await sb.from("windows").select("*")
+    .lte("opens_at", now).gte("closes_at", now)
+    .order("closes_at", { ascending: true }).limit(1);
+  setTransport(data && data[0] ? data[0] : null);
+}
+
+async function loadWindow() {
+  hideAll();
+  const now = new Date().toISOString();
+  const { data, error } = await sb.from("windows").select("*")
+    .lte("opens_at", now).gte("closes_at", now)
+    .order("closes_at", { ascending: true }).limit(1);
+
+  if (error) { showClosed("Couldn't reach the server. Refresh and try again."); setTransport(null); return; }
+  currentWindow = data && data[0] ? data[0] : null;
+  setTransport(currentWindow);
+
+  if (!currentWindow) {
+    // is there an upcoming one to tease?
+    const { data: next } = await sb.from("windows").select("*")
+      .gt("opens_at", now).order("opens_at", { ascending: true }).limit(1);
+    if (next && next[0]) {
+      showClosed("Next window opens " + fmtDate(next[0].opens_at) + ". Get your project ready.");
+    } else {
+      showClosed(null);
+    }
+    return;
+  }
+
+  // already submitted?
+  const { data: mine } = await sb.from("submissions").select("*")
+    .eq("window_id", currentWindow.id).eq("user_id", session.user.id).limit(1);
+  if (mine && mine[0]) {
+    mySub = mine[0];
+    $("doneMsg").textContent = '"' + mySub.track_name + '" is locked in for this window. You can edit or re-render it until submissions close ' + fmtDate(currentWindow.closes_at) + '.' + (mySub.project_link ? '' : ' Heads up: no project folder link yet — add one when you edit so you\'re ready if you get picked.');
+    $("editBtn").classList.remove("hidden");
+    $("donePanel").classList.remove("hidden");
+    return;
+  }
+
+  // fresh twitch token available?
+  if (!twitchToken()) { $("refreshPanel").classList.remove("hidden"); return; }
+
+  editMode = false; mySub = null;
+  $("winTitle").textContent = currentWindow.title || "Submit your project";
+  $("winDeadline").textContent = "Submissions close " + fmtDate(currentWindow.closes_at) + ".";
+  $("submitBtn").textContent = "SUBMIT PROJECT";
+  $("submitBtn").disabled = false;
+  $("formPanel").classList.remove("hidden");
+}
+
+function hideAll() {
+  ["closedPanel","donePanel","refreshPanel","formPanel"].forEach(id => $(id).classList.add("hidden"));
+}
+function showClosed(msg) {
+  if (msg) $("closedMsg").textContent = msg;
+  $("closedPanel").classList.remove("hidden");
+}
+
+/* transport bar countdown */
+function setTransport(win) {
+  clearInterval(countdownTimer);
+  const led = $("led"), tc = $("timecode");
+  if (!win) {
+    led.className = "led closed";
+    tc.className = "timecode closed";
+    tc.textContent = "CLOSED";
+    return;
+  }
+  led.className = "led open";
+  tc.className = "timecode";
+  const tick = () => {
+    const ms = new Date(win.closes_at) - new Date();
+    if (ms <= 0) { setTransport(null); if (session) loadWindow(); return; }
+    const d = Math.floor(ms/86400000), h = Math.floor(ms/3600000)%24,
+          m = Math.floor(ms/60000)%60, s = Math.floor(ms/1000)%60;
+    tc.textContent = "OPEN " + String(d).padStart(2,"0") + ":" + String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  };
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+}
+
+/* auth actions */
+async function login() {
+  await sb.auth.signInWithOAuth({
+    provider: "twitch",
+    options: {
+      scopes: "user:read:subscriptions",
+      redirectTo: location.origin + location.pathname
+    }
+  });
+}
+$("loginBtn").onclick = login;
+$("reloginBtn").onclick = async () => { await sb.auth.signOut(); sessionStorage.removeItem("twitch_token"); login(); };
+$("logoutBtn").onclick = async () => { await sb.auth.signOut(); sessionStorage.removeItem("twitch_token"); location.reload(); };
+
+$("editBtn").onclick = () => {
+  if (!mySub || !currentWindow) return;
+  if (!twitchToken()) { hideAll(); $("refreshPanel").classList.remove("hidden"); return; }
+  editMode = true;
+  hideAll();
+  $("winTitle").textContent = "Edit your submission";
+  $("winDeadline").textContent = "Changes overwrite your current entry. Editable until submissions close " + fmtDate(currentWindow.closes_at) + ".";
+  $("trackName").value = mySub.track_name || "";
+  $("note").value = mySub.note || "";
+  $("projectLink").value = mySub.project_link || "";
+  fileInput.value = "";
+  dz.classList.remove("hasfile");
+  $("dropText").textContent = "Keeping your current MP3 — click only if you want to replace it";
+  $("submitBtn").textContent = "UPDATE SUBMISSION";
+  $("submitBtn").disabled = false;
+  $("status").className = "status";
+  $("formPanel").classList.remove("hidden");
+};
+
+/* file picker */
+const dz = $("dropzone"), fileInput = $("audioFile");
+dz.onclick = () => fileInput.click();
+dz.ondragover = e => { e.preventDefault(); };
+dz.ondrop = e => { e.preventDefault(); if (e.dataTransfer.files[0]) { fileInput.files = e.dataTransfer.files; fileChanged(); } };
+fileInput.onchange = fileChanged;
+function fileChanged() {
+  const f = fileInput.files[0];
+  if (!f) return;
+  $("dropText").textContent = f.name + "  (" + (f.size/1048576).toFixed(1) + " MB)";
+  dz.classList.add("hasfile");
+}
+
+/* submit */
+$("submitBtn").onclick = async () => {
+  const status = $("status");
+  const setStatus = (cls, msg) => { status.className = "status " + cls; status.textContent = msg; };
+
+  const name = $("trackName").value.trim();
+  const file = fileInput.files[0];
+  const link = $("projectLink").value.trim();
+
+  if (!name) return setStatus("err", "Give your track a name.");
+  if (!file && !editMode) return setStatus("err", "Attach your MP3 render.");
+  if (file) {
+    const isMp3 = /\.mp3$/i.test(file.name) || file.type === "audio/mpeg";
+    if (!isMp3) return setStatus("err", "MP3 only — export from Ableton as MP3, 320 kbps.");
+    if (file.size > MAX_MB * 1048576) return setStatus("err", "That file is over " + MAX_MB + " MB. Export at 320 kbps or trim the render.");
+  }
+  if (link && !/^https?:\/\//i.test(link)) return setStatus("err", "Project link needs to be a full URL (starts with https://).");
+  if (!twitchToken()) { hideAll(); $("refreshPanel").classList.remove("hidden"); return; }
+
+  const fd = new FormData();
+  fd.append("twitch_token", twitchToken());
+  fd.append("track_name", name);
+  fd.append("note", $("note").value.trim());
+  fd.append("project_link", link);
+  fd.append("has_file", file ? "1" : "0");
+  fd.append("action", "prepare");
+
+  $("submitBtn").disabled = true;
+
+  const callSubmit = async () => {
+    const res = await fetch(SUPABASE_URL + "/functions/v1/submit", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + session.access_token, "apikey": SUPABASE_KEY },
+      body: fd
+    });
+    const out = await res.json().catch(() => ({}));
+    return { res, out };
+  };
+
+  try {
+    setStatus("busy", "Verifying your sub…");
+    let { res, out } = await callSubmit();
+    if (!res.ok) {
+      if (res.status === 401 && out.code === "twitch_expired") { hideAll(); $("refreshPanel").classList.remove("hidden"); return; }
+      setStatus("err", out.error || "Something broke on our end. Try again in a minute.");
+      $("submitBtn").disabled = false;
+      return;
+    }
+
+    if (out.token) {
+      // MP3 goes straight to storage — built for big files, no middleman
+      setStatus("busy", "Uploading your MP3… slower connections can take a few minutes. Keep this tab open.");
+      const { error: upErr } = await sb.storage.from("renders")
+        .uploadToSignedUrl(out.path, out.token, file, { contentType: "audio/mpeg" });
+      if (upErr) {
+        setStatus("err", "Upload failed (" + upErr.message + "). Check your connection and hit submit again.");
+        $("submitBtn").disabled = false;
+        return;
+      }
+      setStatus("busy", "Locking it in…");
+      fd.set("action", "finalize");
+      ({ res, out } = await callSubmit());
+      if (!res.ok) {
+        setStatus("err", out.error || "Upload worked but the last step failed — hit submit again.");
+        $("submitBtn").disabled = false;
+        return;
+      }
+    }
+
+    hideAll();
+    $("status").className = "status";
+    fileInput.value = "";
+    dz.classList.remove("hasfile");
+    $("dropText").textContent = "Click to choose your .mp3 (or drag it here)";
+    await loadWindow();
+  } catch (e) {
+    setStatus("err", "Connection dropped mid-submit — check your internet and hit submit again. Nothing was lost.");
+    $("submitBtn").disabled = false;
+  }
+};
+
+init();
+</script>
+</body>
+</html>

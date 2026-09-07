@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#030303" />
+<title>PR0CESS_LIVE // TIMER</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAzklEQVR4nGNkZmZmoCVgoqnpoxaMDAtYsIraHP7z88VDdgl5rOTpUGXiLcDug78/vuJBFPkA4nZmDm5mDu7jrvyYsswc3BA1RPoD3Qf4XUqGP9B9AHE7BKG5He4zTFkq+IDsmCDsA0y3U9kHFKYlwj5ATlGQVEQTH+CSpcgHyKGPy38U+QB/fJDpA0yAmZ9JAug+wJ8cyQgidB8gB8IRW3yyVPABpmoyfMCItdliufsjnvrgXKwekaZj8QGmS8kuJPD5gIpg6Ff6oxYMvAUAR5QXjHuOjbQAAAAASUVORK5CYII=" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--void:#050506;--panel:#0B0C0F;--panel-2:#121419;--line:#212429;--line2:#2E3238;
+  --text:#EDEDEB;--dim:#B4B9BF;--dimmer:#676C74;--electric:#3A93D6;--hot:#D8455F;}
+html,body{height:100%}
+body{background:var(--void);color:var(--text);font-family:'JetBrains Mono',ui-monospace,monospace}
+body.overlay{background:transparent}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;
+  background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.22) 2px 3px)}
+body.overlay::after{background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.10) 2px 3px)}
+.wrap{max-width:640px;margin:0 auto;padding:7vh 24px 40px;display:flex;flex-direction:column;gap:22px}
+.mast{text-align:center}
+.brand{font-family:'Code','JetBrains Mono',monospace;font-size:clamp(16px,3.4vw,22px);letter-spacing:.2em;color:#FFF}
+.brand .z{color:var(--electric)}
+.modeswap{display:flex;border:1px solid var(--line2);align-self:center}
+.mbtn{background:transparent;border:none;color:var(--dim);font:inherit;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;padding:11px 22px;cursor:pointer;transition:.15s}
+.mbtn+.mbtn{border-left:1px solid var(--line2)}
+.mbtn.on{background:var(--electric);color:#000;font-weight:700}
+.mbtn:not(.on):hover{color:var(--text)}
+.preview{display:flex;justify-content:center;padding:8px 0}
+.clock{font-family:'Code','JetBrains Mono',monospace;font-weight:800;font-size:clamp(56px,15vw,120px);
+  line-height:1;color:#FFF;letter-spacing:.02em;text-shadow:-2px 0 rgba(216,69,95,.4),2px 0 rgba(58,147,214,.4)}
+.clock.low{color:var(--hot);text-shadow:0 0 24px rgba(216,69,95,.4)}
+.clock.done{color:var(--hot)}
+.ovwrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.overlay .clock{font-size:clamp(80px,22vw,260px);
+  text-shadow:-3px 0 rgba(216,69,95,.85),3px 0 rgba(58,147,214,.85),0 4px 30px rgba(0,0,0,.9)}
+.setrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+.setlab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:4px}
+.chip{background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:13px;padding:9px 14px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--electric);color:var(--electric)}
+#minfield{width:80px;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:14px;padding:9px 10px;text-align:center}
+.btnrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.act{background:var(--electric);color:#000;border:none;font:inherit;font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:14px 30px;cursor:pointer;transition:.15s}
+.act:hover{filter:brightness(1.12)}
+.act.ghost{background:transparent;border:1px solid var(--line2);color:var(--text);font-weight:500}
+.act.ghost:hover{border-color:var(--electric);color:var(--electric);filter:none}
+.gatebox{max-width:280px;margin:0 auto;width:100%}
+.gatebox input{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:15px;padding:12px;text-align:center}
+.hint{font-size:12px;color:var(--dim);line-height:1.6}
+.help{text-align:center;border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+
+</style>
+
+<style>
+/* ═══ G-REX SYSTEM RESKIN ═══════════════════════════════════════
+   Palette remapped to the grexofficial.com brand-bible tokens.
+   Black / white / silver, dark blue secondary. No neon, no rave.
+   Grain replaces scanlines. OBS overlay views are excluded so
+   nothing lands on stream.
+   ═════════════════════════════════════════════════════════════ */
+body:not(.overlay)::after{
+  content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+::selection{background:#3A93D6;color:#050506}
+</style>
+
+<style>
+/* ═══ PR0CESS_LIVE WORDMARK — canonical lockup ══════════════════
+   Code font · .2em tracking · white · blue zero · blue // divider.
+   Identical across hub, battle, queue, project fix and timer.
+   ═════════════════════════════════════════════════════════════ */
+.brand,.logo,.wordmark,.g-brand,.fbrand,.footmark{
+  font-family:'Code','JetBrains Mono',ui-monospace,monospace;
+  font-weight:400;
+  letter-spacing:.2em;
+  color:#fff;
+}
+.brand,.wordmark,.g-brand{font-size:16px}
+.brand .z,.logo .z,.wordmark .z,.g-brand .z,.fbrand .z{color:var(--electric,#3A93D6)}
+.wordmark span,.brand small,.g-brand small{
+  color:var(--dim);font-weight:400;letter-spacing:.2em;
+}
+.wordmark span .z{color:var(--electric,#3A93D6)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* PR0CESS_LIVE live stream timer — Supabase-backed, PIN-controlled.
+   #control -> PIN-gated control panel (live)
+   #overlay -> clean OBS clock, live via Supabase (just use this plain URL in OBS) */
+(function(){
+"use strict";
+var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+var app=document.getElementById("app");
+
+var PIN=localStorage.getItem("pq_pin")||"", ROLE=localStorage.getItem("pq_role")||"";
+var T={mode:"down",running:false,end_ts:null,remaining_ms:600000,start_ts:null,elapsed_ms:0};
+var subs=[];
+function on(fn){subs.push(fn);fn();}
+function emit(){subs.forEach(function(f){f();});}
+/* --- server-synced clock ---------------------------------------
+   Every device measures how far its own clock sits from the database
+   clock, then works in database time. Without this, a control device
+   and an OBS machine whose clocks differ disagree about how much time
+   is left, and the countdown appears to jump the moment you hit start. */
+var SKEW = 0;            // ms to add to Date.now() to get server time
+function now(){ return Date.now() + SKEW; }
+function syncClock(){
+  var t0 = Date.now();
+  return sb.rpc("tv_now").then(function(r){
+    if(r.error || r.data == null) return;
+    var t1 = Date.now();
+    var latency = (t1 - t0) / 2;                 // assume symmetric round trip
+    SKEW = (Number(r.data) + latency) - t1;
+  }).catch(function(){});
+}
+function route(){return (location.hash.replace("#","")||"control");}
+
+var AC=null, audioReady=false;
+function initAudio(){ if(AC)return; try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+function unlockAudio(){ initAudio(); if(AC&&AC.state==="suspended") AC.resume(); audioReady=true; }
+function beep(freq,start,dur,type,gain){
+  if(!AC)return;
+  var o=AC.createOscillator(), g=AC.createGain();
+  o.type=type||"square"; o.frequency.setValueAtTime(freq,AC.currentTime+start);
+  g.gain.setValueAtTime(0.0001,AC.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(gain||0.35,AC.currentTime+start+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,AC.currentTime+start+dur);
+  o.connect(g); g.connect(AC.destination);
+  o.start(AC.currentTime+start); o.stop(AC.currentTime+start+dur+0.02);
+}
+function alarm(){
+  initAudio(); if(!AC)return; if(AC.state==="suspended")AC.resume();
+  // on-brand: descending two-tone digital alert, three sweeps
+  for(var i=0;i<3;i++){
+    var t=i*0.42;
+    beep(880,t,0.14,"square",0.32);
+    beep(587,t+0.13,0.20,"square",0.30);
+    beep(1760,t+0.02,0.06,"sawtooth",0.10); // glitch shimmer
+  }
+}
+function fmt(ms){ if(ms<0)ms=0; var s=Math.round(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;
+  function p(n){return(n<10?"0":"")+n;} return (h>0?h+":"+p(m)+":"+p(x):p(m)+":"+p(x)); }
+
+function pull(){
+  return sb.from("tv_timer").select("*").eq("id",1).single().then(function(r){
+    if(!r.error&&r.data){ T=r.data; emit(); }
+  });
+}
+function live(){
+  pull();
+  try{ sb.channel("tv").on("postgres_changes",{event:"*",schema:"public",table:"tv_timer"},pull).subscribe(); }catch(e){}
+  setInterval(pull, 4000);
+}
+function push(){
+  return sb.rpc("tv_set",{p_pin:PIN,p_mode:T.mode,p_running:T.running,
+    p_end:T.end_ts,p_rem:T.remaining_ms,p_start:T.start_ts,p_el:T.elapsed_ms}).then(function(r){
+    if(r.error){ if(/bad pin/i.test(r.error.message)){PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render();} }
+    return pull();
+  });
+}
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+
+function curMs(){
+  if(T.mode==="down") return T.running?((T.end_ts||0)-now()):(T.remaining_ms||0);
+  return T.running?(now()-(T.start_ts||0)):(T.elapsed_ms||0);
+}
+
+/* ---------- OVERLAY ---------- */
+function renderOverlay(){
+  document.body.className="overlay";
+  app.innerHTML='<div class="ovwrap"><div class="clock" id="clock">00:00</div></div>';
+  var firedO=false;
+  function tick(){
+    var el=document.getElementById("clock"); if(!el)return;
+    var ms=curMs(), done=false;
+    if(T.mode==="down"&&ms<=0){ms=0;done=true;}
+    if(T.mode==="down"&&T.running&&done&&!firedO){ firedO=true; alarm(); }
+    if(!(T.mode==="down"&&done)) firedO=false;
+    el.textContent=fmt(ms);
+    el.classList.toggle("done",done);
+    el.classList.toggle("low",T.mode==="down"&&ms>0&&ms<=60000);
+  }
+  // OBS: try to unlock audio on load (works in OBS CEF which allows autoplay)
+  initAudio(); if(AC&&AC.state==="suspended"){ AC.resume().catch(function(){}); }
+  on(tick); setInterval(tick,200);
+}
+
+/* ---------- CONTROL ---------- */
+function renderControl(){
+  document.body.className="";
+  if(!PIN){ renderGate(); return; }
+  app.innerHTML=
+  '<div class="wrap">'+
+    '<div class="mast"><div class="brand">PR<span class="z">0</span>CESS_LIVE <span class="z">//</span> TIMER</div></div>'+
+    '<div class="modeswap">'+
+      '<button class="mbtn" data-mode="down">Countdown</button>'+
+      '<button class="mbtn" data-mode="up">Count-up</button>'+
+    '</div>'+
+    '<div class="preview"><div class="clock" id="pv">00:00</div></div>'+
+    '<div class="setrow" id="setrow"></div>'+
+    '<div class="btnrow">'+
+      '<button class="act" id="startbtn">Start</button>'+
+      '<button class="act ghost" id="pausebtn">Pause</button>'+
+      '<button class="act ghost" id="resetbtn">Reset</button>'+
+    '</div>'+
+    '<div class="hint help">OBS overlay: add a Browser source pointing at this page\u2019s <b>#overlay</b> URL. '+
+      'It updates live from here \u2014 start, pause, add time and OBS follows instantly. No relinking.'+
+      '<br><a href="#overlay" target="_blank" style="color:var(--electric)">open overlay \u2197</a> <a href="#" id="testsnd" style="color:var(--electric);margin-left:14px">test sound</a> '+
+      '<a href="#" id="lock" style="color:var(--dim);margin-left:14px">lock</a></div>'+
+  '</div>';
+
+  function paintMode(){
+    document.querySelectorAll(".mbtn").forEach(function(b){ b.classList.toggle("on",b.getAttribute("data-mode")===T.mode); });
+    var sr=document.getElementById("setrow");
+    if(T.mode==="down"){
+      sr.style.display="";
+      sr.innerHTML='<span class="setlab">Set / add</span>'+
+        '<button class="chip" data-add="1">+1</button>'+
+        '<button class="chip" data-add="5">+5</button>'+
+        '<button class="chip" data-add="10">+10</button>'+
+        '<input id="minfield" type="number" min="0" placeholder="min">'+
+        '<button class="chip" id="setmin">Set</button>';
+      sr.querySelectorAll("[data-add]").forEach(function(b){ b.onclick=function(){
+        var add=parseInt(b.getAttribute("data-add"),10)*60000;
+        if(T.running){ T.end_ts=(T.end_ts||now())+add; } else { T.remaining_ms=Math.max(0,(T.remaining_ms||0)+add); }
+        push(); }; });
+      var sm=document.getElementById("setmin");
+      if(sm) sm.onclick=function(){ var mins=parseInt(document.getElementById("minfield").value,10)||0;
+        T.running=false; T.remaining_ms=mins*60000; push(); };
+    } else { sr.style.display="none"; }
+  }
+  document.querySelectorAll(".mbtn").forEach(function(b){ b.onclick=function(){
+    T.mode=b.getAttribute("data-mode"); T.running=false;
+    if(T.mode==="up") T.elapsed_ms=0; push(); }; });
+  document.body.addEventListener("click",unlockAudio,{once:false});
+  document.getElementById("startbtn").onclick=function(){
+    unlockAudio();
+    if(T.mode==="down"){ var rem=T.running?((T.end_ts||0)-now()):(T.remaining_ms||0); if(rem<0)rem=0; T.end_ts=now()+rem; T.running=true; }
+    else { var el=T.running?(now()-(T.start_ts||0)):(T.elapsed_ms||0); T.start_ts=now()-el; T.running=true; }
+    push();
+  };
+  document.getElementById("pausebtn").onclick=function(){
+    if(!T.running)return;
+    if(T.mode==="down") T.remaining_ms=Math.max(0,(T.end_ts||0)-now()); else T.elapsed_ms=now()-(T.start_ts||0);
+    T.running=false; push();
+  };
+  document.getElementById("resetbtn").onclick=function(){
+    T.running=false; if(T.mode==="down") T.remaining_ms=600000; else T.elapsed_ms=0; push();
+  };
+  document.getElementById("testsnd").onclick=function(e){ e.preventDefault(); unlockAudio(); alarm(); };
+  document.getElementById("lock").onclick=function(e){ e.preventDefault();
+    PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render(); };
+
+  on(paintMode);
+  var firedC=false;
+  setInterval(function(){
+    var pv=document.getElementById("pv"); if(!pv)return;
+    var ms=curMs(); var done=(T.mode==="down"&&ms<=0);
+    if(T.mode==="down"&&ms<0)ms=0; pv.textContent=fmt(ms);
+    if(T.mode==="down"&&T.running&&done&&!firedC){ firedC=true; alarm(); }
+    if(!done) firedC=false;
+    pv.classList.toggle("low",T.mode==="down"&&T.running&&ms>0&&ms<=60000);
+    pv.classList.toggle("done",done);
+  },200);
+}
+function renderGate(){
+  document.body.className="";
+  app.innerHTML='<div class="wrap"><div class="mast"><div class="brand">PR<span class="z">0</span>CESS_LIVE <span class="z">//</span> TIMER</div></div>'+
+    '<div class="gatebox"><p class="hint" style="text-align:center;margin-bottom:14px">Crew PIN to control the timer.</p>'+
+    '<input id="pin" type="password" placeholder="PIN">'+
+    '<button class="act" id="unlock" style="width:100%;margin-top:12px">Unlock</button>'+
+    '<div class="hint" id="gerr" style="text-align:center;margin-top:8px"></div></div></div>';
+  function go(){ var v=document.getElementById("pin").value.trim();
+    getRole(v).then(function(role){
+      if(role==="owner"||role==="mod"){PIN=v;ROLE=role;localStorage.setItem("pq_pin",v);localStorage.setItem("pq_role",role);render();}
+      else document.getElementById("gerr").textContent="Wrong PIN.";
+    }); }
+  document.getElementById("unlock").onclick=go;
+  document.getElementById("pin").onkeydown=function(e){if(e.key==="Enter")go();};
+}
+
+function render(){ subs=[]; if(route()==="overlay") renderOverlay(); else renderControl(); emit(); }
+window.addEventListener("hashchange",render);
+syncClock().then(function(){ render(); live(); });
+setInterval(syncClock, 120000);   // correct for drift every 2 min
+})();
+
+</script>
+</body>
+</html>

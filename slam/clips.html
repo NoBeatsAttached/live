@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#070707" />
+<title>CLIP PLAYER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#070707;--panel:#101012;--panel2:#151517;--line:#1F1F23;--line2:#2C2C32;
+  --text:#F0F0F0;--dim:#B9B9BE;--dimmer:#6C6C74;
+  --amber:#FFB020;--green:#3FFF9E;--red:#FF4B6E;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+
+/* ---------- overlay ---------- */
+body.ov{background:#000;overflow:hidden}
+body.ov #app{display:none}
+#stage{position:fixed;inset:0;background:#000;display:none}
+body.ov #stage{display:block}
+#stage video,#stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;
+  object-fit:contain;background:#000}
+#stage video{transition:opacity .18s linear}
+#idle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#2A2A2E;font-size:15px;letter-spacing:.06em}
+#label{position:absolute;left:34px;bottom:30px;z-index:5;background:rgba(0,0,0,.66);
+  color:#fff;font-size:17px;padding:8px 16px;border-radius:8px;opacity:0;transition:opacity .4s}
+#label.show{opacity:1}
+
+/* ---------- deck ---------- */
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 60px}
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;
+  padding:16px 0 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dimmer);flex:none}
+.dot.live{background:var(--green)}
+.dot.dead{background:var(--red)}
+.ttl{font-size:16px;font-weight:500}
+.sub{font-size:13px;color:var(--dimmer)}
+.spacer{margin-left:auto}
+
+.lab{font-size:12.5px;color:var(--dimmer);margin:24px 0 10px}
+.tin{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);
+  font:inherit;font-size:14px;padding:11px 13px;border-radius:8px;margin-bottom:8px}
+.tin::placeholder{color:var(--dimmer)}
+.tin:focus{outline:none;border-color:var(--amber)}
+.two{display:flex;gap:8px}
+.two .tin{margin-bottom:0}
+.btn{width:100%;background:var(--amber);color:#0A0A0A;border:none;font:inherit;font-weight:500;
+  font-size:13.5px;padding:12px;border-radius:8px;cursor:pointer;margin-top:8px}
+.btn:hover{filter:brightness(1.08)}
+.btn.quiet{background:transparent;border:1px solid var(--line2);color:var(--dim);font-weight:400}
+.btn.quiet:hover{border-color:var(--dimmer);color:var(--text);filter:none}
+.note{font-size:12.5px;color:var(--dimmer);margin-top:11px;line-height:1.7}
+
+.clips{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.cl{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.cl:last-child{border-bottom:none}
+.cl .n{flex:1;min-width:0;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl .n em{display:block;font-style:normal;font-size:11.5px;color:var(--dimmer);
+  overflow:hidden;text-overflow:ellipsis}
+.tag{flex:none;font-size:11px;color:var(--dimmer);border:1px solid var(--line2);
+  padding:3px 8px;border-radius:5px}
+.tag.tw{color:#B58BFF;border-color:#4B3A78}
+.x{flex:none;background:transparent;border:1px solid var(--line2);color:var(--dimmer);
+  font:inherit;font-size:12px;padding:6px 11px;border-radius:6px;cursor:pointer}
+.x:hover{border-color:var(--red);color:var(--red)}
+.blank{border:1px dashed var(--line2);border-radius:9px;padding:26px 18px;text-align:center;
+  font-size:13px;color:var(--dimmer);line-height:1.8}
+.gate{max-width:300px;margin:0 auto;padding:20vh 20px 0;text-align:center}
+.gate h1{font-size:15px;font-weight:500;color:var(--dim);margin-bottom:22px}
+.gate .tin{text-align:center;font-size:17px;letter-spacing:.24em}
+</style>
+</head>
+<body>
+<div id="stage"><div id="idle">no clips loaded</div></div>
+<div id="label"></div>
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* CLIP PLAYER
+   clips.html          -> PIN-gated deck (manage the reel)
+   clips.html#overlay  -> OBS browser source for the BRB / offline scene   */
+(function(){
+"use strict";
+
+var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var CHANNEL="ch-clips-9x3n7q";
+var PARENT=location.hostname;
+
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+var app=document.getElementById("app");
+var stage=document.getElementById("stage");
+var labelEl=document.getElementById("label");
+var IS_OV=(location.hash.replace("#","").toLowerCase()==="overlay");
+var channel=null;
+function el(id){ return document.getElementById(id); }
+
+function loadList(){ try{ return JSON.parse(localStorage.getItem("cl_list")||"[]"); }catch(e){ return []; } }
+function saveList(l){ localStorage.setItem("cl_list",JSON.stringify(l)); }
+var LIST=loadList();
+
+/* url -> {kind, src, secs} */
+function parseUrl(u){
+  u=(u||"").trim();
+  var m=u.match(/clips\.twitch\.tv\/(?:embed\?clip=)?([A-Za-z0-9_-]+)/);
+  if(!m) m=u.match(/twitch\.tv\/[^\/]+\/clip\/([A-Za-z0-9_-]+)/);
+  if(m) return {kind:"twitch",src:m[1]};
+  if(/^https?:\/\//i.test(u)) return {kind:"file",src:u};
+  return null;
+}
+
+/* ==========================================================
+   OVERLAY
+   ========================================================== */
+function runOverlay(){
+  document.body.className="ov";
+  var order=[], at=0, timer=null, watchdog=null;
+  var A=null, B=null, active=null, spare=null, curKind="", iframeEl=null;
+  var lastTick=0, fails=0;
+
+  function mkVideo(){
+    var v=document.createElement("video");
+    v.autoplay=true; v.playsInline=true; v.controls=false;
+    v.preload="auto"; v.setAttribute("disablepictureinpicture","");
+    v.muted=false; v.defaultMuted=false; v.volume=1;
+    v.style.opacity="0";
+    /* if the browser forced a muted start, unmute the moment it is actually playing */
+    v.addEventListener("playing",function(){
+      if(v.muted){ v.muted=false; v.volume=1; }
+    });
+    stage.appendChild(v);
+    return v;
+  }
+  A=mkVideo(); B=mkVideo(); active=A; spare=B;
+
+  function shuffle(a){
+    a=a.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a;
+  }
+  function peek(n){
+    if(!LIST.length) return null;
+    var idx=at+n;
+    if(idx>=order.length){
+      if(!order.length) return null;
+      return LIST[(idx-order.length)%LIST.length];
+    }
+    return order[idx];
+  }
+  function idle(on){ var i=el("idle"); if(i) i.style.display=on?"flex":"none"; }
+  function showLabel(t){
+    if(!t){ labelEl.className=""; return; }
+    labelEl.textContent=t; labelEl.className="show";
+    setTimeout(function(){ labelEl.className=""; },6000);
+  }
+  function killIframe(){
+    if(iframeEl&&iframeEl.parentNode) iframeEl.parentNode.removeChild(iframeEl);
+    iframeEl=null;
+  }
+
+  /* queue the next file clip into the spare element so there is no gap */
+  function preload(){
+    var n=peek(0);
+    if(!n||n.kind!=="file"){ return; }
+    if(spare.getAttribute("data-src")!==n.src){
+      spare.setAttribute("data-src",n.src);
+      spare.src=n.src;
+      spare.muted=false; spare.volume=1;
+      try{ spare.load(); }catch(e){}
+    }
+  }
+
+  function next(){
+    clearTimeout(timer); timer=null;
+    if(!LIST.length){ idle(true); return; }
+    if(at>=order.length||!order.length){ order=shuffle(LIST); at=0; }
+    var c=order[at++];
+    idle(false);
+    lastTick=Date.now();
+
+    if(c.kind==="file"){
+      killIframe();
+      var play=spare, old=active;
+      if(play.getAttribute("data-src")!==c.src){
+        play.setAttribute("data-src",c.src);
+        play.src=c.src;
+      }
+      play.onended=function(){ fails=0; next(); };
+      play.onerror=function(){ fails++; timer=setTimeout(next, fails>3?4000:400); };
+      play.ontimeupdate=function(){ lastTick=Date.now(); };
+      play.currentTime=0;
+      play.muted=false; play.volume=1;
+      play.style.opacity="1";
+      (function start(tries){
+        var p=play.play();
+        if(p&&p.catch) p.catch(function(){
+          if(tries<2){ setTimeout(function(){ start(tries+1); },250); return; }
+          play.muted=true;
+          var q=play.play();
+          if(q&&q.then) q.then(function(){
+            setTimeout(function(){ play.muted=false; play.volume=1; },120);
+          });
+        });
+      })(0);
+      if(old&&old!==play){
+        old.style.opacity="0";
+        old.pause();
+        old.onended=null; old.onerror=null; old.ontimeupdate=null;
+      }
+      active=play; spare=old||((play===A)?B:A);
+      curKind="file";
+      showLabel(c.label||"");
+      preload();
+    }else{
+      if(active){ active.style.opacity="0"; active.pause(); }
+      killIframe();
+      iframeEl=document.createElement("iframe");
+      iframeEl.src="https://clips.twitch.tv/embed?clip="+encodeURIComponent(c.src)+
+            "&parent="+PARENT+"&autoplay=true&muted=false&quality=chunked";
+      iframeEl.allow="autoplay; fullscreen";
+      stage.appendChild(iframeEl);
+      curKind="twitch";
+      showLabel(c.label||"");
+      timer=setTimeout(next,(c.secs||32)*1000);
+      preload();
+    }
+  }
+
+  /* if a clip stalls (dead link, hung buffer) move on rather than sitting black */
+  function startWatchdog(){
+    clearInterval(watchdog);
+    watchdog=setInterval(function(){
+      if(!LIST.length||curKind!=="file")return;
+      if(!active)return;
+      if(active.paused&&active.readyState<3){ next(); return; }
+      if(Date.now()-lastTick>15000) next();
+    },4000);
+  }
+
+  function restart(){ order=[]; at=0; fails=0; next(); startWatchdog(); }
+
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"clipov"}}});
+  channel.on("broadcast",{event:"list"},function(m){
+    if(!m.payload||!m.payload.list)return;
+    LIST=m.payload.list; saveList(LIST); restart();
+  });
+  channel.on("broadcast",{event:"skip"},function(){ next(); });
+  channel.subscribe(function(s){
+    if(s==="SUBSCRIBED"){
+      channel.track({role:"overlay",at:Date.now()});
+      try{ channel.send({type:"broadcast",event:"req",payload:{}}); }catch(e){}
+    }
+  });
+  restart();
+}
+
+/* ==========================================================
+   DECK
+   ========================================================== */
+var PIN=localStorage.getItem("cl_pin")||"", ROLE=localStorage.getItem("cl_role")||"";
+var ovUp=false;
+
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function push(){
+  if(!channel)return;
+  try{ channel.send({type:"broadcast",event:"list",payload:{list:LIST}}); }catch(e){}
+}
+
+function deckConnect(){
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"deck-"+Math.random().toString(36).slice(2,7)}}});
+  channel.on("broadcast",{event:"req"},function(){ push(); });
+  channel.on("presence",{event:"sync"},function(){
+    var st=channel.presenceState(), f=false;
+    Object.keys(st).forEach(function(k){ st[k].forEach(function(x){ if(x.role==="overlay") f=true; }); });
+    ovUp=f; paintStatus();
+  });
+  channel.subscribe(function(s){
+    if(s==="SUBSCRIBED"){ channel.track({role:"deck",at:Date.now()}); paintStatus(); }
+    if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED"){
+      ovUp=false; paintStatus();
+      setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} deckConnect(); },3000);
+    }
+  });
+}
+function paintStatus(){
+  var d=el("dot"), s=el("stat"); if(!d||!s)return;
+  d.className="dot "+(ovUp?"live":"dead");
+  s.textContent=ovUp?"overlay connected":"overlay not open";
+}
+
+function renderDeck(){
+  if(!PIN||!ROLE){ renderGate(); return; }
+  app.innerHTML=
+  '<div class="wrap">'+
+    '<div class="bar">'+
+      '<span class="dot" id="dot"></span>'+
+      '<span class="ttl">Clip player</span>'+
+      '<span class="sub" id="stat">connecting</span>'+
+      '<span class="spacer"></span>'+
+      '<button class="btn quiet" id="skip" style="width:auto;margin:0;padding:8px 15px">skip</button>'+
+    '</div>'+
+
+    '<div class="lab">Add a clip</div>'+
+    '<input class="tin" id="c_url" type="url" placeholder="Twitch clip link, or a direct .mp4 link">'+
+    '<div class="two">'+
+      '<input class="tin" id="c_label" type="text" maxlength="42" placeholder="Caption (optional)">'+
+      '<input class="tin" id="c_secs" type="number" min="5" max="90" placeholder="secs" style="max-width:110px">'+
+    '</div>'+
+    '<button class="btn" id="c_add">Add to the reel</button>'+
+    '<div class="note" id="c_note">Twitch clips need a length, since the player can\u2019t tell when they end. '+
+      'Direct .mp4 files advance on their own.</div>'+
+
+    '<div class="lab">The reel \u2014 <span id="count"></span></div>'+
+    '<div id="list"></div>'+
+
+    '<div class="lab">OBS link</div>'+
+    '<input class="tin" id="ovurl" readonly onclick="this.select()">'+
+    '<button class="btn quiet" id="copyov">Copy OBS link</button>'+
+    '<div class="note">Browser source in his BRB / offline scene, 1920\u00D71080. Leave '+
+      '"Shutdown source when not visible" <b>checked</b> so it only runs when that scene is up.</div>'+
+    '<button class="btn quiet" id="lock" style="margin-top:22px">lock</button>'+
+  '</div>';
+
+  el("c_add").onclick=addClip;
+  el("skip").onclick=function(){ if(channel){ try{ channel.send({type:"broadcast",event:"skip",payload:{}}); }catch(e){} } };
+  el("lock").onclick=function(){
+    PIN="";ROLE="";localStorage.removeItem("cl_pin");localStorage.removeItem("cl_role");render(); };
+  var f=el("ovurl"), u=location.origin+location.pathname+"#overlay";
+  f.value=u;
+  el("copyov").onclick=function(){
+    f.select();
+    var ok=false; try{ ok=document.execCommand("copy"); }catch(e){}
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(function(){},function(){});
+    this.textContent=ok?"Copied":"Select + Ctrl-C";
+    var b=this; setTimeout(function(){ b.textContent="Copy OBS link"; },1800);
+  };
+  paintList(); paintStatus(); deckConnect();
+}
+
+function note(t){
+  var n=el("c_note"); if(!n)return;
+  var was=n.innerHTML;
+  n.textContent=t;
+  setTimeout(function(){ if(el("c_note")) el("c_note").innerHTML=was; },2600);
+}
+
+function addClip(){
+  var u=el("c_url").value.trim();
+  var p=parseUrl(u);
+  if(!p){ note("That doesn\u2019t look like a Twitch clip or a direct file link."); return; }
+  var rec={kind:p.kind,src:p.src,label:el("c_label").value.trim()};
+  if(p.kind==="twitch") rec.secs=parseInt(el("c_secs").value,10)||32;
+  LIST.push(rec); saveList(LIST);
+  el("c_url").value=""; el("c_label").value=""; el("c_secs").value="";
+  paintList(); push();
+}
+
+function paintList(){
+  var w=el("list"); if(!w)return;
+  el("count").textContent=LIST.length?(LIST.length+(LIST.length===1?" clip":" clips")+", shuffled"):"empty";
+  if(!LIST.length){
+    w.innerHTML='<div class="blank">Nothing in the reel yet.<br>Add a few and they\u2019ll play in random order.</div>';
+    return;
+  }
+  w.innerHTML='<div class="clips" id="cls"></div>';
+  var box=el("cls");
+  LIST.forEach(function(c,i){
+    var row=document.createElement("div"); row.className="cl";
+    var n=document.createElement("div"); n.className="n";
+    n.textContent=c.label||(c.kind==="twitch"?c.src:c.src.split("/").pop());
+    var em=document.createElement("em");
+    em.textContent=(c.kind==="twitch")?("twitch \u00B7 "+(c.secs||32)+"s"):c.src;
+    n.appendChild(em);
+    var tag=document.createElement("span");
+    tag.className="tag"+(c.kind==="twitch"?" tw":"");
+    tag.textContent=(c.kind==="twitch")?"twitch":"file";
+    var x=document.createElement("button"); x.className="x"; x.textContent="remove";
+    x.onclick=function(){ LIST.splice(i,1); saveList(LIST); paintList(); push(); };
+    row.appendChild(n); row.appendChild(tag); row.appendChild(x);
+    box.appendChild(row);
+  });
+}
+
+function renderGate(){
+  app.innerHTML='<div class="gate"><h1>Clip player</h1>'+
+    '<input class="tin" id="pin" type="password" placeholder="PIN">'+
+    '<button class="btn" id="unlock">Unlock</button>'+
+    '<div class="note" id="gerr"></div></div>';
+  function go(){
+    var v=el("pin").value.trim(); if(!v)return;
+    el("gerr").textContent="checking\u2026";
+    getRole(v).then(function(role){
+      if(role==="owner"||role==="mod"){
+        PIN=v;ROLE=role;
+        localStorage.setItem("cl_pin",v);localStorage.setItem("cl_role",role);
+        render();
+      }else{ el("gerr").textContent="Wrong PIN"; el("pin").value=""; }
+    }).catch(function(){ el("gerr").textContent="Can\u2019t reach the server"; });
+  }
+  el("unlock").onclick=go;
+  el("pin").onkeydown=function(e){ if(e.key==="Enter") go(); };
+}
+
+function render(){ if(IS_OV) runOverlay(); else renderDeck(); }
+render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT FIX // OVERLAY</title>
+<style>
+  /* Code_Font.ttf — drop the file in the repo next to this HTML.
+     Falls back to a mono pixel-ish stack if it can't load. */
+  @font-face{
+    font-family:'CodeFont';
+    src:url('Code_Font.ttf') format('truetype');
+    font-display:swap;
+  }
+  :root{
+    --panel:#0B0C0F; --panel-2:#121419; --line:#3A4148;
+    --text:#EDEDEB; --dim:#B4B9BF; --amber:#3A93D6; --teal:#B4B9BF; --red:#D8455F;
+    --hud:'CodeFont','Courier New',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:transparent;font-family:var(--hud);overflow:hidden}
+
+  /* full-width bar to sit under the follower goal; OBS scales the whole source */
+  #stage{position:fixed;top:0;left:0;right:0;padding:6px}
+  #badge{
+    width:100%;background:linear-gradient(180deg,#161b1c,#0e1112);
+    border:2px solid var(--line);
+    box-shadow:0 4px 0 rgba(0,0,0,.4);
+    overflow:hidden;opacity:0;transform:translateY(-8px);
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  #badge.show{opacity:1;transform:translateY(0)}
+
+  /* header strip with the hazard-stripe motif like the follower bar */
+  .top{
+    display:flex;align-items:center;gap:12px;padding:9px 14px;
+    border-bottom:2px solid var(--line);
+    background:
+      repeating-linear-gradient(45deg,#00000000 0 6px,#ffffff08 6px 12px),
+      linear-gradient(180deg,#1a1f20,#141819);
+  }
+  .led{width:13px;height:13px;background:var(--amber);box-shadow:0 0 10px var(--amber);flex:none;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .brand{font-family:var(--hud);font-weight:400;font-size:22px;letter-spacing:.12em;color:var(--text);text-transform:uppercase}
+  .brand span{color:var(--dim)}
+  .state{margin-left:auto;font-size:18px;letter-spacing:.24em;color:var(--amber);text-transform:uppercase}
+
+  .body{display:flex;align-items:center;gap:24px;padding:16px 20px}
+  .stat{display:flex;flex-direction:column;line-height:1}
+  .kicker{font-size:14px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;margin-bottom:8px}
+  .count{font-family:var(--hud);font-size:52px;color:var(--teal);letter-spacing:.02em}
+  .count-label{font-size:14px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin-top:6px}
+  .divider{width:2px;align-self:stretch;background:var(--line);margin:2px 0}
+  .clock{font-family:var(--hud);font-size:42px;color:var(--amber);letter-spacing:.06em}
+  .tlabel{font-size:14px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:6px}
+
+  .qr{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .qr .frame{width:92px;height:92px;background:#fff;padding:6px;display:flex;align-items:center;justify-content:center}
+  .qr canvas,.qr img,.qr svg{width:100%;height:100%;display:block}
+  .qr .scan{font-size:15px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;line-height:1.4;text-align:right}
+  .qr .scan b{color:var(--teal);font-weight:400;display:block}
+
+  .count.bump{animation:bump .5s ease}
+  @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18);color:var(--amber)}100%{transform:scale(1);color:var(--teal)}}
+
+  /* closed state */
+  #badge.closed .led{background:var(--dim);box-shadow:none;animation:none}
+  #badge.closed .state{color:var(--dim)}
+  #badge.closed .stat,
+  #badge.closed .divider{display:none}
+  #badge.closed .closed-msg{display:flex}
+  .closed-msg{display:none;flex-direction:column;line-height:1.4}
+  .closed-msg .cm-title{font-size:22px;letter-spacing:.1em;color:var(--text);text-transform:uppercase;margin-bottom:7px}
+  .closed-msg .cm-body{font-size:17px;color:var(--dim);letter-spacing:.03em;line-height:1.5}
+  .closed-msg .cm-body b{color:var(--amber);font-weight:400}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="badge">
+    <div class="top">
+      <div class="led"></div>
+      <div class="brand">PROJECT FIX <span>// PR0CESS_LIVE</span></div>
+      <div class="state" id="state">OPEN</div>
+    </div>
+    <div class="body">
+      <div class="stat">
+        <div class="kicker">Submissions</div>
+        <div class="count" id="count">0</div>
+        <div class="count-label">tracks in</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <div class="kicker">Closes in</div>
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="tlabel">hrs · min · sec</div>
+      </div>
+      <div class="closed-msg">
+        <div class="cm-title">PROJECT FIX</div>
+        <div class="cm-body" id="closedMsgText">Submissions are closed right now — scan to see when the next window opens.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://cdkzbbrakewvhmejzryj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Rba1RBrB7u0_79fUzEUYhw_Wm_Ev_42";
+const SITE_URL = "https://nobeatsattached.github.io/grex-project-fix/";
+const POLL_MS = 8000; // how often to refresh count + window (8s is gentle on the free tier)
+/* ========================================== */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+let countdownTimer = null, pollTimer = null, lastCount = 0, currentWindow = null;
+
+// QR is now an inline SVG in the markup — no library, no external requests, nothing to block.
+
+async function poll() {
+  // remote on/off flag from the Control Room
+  const { data: setting } = await sb.from("app_settings").select("overlay_on").eq("id", 1).maybeSingle();
+  if (setting && setting.overlay_on === false) {
+    $("badge").classList.remove("show"); // hidden until switched on
+    clearInterval(countdownTimer);
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const { data, error } = await sb.from("windows").select("*")
+    .lte("opens_at", now).gte("closes_at", now)
+    .order("closes_at", { ascending: true }).limit(1);
+
+  if (error) return; // keep showing last known state on a hiccup
+
+  const win = data && data[0] ? data[0] : null;
+
+  if (!win) {
+    // no open window -> slim closed card (QR stays visible), don't hide.
+    // Look ahead for the next scheduled window and show its real date.
+    $("badge").classList.add("show");
+    $("badge").classList.add("closed");
+    $("state").textContent = "CLOSED";
+    currentWindow = null;
+    clearInterval(countdownTimer);
+
+    const { data: next } = await sb.from("windows").select("opens_at,title")
+      .gt("opens_at", now).order("opens_at", { ascending: true }).limit(1);
+    const msg = $("closedMsgText");
+    if (next && next[0]) {
+      msg.innerHTML = 'Next window opens<br><b style="color:var(--amber)">' + fmtNext(next[0].opens_at) + '</b><br>Scan to get ready.';
+    } else {
+      msg.textContent = 'Submissions are closed right now — scan to catch the next window.';
+    }
+    return;
+  }
+
+  $("badge").classList.remove("closed");
+  $("state").textContent = "OPEN";
+
+  // window changed (new one, or reopened) -> restart countdown
+  if (!currentWindow || currentWindow.id !== win.id || currentWindow.closes_at !== win.closes_at) {
+    currentWindow = win;
+    startCountdown(win);
+  }
+  $("badge").classList.add("show");
+
+  // live submission count — via a function, since the overlay is anonymous
+  // and RLS would otherwise hide the rows and return 0.
+  const { data: cnt } = await sb.rpc("window_submission_count", { win: win.id });
+  if (typeof cnt === "number") setCount(cnt);
+}
+
+function setCount(n) {
+  const el = $("count");
+  el.textContent = n;
+  if (n > lastCount) { // bump animation when a new one lands
+    el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+  }
+  lastCount = n;
+}
+
+function startCountdown(win) {
+  clearInterval(countdownTimer);
+  const tick = () => {
+    const ms = new Date(win.closes_at) - new Date();
+    if (ms <= 0) { $("clock").textContent = "00:00:00"; clearInterval(countdownTimer); poll(); return; }
+    const totalH = Math.floor(ms / 3600000);
+    const m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60;
+    const pad = n => String(n).padStart(2, "0");
+    $("clock").textContent = pad(totalH) + ":" + pad(m) + ":" + pad(s);
+  };
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+function fmtNext(iso) {
+  return new Date(iso).toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+}
+
+poll();
+pollTimer = setInterval(poll, POLL_MS);
+</script>
+</body>
+</html>

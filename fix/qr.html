@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT FIX // QR</title>
+<style>
+  @font-face{ font-family:'CodeFont'; src:url('Code_Font.ttf') format('truetype'); font-display:swap; }
+  :root{ --line:#3A4148; --text:#EDEDEB; --dim:#B4B9BF; --amber:#3A93D6; --teal:#B4B9BF;
+         --hud:'CodeFont','Courier New',monospace; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:transparent;font-family:var(--hud);overflow:hidden}
+  #stage{position:fixed;top:0;left:0;padding:8px}
+  #card{
+    display:inline-block;background:linear-gradient(180deg,#161b1c,#0e1112);
+    border:2px solid var(--line);box-shadow:0 4px 0 rgba(0,0,0,.4);
+    opacity:0;transform:translateY(-8px);transition:opacity .35s ease, transform .35s ease;
+  }
+  #card.show{opacity:1;transform:translateY(0)}
+  .head{
+    display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:2px solid var(--line);
+    background:repeating-linear-gradient(45deg,#00000000 0 6px,#ffffff08 6px 12px),linear-gradient(180deg,#1a1f20,#141819);
+  }
+  .led{width:12px;height:12px;background:var(--amber);box-shadow:0 0 10px var(--amber);flex:none;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .head .t{font-size:18px;letter-spacing:.12em;color:var(--text);text-transform:uppercase}
+  .head .t span{color:var(--dim)}
+  .qrwrap{padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .frame{width:240px;height:240px;background:#fff;padding:10px;display:flex;align-items:center;justify-content:center}
+  .frame img{width:100%;height:100%;display:block;image-rendering:pixelated}
+  .scan{font-size:20px;letter-spacing:.14em;color:var(--text);text-transform:uppercase;text-align:center}
+  .scan b{color:var(--teal);font-weight:400}
+  .sub{font-size:14px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;text-align:center;margin-top:-4px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="card">
+    <div class="head">
+      <div class="led"></div>
+      <div class="t">PROJECT FIX <span>// SUBMIT</span></div>
+    </div>
+    <div class="qrwrap">
+      <div class="frame"><img src="data:image/png;base64,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" alt="Scan to submit"></div>
+      <div class="scan">SCAN TO <b>SUBMIT</b></div>
+      <div class="sub">Ableton · VIP subs only</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://cdkzbbrakewvhmejzryj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Rba1RBrB7u0_79fUzEUYhw_Wm_Ev_42";
+const POLL_MS = 8000;
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+async function poll(){
+  const { data } = await sb.from("app_settings").select("overlay_on").eq("id",1).maybeSingle();
+  if(data && data.overlay_on === false){ $("card").classList.remove("show"); return; }
+  $("card").classList.add("show");
+}
+poll();
+setInterval(poll, POLL_MS);
+</script>
+</body>
+</html>

@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#070707" />
+<title>OBS CONTROL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#070707;--panel:#101012;--panel2:#151517;--line:#1F1F23;--line2:#2C2C32;
+  --text:#F0F0F0;--dim:#B9B9BE;--dimmer:#6C6C74;
+  --amber:#FFB020;--amber-soft:rgba(255,176,32,.13);
+  --green:#3FFF9E;--red:#FF4B6E;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;line-height:1.5;overscroll-behavior:none}
+body.bridge{background:transparent}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 60px}
+
+/* status bar */
+.bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:11px;
+  padding:16px 0 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dimmer);flex:none}
+.dot.live{background:var(--green)}
+.dot.dead{background:var(--red)}
+.scene{font-size:16px;font-weight:500;color:var(--text);letter-spacing:-.01em}
+.scene.bad{color:var(--dimmer);font-weight:400}
+.spacer{margin-left:auto}
+.undo{background:transparent;border:1px solid var(--line2);color:var(--dimmer);
+  font:inherit;font-size:13px;padding:8px 15px;border-radius:7px;cursor:pointer;transition:.14s}
+.undo.armed{border-color:var(--amber);color:var(--amber)}
+.eye{background:transparent;border:1px solid var(--line2);color:var(--dimmer);font:inherit;
+  font-size:13px;padding:8px 15px;border-radius:7px;cursor:pointer;transition:.14s;margin-right:7px}
+.eye.on{border-color:var(--amber);color:var(--amber)}
+.eye.qbtn{font-size:12px;padding:8px 12px;margin-right:7px}
+.undo:disabled{opacity:.4;cursor:default}
+
+/* rows */
+.row{display:flex;gap:7px;flex-wrap:wrap;padding:16px 0}
+.pill{background:var(--panel);border:1px solid transparent;color:var(--dim);font:inherit;
+  font-size:13.5px;padding:9px 15px;border-radius:8px;cursor:pointer;transition:.14s}
+.pill:hover{color:var(--text);background:var(--panel2)}
+.pill.on{background:var(--amber);color:#0A0A0A;font-weight:500}
+.pill.sel{border-color:var(--amber);color:var(--amber)}
+.pill.hidden{color:var(--dimmer);text-decoration:line-through}
+
+/* map */
+.map{position:relative;width:100%;aspect-ratio:16/9;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:none;user-select:none}
+.mapempty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--dimmer)}
+.mapframe{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0}
+.mi{position:absolute;z-index:2;border:1px solid rgba(255,255,255,.42);border-radius:2px;
+  overflow:hidden;cursor:grab;box-shadow:0 0 0 1px rgba(0,0,0,.55)}
+.mi b{display:inline-block;max-width:100%;font-size:11px;font-weight:400;color:#EDEDED;
+  background:rgba(0,0,0,.72);padding:3px 6px;border-radius:0 0 3px 0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.mi.tiny b{display:none}
+.mi.tiny:hover b,.mi.sel b{display:inline-block}
+.mi:hover{border-color:rgba(255,255,255,.8);z-index:4}
+.mi.sel{border:2px solid var(--amber);background:var(--amber-soft);z-index:6;overflow:visible;cursor:grabbing}
+.mi.sel b{color:#0A0A0A;background:var(--amber)}
+.mi.off{opacity:.3;border-style:dashed}
+.mi.stray{border-color:var(--red);border-style:dotted}
+.mi.pend{border:2px dashed var(--amber);background:rgba(255,176,32,.09)}
+.mi.pend b{color:var(--amber)}
+.commit{display:flex;align-items:center;gap:10px;margin-top:10px;background:rgba(255,176,32,.1);
+  border:1px solid var(--amber);border-radius:9px;padding:11px 14px;flex-wrap:wrap}
+.commit.off{background:rgba(255,75,110,.1);border-color:var(--red)}
+.commit.off .msg{color:var(--red)}
+.commit.off .cbtn{background:var(--red)}
+.commit .msg{font-size:13.5px;color:var(--amber)}
+.cbtn{background:var(--amber);color:#0A0A0A;border:none;font:inherit;font-weight:500;font-size:13.5px;
+  padding:9px 18px;border-radius:7px;cursor:pointer}
+.cbtn.quiet{background:transparent;border:1px solid var(--line2);color:var(--dim);font-weight:400}
+.mi .hd{position:absolute;background:var(--amber);border-radius:2px;z-index:8}
+.hd.nw,.hd.ne,.hd.sw,.hd.se{width:13px;height:13px}
+.hd.n,.hd.s{left:50%;margin-left:-13px;width:26px;height:9px}
+.hd.e,.hd.w{top:50%;margin-top:-13px;height:26px;width:9px}
+.hd.nw{left:-7px;top:-7px;cursor:nwse-resize}
+.hd.ne{right:-7px;top:-7px;cursor:nesw-resize}
+.hd.sw{left:-7px;bottom:-7px;cursor:nesw-resize}
+.hd.se{right:-7px;bottom:-7px;cursor:nwse-resize}
+.hd.n{top:-5px;cursor:ns-resize}
+.hd.s{bottom:-5px;cursor:ns-resize}
+.hd.w{left:-5px;cursor:ew-resize}
+.hd.e{right:-5px;cursor:ew-resize}
+
+/* selection strip */
+.strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+  background:var(--panel);border-radius:9px;padding:12px 14px;min-height:52px}
+.strip .who{font-size:14px;font-weight:500;color:var(--amber)}
+.strip .nums{font-size:12.5px;color:var(--dimmer);font-variant-numeric:tabular-nums}
+.strip .none{font-size:13px;color:var(--dimmer)}
+.sbtn{background:var(--panel2);border:1px solid var(--line2);color:var(--dim);font:inherit;
+  font-size:13px;padding:8px 13px;border-radius:7px;cursor:pointer;transition:.14s}
+.sbtn:hover{color:var(--text);border-color:var(--dimmer)}
+.sbtn.warn:hover{color:var(--red);border-color:var(--red)}
+
+.health{display:flex;gap:22px;flex-wrap:wrap;align-items:baseline;padding:14px 0 2px}
+.hs{display:flex;flex-direction:column;gap:3px}
+.hs .k{font-size:11px;color:var(--dimmer)}
+.hs .v{font-size:15px;color:var(--dim);font-variant-numeric:tabular-nums}
+.hs .v.good{color:var(--green)}
+.hs .v.warn{color:var(--amber)}
+.hs .v.bad{color:var(--red)}
+.hs .v.idle{color:var(--dimmer)}
+.hint{font-size:12.5px;color:var(--dimmer);margin-top:11px}
+.hint kbd{background:var(--panel2);border:1px solid var(--line2);border-radius:4px;
+  padding:1px 6px;font:inherit;font-size:11.5px;color:var(--dim)}
+
+/* owner drawer */
+.drawer{margin-top:34px;border-top:1px solid var(--line);padding-top:8px}
+.dtoggle{width:100%;background:transparent;border:none;color:var(--dimmer);font:inherit;
+  font-size:13px;padding:12px 0;cursor:pointer;text-align:left}
+.dtoggle:hover{color:var(--dim)}
+.dbody{display:none;grid-template-columns:1fr;gap:26px;padding:8px 0 6px}
+.dbody.open{display:grid}
+@media(min-width:820px){.dbody.open{grid-template-columns:1fr 1fr;gap:30px}}
+.lab{font-size:12.5px;color:var(--dimmer);margin-bottom:9px}
+.tin{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);
+  font:inherit;font-size:14px;padding:11px 13px;border-radius:8px;margin-bottom:8px}
+.tin::placeholder{color:var(--dimmer)}
+.tin:focus{outline:none;border-color:var(--amber)}
+.btn{width:100%;background:var(--amber);color:#0A0A0A;border:none;font:inherit;font-weight:500;
+  font-size:13.5px;padding:12px;border-radius:8px;cursor:pointer;margin-top:4px;transition:.14s}
+.btn:hover{filter:brightness(1.08)}
+.btn.quiet{background:transparent;border:1px solid var(--line2);color:var(--dim);font-weight:400}
+.btn.quiet:hover{border-color:var(--dimmer);color:var(--text);filter:none}
+.btn.danger{background:var(--red);color:#0A0A0A;font-weight:500}
+.note{font-size:12.5px;color:var(--dimmer);margin-top:11px}
+.foot{display:flex;gap:20px;justify-content:center;margin-top:36px;padding-top:18px;
+  border-top:1px solid var(--line)}
+.foot a{font-size:12.5px;color:var(--dimmer);text-decoration:none}
+.foot a:hover{color:var(--amber)}
+#rawout{width:100%;min-height:110px;margin-top:10px;background:var(--panel);color:var(--amber);
+  border:1px solid var(--line2);border-radius:8px;font:inherit;font-size:11.5px;padding:10px}
+
+/* gate */
+.gate{max-width:300px;margin:0 auto;padding:20vh 20px 0;text-align:center}
+.gate h1{font-size:15px;font-weight:500;color:var(--dim);margin-bottom:22px;letter-spacing:.02em}
+.gate .tin{text-align:center;font-size:17px;letter-spacing:.24em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* OBS CONTROL
+   obs.html               -> control deck
+   obs.html?pw=PASSWORD   -> bridge, runs as a browser source inside OBS  */
+(function(){
+"use strict";
+
+var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var CHANNEL="ch-obs-4bn7yq2";
+var OBS_PORT=4455;
+var NUDGE=20;
+var SCALE_STEP=.06;
+
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{realtime:{params:{eventsPerSecond:25}}});
+var app=document.getElementById("app");
+function rawPw(){
+  var m=location.search.match(/[?&]pw=([^&]*)/);
+  if(!m) return "";
+  try{ return decodeURIComponent(m[1]); }catch(e){ return m[1]; }
+}
+var IS_BRIDGE=/[?&]pw=/.test(location.search);
+var channel=null;
+var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+function sha256bytes(msg){
+  function rr(n,x){return (x>>>n)|(x<<(32-n));}
+  var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var bytes=[],i;
+  for(i=0;i<msg.length;i++){
+    var c=msg.charCodeAt(i);
+    if(c<128) bytes.push(c);
+    else if(c<2048){ bytes.push(192|(c>>6),128|(c&63)); }
+    else { bytes.push(224|(c>>12),128|((c>>6)&63),128|(c&63)); }
+  }
+  var bitLen=bytes.length*8;
+  bytes.push(0x80);
+  while(bytes.length%64!==56) bytes.push(0);
+  for(i=7;i>=0;i--) bytes.push((bitLen/Math.pow(2,i*8))&255);
+  var w=new Array(64);
+  for(var b=0;b<bytes.length;b+=64){
+    for(i=0;i<16;i++) w[i]=(bytes[b+i*4]<<24)|(bytes[b+i*4+1]<<16)|(bytes[b+i*4+2]<<8)|bytes[b+i*4+3];
+    for(i=16;i<64;i++){
+      var s0=rr(7,w[i-15])^rr(18,w[i-15])^(w[i-15]>>>3);
+      var s1=rr(17,w[i-2])^rr(19,w[i-2])^(w[i-2]>>>10);
+      w[i]=(w[i-16]+s0+w[i-7]+s1)|0;
+    }
+    var a=H[0],bb=H[1],c2=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(i=0;i<64;i++){
+      var S1=rr(6,e)^rr(11,e)^rr(25,e);
+      var ch=(e&f)^((~e)&g);
+      var t1=(h+S1+ch+K[i]+w[i])|0;
+      var S0=rr(2,a)^rr(13,a)^rr(22,a);
+      var mj=(a&bb)^(a&c2)^(bb&c2);
+      var t2=(S0+mj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c2;c2=bb;bb=a;a=(t1+t2)|0;
+    }
+    H[0]=(H[0]+a)|0;H[1]=(H[1]+bb)|0;H[2]=(H[2]+c2)|0;H[3]=(H[3]+d)|0;
+    H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+  }
+  var out=[];
+  for(i=0;i<8;i++){ out.push((H[i]>>>24)&255,(H[i]>>>16)&255,(H[i]>>>8)&255,H[i]&255); }
+  return out;
+}
+function b64(bytes){
+  var s=""; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+  return btoa(s);
+}
+function sha256b64(str){ return b64(sha256bytes(str)); }
+
+/* ==========================================================
+   BRIDGE — runs on G-REX's machine
+   ========================================================== */
+function runBridge(){
+  document.body.className="bridge";
+  var pw=rawPw();
+  var ws=null, obsReady=false, reqId=0, pending={}, canvas={w:1920,h:1080};
+  var curScene="", deckHere=false, lastErr="", textKind="", kinds=[];
+  var eyeOn=false, imgFmt="", eyeTimer=null, eyeQ="soft";
+  var undoStack=[];
+  function pushUndo(label,fn){
+    undoStack.push({label:label,fn:fn});
+    if(undoStack.length>25) undoStack.shift();
+    send("undo",{n:undoStack.length,last:label});
+  }
+  function pickKind(prefix){
+    for(var i=0;i<kinds.length;i++) if(kinds[i].indexOf(prefix)===0) return kinds[i];
+    return "";
+  }
+
+  app.innerHTML='<div class="bwrap"><div class="bcard"><h1>PR<span class="z">0</span>CESS_LIVE // BRIDGE</h1>'+
+    '<div class="brow"><span class="k">OBS</span><span class="v" id="b_obs">connecting</span></div>'+
+    '<div class="brow"><span class="k">Relay</span><span class="v" id="b_rel">connecting</span></div>'+
+    '<div class="brow"><span class="k">Last</span><span class="v" id="b_last">\u2014</span></div>'+
+    '<div class="brow"><span class="k">View</span><span class="v" id="b_shot">off</span></div>'+
+    '<div class="brow"><span class="k">View</span><span class="v" id="b_shot">\u2014</span></div>'+
+    '<p class="hint" style="margin-top:14px">Leave this running. It takes commands from the deck and passes them to OBS.</p>'+
+    '</div></div>';
+  function setRow(id,txt,cls){ var e=document.getElementById(id); if(e){ e.textContent=txt; e.className="v"+(cls?" "+cls:""); } }
+
+  function obsConnect(){
+    setRow("b_obs","connecting");
+    try{ ws=new WebSocket("ws://127.0.0.1:"+OBS_PORT); }
+    catch(e){ setRow("b_obs","blocked","bad"); return; }
+
+    ws.onopen=function(){ setRow("b_obs","handshaking"); };
+    ws.onclose=function(e){
+      obsReady=false;
+      var why="disconnected";
+      if(e&&e.code===4009) why="WRONG PASSWORD";
+      else if(e&&e.code===4008) why="handshake timed out";
+      else if(e&&e.code===1006) why="OBS not listening \u2014 is the server enabled?";
+      setRow("b_obs",why,"bad");
+      setTimeout(obsConnect,4000);
+    };
+    ws.onerror=function(){ setRow("b_obs","can\u2019t reach OBS","bad"); };
+    ws.onmessage=function(ev){
+      var m; try{ m=JSON.parse(ev.data); }catch(e){ return; }
+      if(m.op===0){
+        var ident={op:1,d:{rpcVersion:1}};
+        if(m.d.authentication){
+          var secret=sha256b64(pw+m.d.authentication.salt);
+          ident.d.authentication=sha256b64(secret+m.d.authentication.challenge);
+        }
+        ws.send(JSON.stringify(ident));
+      }
+      if(m.op===2){
+        obsReady=true; setRow("b_obs","connected","ok");
+        obs("GetVideoSettings",{}).then(function(v){
+          if(v){ canvas.w=v.baseWidth||1920; canvas.h=v.baseHeight||1080; }
+        });
+        obs("GetVersion",{}).then(function(v){
+          var f=(v&&v.supportedImageFormats)||[];
+          var want=["jpg","jpeg","png","bmp"];
+          for(var i=0;i<want.length;i++){ if(f.indexOf(want[i])>-1){ imgFmt=want[i]; break; } }
+          if(!imgFmt&&f.length) imgFmt=f[0];
+          setRow("b_shot", imgFmt?("ready ("+imgFmt+")"):"no image format");
+        });
+        obs("GetInputKindList",{}).then(function(r){
+          kinds=((r&&r.inputKinds)||[]);
+          textKind=kinds.filter(function(k){ return k.indexOf("text_")===0; }).sort().pop()||"";
+        });
+        pushState();
+      }
+      if(m.op===7){
+        var p=pending[m.d.requestId];
+        if(p){ delete pending[m.d.requestId];
+          if(m.d.requestStatus&&m.d.requestStatus.result) p.res(m.d.responseData||{});
+          else {
+            lastErr=(m.d.requestStatus&&(m.d.requestStatus.comment||m.d.requestStatus.code))||"failed";
+            p.res(null);
+          } }
+      }
+      if(m.op===5){ // something changed in OBS — refresh the deck
+        if(/Scene|SceneItem|Input/.test(m.d.eventType||"")) schedulePush();
+      }
+    };
+  }
+
+  function obs(type,data){
+    return new Promise(function(res){
+      if(!ws||ws.readyState!==1||!obsReady){ res(null); return; }
+      var id="r"+(++reqId);
+      pending[id]={res:res};
+      ws.send(JSON.stringify({op:6,d:{requestType:type,requestId:id,requestData:data||{}}}));
+      setTimeout(function(){ if(pending[id]){ delete pending[id]; res(null); } },4000);
+    });
+  }
+
+  var pushTimer=null;
+  function schedulePush(){ clearTimeout(pushTimer); pushTimer=setTimeout(pushState,250); }
+
+  var lastBytes=0, lastBytesAt=0, health={};
+  function pullHealth(){
+    return obs("GetStreamStatus",{}).then(function(ss){
+      return obs("GetStats",{}).then(function(st){
+        var h={};
+        if(ss){
+          h.live=!!ss.outputActive;
+          h.up=ss.outputDuration||0;
+          h.skipped=ss.outputSkippedFrames||0;
+          h.total=ss.outputTotalFrames||0;
+          var b=ss.outputBytes||0, now=Date.now();
+          if(lastBytesAt&&b>lastBytes){
+            h.kbps=Math.round(((b-lastBytes)*8/1000)/((now-lastBytesAt)/1000));
+          }
+          lastBytes=b; lastBytesAt=now;
+        }
+        if(st){
+          h.cpu=Math.round((st.cpuUsage||0)*10)/10;
+          h.render=Math.round((st.averageFrameRenderTime||0)*100)/100;
+          h.renderMissed=st.renderSkippedFrames||0;
+          h.renderTotal=st.renderTotalFrames||0;
+          h.fps=Math.round(st.activeFps||0);
+        }
+        health=h;
+        return h;
+      });
+    });
+  }
+
+  function pushState(){
+    if(!obsReady){ send("state",{ok:false}); return; }
+    obs("GetSceneList",{}).then(function(sl){
+      if(!sl){ send("state",{ok:false}); return; }
+      var cur=sl.currentProgramSceneName;
+      curScene=cur;
+      var scenes=(sl.scenes||[]).map(function(s){return s.sceneName;}).reverse();
+      obs("GetSceneItemList",{sceneName:cur}).then(function(il){
+        var raw=((il&&il.sceneItems)||[]).slice().reverse();
+        if(!raw.length){ send("state",{ok:true,scenes:scenes,current:cur,items:[],cw:canvas.w,ch:canvas.h}); return; }
+        var jobs=raw.map(function(it){
+          return obs("GetSceneItemTransform",{sceneName:cur,sceneItemId:it.sceneItemId})
+          .then(function(tr){
+            var t=(tr&&tr.sceneItemTransform)||it.sceneItemTransform||{};
+            var bt=t.boundsType||"OBS_BOUNDS_NONE";
+            var w,h;
+            if(bt!=="OBS_BOUNDS_NONE"&&t.boundsWidth){
+              w=t.boundsWidth; h=t.boundsHeight;
+            }else{
+              var sw=(t.sourceWidth||0)-(t.cropLeft||0)-(t.cropRight||0);
+              var sh=(t.sourceHeight||0)-(t.cropTop||0)-(t.cropBottom||0);
+              w=sw*(t.scaleX||1); h=sh*(t.scaleY||1);
+              if((!w||!h)&&t.width){ w=t.width; h=t.height; }
+            }
+            if(!w||w<1) w=canvas.w*0.08;
+            if(!h||h<1) h=canvas.h*0.08;
+            var a=(typeof t.alignment==="number")?t.alignment:5;
+            var x=t.positionX||0, y=t.positionY||0;
+            if(a&2) x=x-w; else if(!(a&1)) x=x-w/2;
+            if(a&8) y=y-h; else if(!(a&4)) y=y-h/2;
+            return {id:it.sceneItemId,name:it.sourceName,on:it.sceneItemEnabled!==false,
+                    x:Math.round(x),y:Math.round(y),w:Math.round(w),h:Math.round(h)};
+          });
+        });
+        Promise.all(jobs).then(function(items){
+          pullHealth().then(function(h){
+            send("state",{ok:true,scenes:scenes,current:cur,items:items,
+                          health:h,cw:canvas.w,ch:canvas.h});
+          });
+        });
+      });
+    });
+  }
+
+  function note(t){
+    setRow("b_last",t);
+    /* the operator is on another machine — surface it there too */
+    if(/fail|refus|error|no |can.t|isn.t|wrong/i.test(t)) send("said",{t:t});
+  }
+
+  function shot(){
+    if(!obsReady||!curScene){ setRow("b_shot","no scene","bad"); return; }
+    if(!imgFmt){ setRow("b_shot","no image format","bad"); return; }
+    lastErr="";
+    var sharp=(eyeQ==="sharp");
+    var req={sourceName:curScene,imageFormat:imgFmt,imageWidth:sharp?760:400};
+    if(imgFmt!=="png"&&imgFmt!=="bmp") req.imageCompressionQuality=sharp?72:32;
+    obs("GetSourceScreenshot",req).then(function(r){
+      if(!r||!r.imageData){ setRow("b_shot",lastErr||"no image returned","bad"); return; }
+      var kb=Math.round(r.imageData.length/1024);
+      if(kb>220){ setRow("b_shot",kb+"kb too big","bad"); return; }
+      try{
+        channel.send({type:"broadcast",event:"shot",payload:{img:r.imageData}});
+        setRow("b_shot",kb+"kb","ok");
+      }catch(e){ setRow("b_shot","send failed","bad"); }
+    });
+  }
+
+  function handle(p){
+    if(!p||!p.cmd)return;
+    note(p.cmd);
+    if(p.cmd==="ping"){ pushState(); return; }
+    if(p.cmd==="reveal"){
+      var rn=p.name, rs=p.secs||0;
+      obs("SetSceneItemEnabled",{sceneName:p.scene,sceneItemId:p.id,sceneItemEnabled:true})
+        .then(schedulePush);
+      pushUndo("reveal",function(){ obs("RemoveInput",{inputName:rn}).then(schedulePush); });
+      if(rs) setTimeout(function(){ obs("RemoveInput",{inputName:rn}).then(schedulePush); },rs*1000);
+      note("revealed "+rn);
+      return;
+    }
+    if(p.cmd==="reload"){
+      var rnm=p.name||"";
+      if(/^BRIDGE$/i.test(rnm)){ note("refused: that\u2019s the bridge"); send("said",{t:"That\u2019s the bridge \u2014 refreshing it would cut your own connection."}); return; }
+      obs("GetInputSettings",{inputName:rnm}).then(function(si){
+        if(!si){ send("said",{t:"Couldn\u2019t read that source."}); return; }
+        if((si.inputKind||"").indexOf("browser")!==0){
+          send("said",{t:rnm+" isn\u2019t a browser source."}); return;
+        }
+        obs("PressInputPropertiesButton",{inputName:rnm,propertyName:"refreshnocache"}).then(function(r){
+          note(r?("refreshed "+rnm):("refresh failed: "+lastErr));
+          send("said",{t:r?("Refreshed "+rnm):("Refresh failed: "+(lastErr||"unknown"))});
+        });
+      });
+      return;
+    }
+    if(p.cmd==="eye"){
+      eyeOn=!!p.on;
+      if(p.q) eyeQ=p.q;
+      clearInterval(eyeTimer); eyeTimer=null;
+      if(eyeOn){ shot(); eyeTimer=setInterval(shot,1400); }
+      else setRow("b_shot","off");
+      return;
+    }
+    if(p.cmd==="raw"){
+      obs("GetSceneItemList",{sceneName:p.scene}).then(function(il){
+        var raw=((il&&il.sceneItems)||[]);
+        Promise.all(raw.map(function(it){
+          return obs("GetSceneItemTransform",{sceneName:p.scene,sceneItemId:it.sceneItemId})
+            .then(function(r){ return {n:it.sourceName,t:(r&&r.sceneItemTransform)||null}; });
+        })).then(function(all){
+          send("raw",{canvas:canvas.w+"x"+canvas.h,scene:p.scene,items:all});
+        });
+      });
+      return;
+    }
+    if(p.cmd==="create"){
+      var nm=(p.name||"").trim()||("SOURCE "+Date.now());
+      var kind="", settings={};
+      if(p.kind==="browser"){
+        kind=pickKind("browser_source");
+        settings={url:p.val,width:p.w||1920,height:p.h||1080};
+      }else if(p.kind==="media"){
+        kind=pickKind("ffmpeg_source");
+        settings={is_local_file:false,input:p.val,looping:true,restart_on_activate:true};
+      }else if(p.kind==="text"){
+        kind=textKind;
+        settings={text:String(p.val||""),font:{face:"Arial",size:96,style:"Bold"}};
+      }else if(p.kind==="color"){
+        kind=pickKind("color_source");
+        settings={width:Math.round(canvas.w/2),height:Math.round(canvas.h/2),color:4278190335};
+      }
+      if(!kind){ note("this OBS has no "+p.kind+" source"); return; }
+      obs("CreateInput",{sceneName:p.scene,inputName:nm,inputKind:kind,
+        inputSettings:settings,sceneItemEnabled:true}).then(function(r){
+        if(!r){ note("create failed: "+lastErr); return; }
+        note("added "+nm);
+        pushUndo("add source",function(){ obs("RemoveInput",{inputName:nm}); });
+        schedulePush();
+      });
+      return;
+    }
+    if(p.cmd==="del"){
+      var dn=p.name, dsc=p.scene, did=p.id;
+      obs("GetInputSettings",{inputName:dn}).then(function(si){
+        var finish=function(savedT){
+          obs("RemoveInput",{inputName:dn}).then(function(r){
+            if(!r){ note("remove failed: "+lastErr); return; }
+            note("removed "+dn);
+            if(si&&si.inputKind){
+              pushUndo("delete",function(){
+                obs("CreateInput",{sceneName:dsc,inputName:dn,inputKind:si.inputKind,
+                  inputSettings:si.inputSettings||{},sceneItemEnabled:true}).then(function(cr){
+                  if(cr&&savedT){
+                    obs("SetSceneItemTransform",{sceneName:dsc,sceneItemId:cr.sceneItemId,
+                      sceneItemTransform:{positionX:savedT.positionX,positionY:savedT.positionY,
+                        scaleX:savedT.scaleX,scaleY:savedT.scaleY,
+                        alignment:savedT.alignment,
+                        boundsType:savedT.boundsType,boundsWidth:savedT.boundsWidth,
+                        boundsHeight:savedT.boundsHeight,boundsAlignment:savedT.boundsAlignment}});
+                  }
+                  schedulePush();
+                });
+              });
+            }
+            schedulePush();
+          });
+        };
+        if(did) obs("GetSceneItemTransform",{sceneName:dsc,sceneItemId:did})
+                  .then(function(tr){ finish(tr&&tr.sceneItemTransform); });
+        else finish(null);
+      });
+      return;
+    }
+    if(p.cmd==="text"){
+      if(!textKind){ note("no text source available"); return; }
+      var tn="PRC_DROP_"+Date.now();
+      obs("CreateInput",{sceneName:p.scene,inputName:tn,inputKind:textKind,
+        inputSettings:{text:String(p.msg||""),font:{face:"Arial",size:p.size||96,style:"Bold"}},
+        sceneItemEnabled:!p.staged}).then(function(r){
+        if(!r){ note("text failed: "+lastErr); return; }
+        obs("SetSceneItemTransform",{sceneName:p.scene,sceneItemId:r.sceneItemId,
+          sceneItemTransform:{alignment:0,positionX:canvas.w/2,positionY:canvas.h/2}});
+        if(p.staged){ send("made",{id:r.sceneItemId,name:tn,secs:p.secs||0}); }
+        else if(p.secs) setTimeout(function(){ obs("RemoveInput",{inputName:tn}).then(schedulePush); },p.secs*1000);
+        schedulePush();
+      });
+      return;
+    }
+    if(p.cmd==="media"){
+      var mn="PRC_DROP_"+Date.now();
+      obs("CreateInput",{sceneName:p.scene,inputName:mn,inputKind:"ffmpeg_source",
+        inputSettings:{is_local_file:false,input:String(p.url||""),looping:!!p.loop,
+                       restart_on_activate:true,clear_on_media_end:true},
+        sceneItemEnabled:!p.staged}).then(function(r){
+        if(!r){ note("media failed: "+lastErr); return; }
+        obs("SetSceneItemTransform",{sceneName:p.scene,sceneItemId:r.sceneItemId,
+          sceneItemTransform:{alignment:0,positionX:canvas.w/2,positionY:canvas.h/2,
+            boundsType:"OBS_BOUNDS_SCALE_INNER",boundsAlignment:0,
+            boundsWidth:Math.round(canvas.w*0.6),boundsHeight:Math.round(canvas.h*0.6)}});
+        if(p.staged){ send("made",{id:r.sceneItemId,name:mn,secs:p.secs||0}); }
+        else if(p.secs) setTimeout(function(){ obs("RemoveInput",{inputName:mn}).then(schedulePush); },p.secs*1000);
+        schedulePush();
+      });
+      return;
+    }
+    if(p.cmd==="nuke"){
+      obs("GetInputList",{}).then(function(r){
+        ((r&&r.inputs)||[]).forEach(function(i){
+          if((i.inputName||"").indexOf("PRC_DROP_")===0) obs("RemoveInput",{inputName:i.inputName});
+        });
+        setTimeout(schedulePush,400);
+      });
+      return;
+    }
+    if(p.cmd==="undo"){
+      var u=undoStack.pop();
+      if(!u){ note("nothing to undo"); send("undo",{n:0,last:""}); return; }
+      note("undid "+u.label);
+      u.fn();
+      send("undo",{n:undoStack.length,last:undoStack.length?undoStack[undoStack.length-1].label:""});
+      setTimeout(schedulePush,300);
+      return;
+    }
+    if(p.cmd==="scene"){
+      var wasScene=curScene;
+      if(wasScene&&wasScene!==p.scene){
+        pushUndo("scene change",function(){ obs("SetCurrentProgramScene",{sceneName:wasScene}); });
+      }
+      obs("SetCurrentProgramScene",{sceneName:p.scene}).then(schedulePush);
+      return;
+    }
+    if(p.cmd==="vis"){
+      var wasOn=!p.on, vsc=p.scene, vid=p.id;
+      pushUndo(p.on?"show":"hide",function(){
+        obs("SetSceneItemEnabled",{sceneName:vsc,sceneItemId:vid,sceneItemEnabled:wasOn});
+      });
+      obs("SetSceneItemEnabled",{sceneName:p.scene,sceneItemId:p.id,sceneItemEnabled:!!p.on}).then(schedulePush);
+      return;
+    }
+    if(p.cmd==="box"){
+      obs("GetSceneItemTransform",{sceneName:p.scene,sceneItemId:p.id}).then(function(r){
+        if(!r||!r.sceneItemTransform)return;
+        var t=r.sceneItemTransform;
+        var prevB={positionX:t.positionX,positionY:t.positionY,scaleX:t.scaleX,scaleY:t.scaleY,
+                   boundsWidth:t.boundsWidth,boundsHeight:t.boundsHeight};
+        var bsc=p.scene, bid=p.id, bt=t.boundsType||"OBS_BOUNDS_NONE";
+        pushUndo("resize",function(){
+          var back={positionX:prevB.positionX,positionY:prevB.positionY,
+                    scaleX:prevB.scaleX,scaleY:prevB.scaleY};
+          if(bt!=="OBS_BOUNDS_NONE"){ back.boundsWidth=prevB.boundsWidth; back.boundsHeight=prevB.boundsHeight; }
+          obs("SetSceneItemTransform",{sceneName:bsc,sceneItemId:bid,sceneItemTransform:back});
+        });
+        var w=Math.max(8,p.w||8), h=Math.max(8,p.h||8);
+        var nt={};
+        if(bt!=="OBS_BOUNDS_NONE"){
+          nt.boundsWidth=Math.round(w); nt.boundsHeight=Math.round(h);
+        }else{
+          var sw=(t.sourceWidth||0)-(t.cropLeft||0)-(t.cropRight||0);
+          var sh=(t.sourceHeight||0)-(t.cropTop||0)-(t.cropBottom||0);
+          if(sw>0) nt.scaleX=Math.max(.02,w/sw);
+          if(sh>0) nt.scaleY=Math.max(.02,h/sh);
+        }
+        var a=(typeof t.alignment==="number")?t.alignment:5;
+        var px=p.x, py=p.y;
+        if(a&2) px=p.x+w; else if(!(a&1)) px=p.x+w/2;
+        if(a&8) py=p.y+h; else if(!(a&4)) py=p.y+h/2;
+        nt.positionX=Math.round(px); nt.positionY=Math.round(py);
+        obs("SetSceneItemTransform",{sceneName:p.scene,sceneItemId:p.id,sceneItemTransform:nt})
+          .then(schedulePush);
+      });
+      return;
+    }
+    if(p.cmd==="move"||p.cmd==="scale"||p.cmd==="snap"||p.cmd==="place"){
+      obs("GetSceneItemTransform",{sceneName:p.scene,sceneItemId:p.id}).then(function(r){
+        if(!r||!r.sceneItemTransform)return;
+        var prev={positionX:r.sceneItemTransform.positionX,positionY:r.sceneItemTransform.positionY,
+                  scaleX:r.sceneItemTransform.scaleX,scaleY:r.sceneItemTransform.scaleY};
+        var psc=p.scene, pid=p.id;
+        pushUndo(p.cmd==="scale"?"resize":"move",function(){
+          obs("SetSceneItemTransform",{sceneName:psc,sceneItemId:pid,sceneItemTransform:prev});
+        });
+        var t=r.sceneItemTransform, nt={};
+        if(p.cmd==="place"){
+          var pw2=(t.sourceWidth||0)*t.scaleX, ph2=(t.sourceHeight||0)*t.scaleY;
+          nt.positionX=Math.round(p.nx*canvas.w-pw2/2);
+          nt.positionY=Math.round(p.ny*canvas.h-ph2/2);
+        }
+        if(p.cmd==="move"){
+          nt.positionX=t.positionX+(p.dx||0);
+          nt.positionY=t.positionY+(p.dy||0);
+        }
+        if(p.cmd==="scale"){
+          var f=1+(p.dir>0?SCALE_STEP:-SCALE_STEP);
+          nt.scaleX=Math.max(.05,t.scaleX*f);
+          nt.scaleY=Math.max(.05,t.scaleY*f);
+        }
+        if(p.cmd==="snap"){
+          var w=(t.sourceWidth||0)*t.scaleX, h=(t.sourceHeight||0)*t.scaleY;
+          var m=24;
+          var pos={
+            tl:[m,m], tr:[canvas.w-w-m,m], bl:[m,canvas.h-h-m], br:[canvas.w-w-m,canvas.h-h-m],
+            c:[(canvas.w-w)/2,(canvas.h-h)/2]
+          }[p.where]||[0,0];
+          nt.positionX=pos[0]; nt.positionY=pos[1];
+        }
+        obs("SetSceneItemTransform",{sceneName:p.scene,sceneItemId:p.id,sceneItemTransform:nt}).then(schedulePush);
+      });
+    }
+  }
+
+  function send(event,payload){
+    if(channel){ try{ channel.send({type:"broadcast",event:event,payload:payload}); }catch(e){} }
+  }
+
+  function shot(){
+    if(!obsReady||!curScene){ setRow("b_shot","waiting on OBS"); return; }
+    lastErr="";
+    obs("GetSourceScreenshot",{sourceName:curScene,imageFormat:"jpg",
+      imageWidth:384,imageCompressionQuality:30}).then(function(r){
+      if(r&&r.imageData){ deliver(r.imageData); return; }
+      // some builds don't accept jpg — try png once
+      obs("GetSourceScreenshot",{sourceName:curScene,imageFormat:"png",imageWidth:320}).then(function(r2){
+        if(r2&&r2.imageData){ deliver(r2.imageData); return; }
+        setRow("b_shot",lastErr||"no image back","bad");
+      });
+    });
+  }
+  function deliver(img){
+    var kb=Math.round(img.length/1024);
+    if(kb>200){ setRow("b_shot",kb+"kb — too big","bad"); return; }
+    try{
+      channel.send({type:"broadcast",event:"shot",payload:{img:img}});
+      setRow("b_shot","sending "+kb+"kb","ok");
+    }catch(e){ setRow("b_shot","send failed","bad"); }
+  }
+
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"bridge"}}});
+  channel.on("broadcast",{event:"cmd"},function(m){ handle(m.payload); });
+  channel.on("presence",{event:"sync"},function(){
+    var st=channel.presenceState(), f=false;
+    Object.keys(st).forEach(function(k){ st[k].forEach(function(x){ if(x.role==="deck") f=true; }); });
+    deckHere=f;
+    if(f) shot();
+  });
+  channel.subscribe(function(st){
+    if(st==="SUBSCRIBED"){ channel.track({role:"bridge",at:Date.now()}); setRow("b_rel","connected","ok"); pushState(); }
+    if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED"){
+      setRow("b_rel","reconnecting","bad");
+      setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} location.reload(); },4000);
+    }
+  });
+  obsConnect();
+  setInterval(function(){ if(obsReady&&deckHere) pushState(); },10000);
+  setInterval(function(){ if(obsReady&&!deckHere) pushState(); },30000);
+}
+/* ==========================================================
+   DECK
+   ========================================================== */
+var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_role")||"";
+var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
+var selId=null, bridgeUp=false, dragging=false, eyeOn=false, lastFrame=null;
+var pending={}, pendNew={}, pendScene="";
+function hasPending(){ var k; for(k in pending) return true; for(k in pendNew) return true; return false; }
+function boxOf(it){ return pending[it.id]||{x:it.x,y:it.y,w:it.w,h:it.h}; }
+var SLAM_OVERLAY=location.origin+location.pathname.replace(/[^\/]*$/,"")+"index.html#overlay";
+
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function cmd(p){ if(channel){ if(!p.scene) p.scene=ST.current; try{ channel.send({type:"broadcast",event:"cmd",payload:p}); }catch(e){} } }
+function el(id){ return document.getElementById(id); }
+var saidTimer=null;
+function said(t){
+  var h=el("saidbar"); if(!h)return;
+  h.textContent=t; h.style.display="block";
+  clearTimeout(saidTimer);
+  saidTimer=setTimeout(function(){ if(el("saidbar")) el("saidbar").style.display="none"; },5000);
+}
+function sel(){ var f=null; ST.items.forEach(function(it){ if(it.id===selId) f=it; }); return f; }
+
+function deckConnect(){
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"deck-"+Math.random().toString(36).slice(2,7)}}});
+  channel.on("broadcast",{event:"state"},function(m){ ST=m.payload||ST; paint(); });
+  channel.on("broadcast",{event:"undo"},function(m){
+    var b=el("undo"); if(!b||!m.payload)return;
+    var n=m.payload.n||0;
+    b.disabled=(n===0);
+    b.className="undo"+(n?" armed":"");
+    b.textContent=n?("undo "+(m.payload.last||"")):"undo";
+  });
+  channel.on("broadcast",{event:"made"},function(m){
+    if(!m.payload)return;
+    pendScene=pendScene||ST.current;
+    pendNew[m.payload.id]={name:m.payload.name,secs:m.payload.secs||0};
+    selId=m.payload.id;
+    cmd({cmd:"ping"});
+  });
+  channel.on("broadcast",{event:"shot"},function(m){
+    if(!m.payload||!m.payload.img)return;
+    if(!eyeOn) return;
+    lastFrame=m.payload.img;
+    var im=document.querySelector(".mapframe");
+    if(im) im.src=lastFrame; else paint();
+  });
+  channel.on("broadcast",{event:"said"},function(m){
+    if(m.payload&&m.payload.t) said(m.payload.t);
+  });
+  channel.on("broadcast",{event:"raw"},function(m){
+    var box=el("rawout"); if(!box||!m.payload)return;
+    box.style.display="block"; box.value=JSON.stringify(m.payload); box.focus(); box.select();
+  });
+  channel.on("presence",{event:"sync"},function(){
+    var st=channel.presenceState(), f=false;
+    Object.keys(st).forEach(function(k){ st[k].forEach(function(x){ if(x.role==="bridge") f=true; }); });
+    bridgeUp=f; paintStatus();
+  });
+  channel.subscribe(function(s){
+    if(s==="SUBSCRIBED"){ channel.track({role:"deck",at:Date.now()}); cmd({cmd:"ping"}); paintStatus(); }
+    if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED"){
+      bridgeUp=false; paintStatus();
+      setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} deckConnect(); },3000);
+    }
+  });
+}
+
+function paintStatus(){
+  var d=el("dot"), s=el("scene"); if(!d||!s)return;
+  var live=bridgeUp&&ST.ok;
+  d.className="dot "+(live?"live":"dead");
+  if(live){ s.className="scene"; s.textContent=ST.current||"connected"; }
+  else{ s.className="scene bad"; s.textContent=bridgeUp?"OBS not connected":"bridge offline"; }
+}
+
+function renderDeck(){
+  if(!PIN||!ROLE){ renderGate(); return; }
+  var owner=(ROLE==="owner");
+  app.innerHTML=
+  '<div class="wrap">'+
+    '<div class="bar">'+
+      '<span class="dot" id="dot"></span>'+
+      '<span class="scene bad" id="scene">connecting</span>'+
+      '<span class="spacer"></span>'+
+      '<button class="eye" id="eye">live view</button>'+
+      '<button class="eye qbtn" id="eyeq" style="display:none">soft</button>'+
+      '<button class="undo" id="undo" disabled>undo</button>'+
+    '</div>'+
+
+    '<div class="health" id="health"></div>'+
+    '<div class="row" id="scenes"></div>'+
+    '<div class="map" id="map"></div>'+
+    '<div class="strip" id="strip"></div>'+
+    '<div id="commitbar" class="commit" style="display:none"></div>'+
+    '<div id="saidbar" style="display:none;margin-top:10px;background:var(--panel);color:var(--dim);'+
+      'font-size:13px;padding:11px 14px;border-radius:9px"></div>'+
+    '<div class="row" id="srcs" style="padding-top:14px"></div>'+
+    '<div class="hint">Drag to move, pull an edge or corner to stretch. '+
+      '<kbd>\u2190\u2191\u2192\u2193</kbd> nudge \u00B7 <kbd>shift</kbd> bigger steps \u00B7 '+
+      '<kbd>h</kbd> hide \u00B7 <kbd>u</kbd> undo \u00B7 <kbd>esc</kbd> deselect</div>'+
+
+    (owner
+      ? '<div class="drawer">'+
+          '<button class="dtoggle" id="dtoggle">+ add a source, or drop something on his screen</button>'+
+          '<div class="dbody" id="dbody">'+
+            '<div>'+
+              '<div class="lab">Add a source</div>'+
+              '<div class="row" id="b_kind" style="padding:0 0 10px"></div>'+
+              '<input class="tin" id="b_name" type="text" maxlength="40" placeholder="Name it">'+
+              '<input class="tin" id="b_val" type="text" placeholder="URL for the page">'+
+              '<button class="btn" id="b_add">Add to this scene</button>'+
+              '<button class="btn quiet" id="b_slam">Add the slam overlay</button>'+
+              '<div class="note" id="b_note">Goes on whatever scene is live and stays there.</div>'+
+            '</div>'+
+            '<div>'+
+              '<div class="lab">Drop something on his screen</div>'+
+              '<input class="tin" id="d_text" type="text" maxlength="80" placeholder="Type onto his screen">'+
+              '<button class="btn" id="d_send">Send text</button>'+
+              '<input class="tin" id="d_url" type="url" placeholder="Direct .mp4 / .webm / .gif link" style="margin-top:14px">'+
+              '<button class="btn" id="d_play">Play it</button>'+
+              '<div class="lab" style="margin-top:16px">Gone after</div>'+
+              '<div class="row" id="d_secs" style="padding:0 0 10px"></div>'+
+              '<button class="btn quiet" id="d_nuke">Remove all drops</button>'+
+              '<div class="note" id="d_note">Lands on whatever scene is live right now.</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'
+      : '')+
+
+    '<div class="foot"><a href="#" id="refresh">refresh</a><a href="#" id="diag">raw</a><a href="#" id="lock">lock</a></div>'+
+    '<textarea id="rawout" readonly style="display:none"></textarea>'+
+  '</div>';
+
+  el("undo").onclick=function(){ cmd({cmd:"undo"}); };
+  el("eye").onclick=function(){
+    eyeOn=!eyeOn;
+    this.className="eye"+(eyeOn?" on":"");
+    el("eyeq").style.display=eyeOn?"":"none";
+    if(!eyeOn){
+      lastFrame=null;
+      var fr=document.querySelector(".mapframe");
+      if(fr&&fr.parentNode) fr.parentNode.removeChild(fr);
+      paint();
+    }
+    cmd({cmd:"eye",on:eyeOn,q:eyeQ});
+  };
+  el("eyeq").onclick=function(){
+    eyeQ=(eyeQ==="soft")?"sharp":"soft";
+    this.textContent=eyeQ;
+    this.className="eye qbtn"+(eyeQ==="sharp"?" on":"");
+    if(eyeOn) cmd({cmd:"eye",on:true,q:eyeQ});
+  };
+  el("refresh").onclick=function(e){ e.preventDefault(); cmd({cmd:"ping"}); };
+  el("diag").onclick=function(e){ e.preventDefault(); cmd({cmd:"raw"}); };
+  el("lock").onclick=function(e){ e.preventDefault();
+    PIN="";ROLE="";localStorage.removeItem("slam_pin");localStorage.removeItem("slam_role");render(); };
+
+  if(owner){
+    el("dtoggle").onclick=function(){
+      var b=el("dbody"); var open=b.classList.toggle("open");
+      this.textContent=(open?"\u2212":"+")+" add a source, or drop something on his screen";
+    };
+    wireBuild(); wireDrop();
+  }
+
+  window.onbeforeunload=function(){
+    if(hasPending()) return "You have changes that aren't live yet.";
+  };
+  wireMap(); wireKeys();
+  paint(); paintStatus(); deckConnect();
+}
+
+/* ---------- keyboard ---------- */
+function wireKeys(){
+  document.addEventListener("keydown",function(e){
+    var t=e.target.tagName;
+    if(t==="INPUT"||t==="TEXTAREA")return;
+    if(e.key==="Enter"){ if(hasPending()){ commitAll(); e.preventDefault(); } return; }
+    if(e.key==="Escape"){ if(hasPending()) discardAll(); else { selId=null; paint(); } return; }
+    if(e.key==="u"||e.key==="U"){ cmd({cmd:"undo"}); return; }
+    var s=sel();
+    if(!s)return;
+    if(e.key==="h"||e.key==="H"){ cmd({cmd:"vis",id:s.id,on:!s.on}); return; }
+    var step=e.shiftKey?NUDGE*5:NUDGE, dx=0, dy=0;
+    if(e.key==="ArrowLeft") dx=-step;
+    if(e.key==="ArrowRight") dx=step;
+    if(e.key==="ArrowUp") dy=-step;
+    if(e.key==="ArrowDown") dy=step;
+    if(dx||dy){
+      var b=boxOf(s);
+      pendScene=pendScene||ST.current;
+      pending[s.id]={x:b.x+dx,y:b.y+dy,w:b.w,h:b.h};
+      paint(); e.preventDefault();
+    }
+  });
+}
+
+/* ---------- map ---------- */
+function wireMap(){
+  var map=el("map"), drag=null;
+  function calcBox(d,dx,dy,lock){
+    var x=d.x0,y=d.y0,w=d.w0,h=d.h0,c=d.corner;
+    var ar=(d.h0>0?d.w0/d.h0:1);
+    var wide=(c.indexOf("e")>-1), narrow=(c.indexOf("w")>-1);
+    var tall=(c.indexOf("s")>-1), shrt=(c.indexOf("n")>-1);
+    if(wide) w=d.w0+dx;
+    if(narrow) w=d.w0-dx;
+    if(tall) h=d.h0+dy;
+    if(shrt) h=d.h0-dy;
+    if(lock&&(wide||narrow)&&(tall||shrt)) h=w/ar;
+    if(w<8) w=8;
+    if(h<8) h=8;
+    if(narrow) x=d.x0+(d.w0-w);
+    if(shrt) y=d.y0+(d.h0-h);
+    return {x:Math.round(x),y:Math.round(y),w:Math.round(w),h:Math.round(h)};
+  }
+  map.addEventListener("pointerdown",function(e){
+    var t=e.target;
+    var isHd=t.className&&(""+t.className).indexOf("hd")===0;
+    var box=isHd?t.parentNode:(t.closest?t.closest(".mi"):null);
+    if(!box||!box.getAttribute)return;
+    var id=parseInt(box.getAttribute("data-id"),10);
+    if(!isHd){
+      selId=id; paint();
+      box=map.querySelector('.mi[data-id="'+id+'"]');
+      if(!box)return;
+    }
+    drag={mode:isHd?"size":"move",corner:isHd?t.getAttribute("data-c"):null,
+          id:id,el:box,r:map.getBoundingClientRect(),ox:e.clientX,oy:e.clientY,
+          x0:parseFloat(box.getAttribute("data-x"))||0,y0:parseFloat(box.getAttribute("data-y"))||0,
+          w0:parseFloat(box.getAttribute("data-w"))||0,h0:parseFloat(box.getAttribute("data-h"))||0};
+    try{ map.setPointerCapture(e.pointerId); }catch(err){}
+    dragging=true; e.preventDefault();
+  });
+  map.addEventListener("pointermove",function(e){
+    if(!drag)return;
+    var cw=ST.cw||1920, ch=ST.ch||1080;
+    var dx=(e.clientX-drag.ox)/drag.r.width*cw;
+    var dy=(e.clientY-drag.oy)/drag.r.height*ch;
+    if(drag.mode==="move"){
+      drag.el.style.left=((drag.x0+dx)/cw*100)+"%";
+      drag.el.style.top=((drag.y0+dy)/ch*100)+"%";
+      liveNums(Math.round(drag.x0+dx),Math.round(drag.y0+dy),drag.w0,drag.h0);
+    }else{
+      var b=calcBox(drag,dx,dy,e.shiftKey);
+      drag.el.style.left=(b.x/cw*100)+"%";
+      drag.el.style.top=(b.y/ch*100)+"%";
+      drag.el.style.width=(b.w/cw*100)+"%";
+      drag.el.style.height=(b.h/ch*100)+"%";
+      drag.last=b;
+      liveNums(b.x,b.y,b.w,b.h);
+    }
+  });
+  function endDrag(e){
+    if(!drag){ dragging=false; return; }
+    var cw=ST.cw||1920, ch=ST.ch||1080;
+    if(drag.mode==="move"){
+      var dx=(e.clientX-drag.ox)/drag.r.width*cw;
+      var dy=(e.clientY-drag.oy)/drag.r.height*ch;
+      if(Math.abs(dx)>1||Math.abs(dy)>1){
+        pendScene=pendScene||ST.current;
+        pending[drag.id]={x:Math.round(drag.x0+dx),y:Math.round(drag.y0+dy),
+                          w:Math.round(drag.w0),h:Math.round(drag.h0)};
+      }
+    }else if(drag.last){
+      pendScene=pendScene||ST.current;
+      pending[drag.id]={x:drag.last.x,y:drag.last.y,w:drag.last.w,h:drag.last.h};
+    }
+    drag=null; dragging=false;
+    paint();
+  }
+  map.addEventListener("pointerup",endDrag);
+  map.addEventListener("pointercancel",function(){ drag=null; dragging=false; paint(); });
+}
+function liveNums(x,y,w,h){
+  var n=el("nums"); if(n) n.textContent=x+", "+y+"  \u00B7  "+Math.round(w)+"\u00D7"+Math.round(h);
+}
+
+function resizeBy(s,f){
+  var b=boxOf(s);
+  pendScene=pendScene||ST.current;
+  var nw=Math.max(8,Math.round(b.w*f)), nh=Math.max(8,Math.round(b.h*f));
+  pending[s.id]={x:Math.round(b.x+(b.w-nw)/2),y:Math.round(b.y+(b.h-nh)/2),w:nw,h:nh};
+  paint();
+}
+function paintCommit(){
+  var c=el("commitbar"); if(!c)return;
+  if(!hasPending()){ c.innerHTML=""; c.style.display="none"; return; }
+  c.style.display="flex";
+  var n=0,k;
+  for(k in pending) n++;
+  for(k in pendNew) n++;
+  var off=(pendScene&&pendScene!==ST.current);
+  c.className="commit"+(off?" off":"");
+  c.innerHTML='<span class="msg">'+n+(n===1?" change":" changes")+' not live yet'+
+    (off?(' \u2014 staged on \u201C'+pendScene+'\u201D'):'')+'</span>'+
+    '<span class="spacer"></span>'+
+    '<button class="cbtn quiet" id="cdiscard">discard</button>'+
+    '<button class="cbtn" id="ccommit">put it on screen</button>';
+  el("ccommit").onclick=commitAll;
+  el("cdiscard").onclick=discardAll;
+}
+
+function commitAll(){
+  var id;
+  if(pendScene&&pendScene!==ST.current){
+    said("Those changes were staged on \u201C"+pendScene+"\u201D. Switch back to commit them, or discard.");
+    return;
+  }
+  for(id in pending){
+    var b=pending[id];
+    cmd({cmd:"box",id:parseInt(id,10),x:b.x,y:b.y,w:b.w,h:b.h});
+  }
+  for(id in pendNew){
+    var n=pendNew[id];
+    cmd({cmd:"reveal",id:parseInt(id,10),name:n.name,secs:n.secs});
+  }
+  pending={}; pendNew={}; pendScene="";
+  setTimeout(function(){ cmd({cmd:"ping"}); },450);
+  paint();
+}
+function discardAll(){
+  var id, sc=pendScene||ST.current;
+  for(id in pendNew){ cmd({cmd:"del",name:pendNew[id].name,id:parseInt(id,10),scene:sc}); }
+  pending={}; pendNew={}; pendScene="";
+  setTimeout(function(){ cmd({cmd:"ping"}); },450);
+  paint();
+}
+
+/* ---------- build / drop ---------- */
+function wireBuild(){
+  var bKind="browser", kw=el("b_kind");
+  var ph={browser:"URL for the page",media:"Direct .mp4 / .webm link",
+          text:"What it should say",color:"(nothing needed)"};
+  [["Browser","browser"],["Media","media"],["Text","text"],["Color","color"]].forEach(function(p){
+    var b=document.createElement("button");
+    b.className="pill"+(bKind===p[1]?" on":""); b.textContent=p[0];
+    b.onclick=function(){ bKind=p[1];
+      Array.prototype.forEach.call(kw.children,function(c){c.className="pill";});
+      b.className="pill on"; el("b_val").placeholder=ph[bKind]; };
+    kw.appendChild(b);
+  });
+  function bnote(t){
+    var n=el("b_note"); if(!n)return; n.textContent=t;
+    setTimeout(function(){ if(el("b_note")) el("b_note").textContent="Goes on whatever scene is live and stays there."; },2600);
+  }
+  el("b_add").onclick=function(){
+    var nm=el("b_name").value.trim(), vl=el("b_val").value.trim();
+    if(!nm){ bnote("Give it a name"); return; }
+    if(bKind!=="color"&&!vl){ bnote("Needs a value"); return; }
+    if((bKind==="browser"||bKind==="media")&&!/^https?:\/\//i.test(vl)){ bnote("Needs an http link"); return; }
+    cmd({cmd:"create",kind:bKind,name:nm,val:vl});
+    el("b_name").value=""; el("b_val").value=""; bnote("Added");
+  };
+  el("b_slam").onclick=function(){
+    cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SLAM_OVERLAY});
+    bnote("Slam overlay added");
+  };
+}
+function wireDrop(){
+  var secs=6, sw=el("d_secs");
+  [["3s",3],["6s",6],["15s",15],["stays",0]].forEach(function(p){
+    var b=document.createElement("button");
+    b.className="pill"+(secs===p[1]?" on":""); b.textContent=p[0];
+    b.onclick=function(){ secs=p[1];
+      Array.prototype.forEach.call(sw.children,function(c){c.className="pill";});
+      b.className="pill on"; };
+    sw.appendChild(b);
+  });
+  function dnote(t){
+    var n=el("d_note"); if(!n)return; n.textContent=t;
+    setTimeout(function(){ if(el("d_note")) el("d_note").textContent="Lands on whatever scene is live right now."; },2600);
+  }
+  el("d_send").onclick=function(){
+    var v=el("d_text").value.trim();
+    if(!v){ dnote("Type something first"); return; }
+    cmd({cmd:"text",msg:v,secs:secs,staged:true}); el("d_text").value="";
+    dnote("Placed off-air \u2014 position it, then commit");
+  };
+  el("d_play").onclick=function(){
+    var v=el("d_url").value.trim();
+    if(!/^https?:\/\//i.test(v)){ dnote("Needs a direct http link"); return; }
+    cmd({cmd:"media",url:v,secs:secs,staged:true}); el("d_url").value="";
+    dnote("Placed off-air \u2014 position it, then commit");
+  };
+  el("d_nuke").onclick=function(){ cmd({cmd:"nuke"}); dnote("Cleared"); };
+}
+
+/* ---------- paint ---------- */
+function paint(){
+  if(dragging) return;
+  paintStatus();
+  paintCommit();
+
+  var sc=el("scenes");
+  if(sc){
+    sc.innerHTML="";
+    ST.scenes.forEach(function(n){
+      var b=document.createElement("button");
+      b.className="pill"+(n===ST.current?" on":"");
+      b.textContent=n;
+      b.onclick=function(){ cmd({cmd:"scene",scene:n}); };
+      sc.appendChild(b);
+    });
+  }
+
+  var hv=el("health");
+  if(hv){
+    var h=ST.health||{};
+    if(!ST.ok){ hv.innerHTML=""; }
+    else{
+      function cell(k,v,cls){
+        return '<div class="hs"><span class="k">'+k+'</span><span class="v '+(cls||"")+'">'+v+'</span></div>';
+      }
+      function dur(sec){
+        sec=Math.floor(sec/1000);
+        var hh=Math.floor(sec/3600), mm=Math.floor((sec%3600)/60), ss2=sec%60;
+        function p(n){return (n<10?"0":"")+n;}
+        return (hh>0?hh+":"+p(mm):mm+":"+p(ss2))+(hh>0?":"+p(ss2):"");
+      }
+      var out="";
+      out+=cell("stream", h.live?"live":"offline", h.live?"good":"idle");
+      if(h.live){
+        out+=cell("uptime",dur(h.up||0));
+        if(typeof h.kbps==="number") out+=cell("bitrate",h.kbps+" kbps");
+        var dropPct=(h.total?((h.skipped||0)/h.total*100):0);
+        out+=cell("dropped",dropPct.toFixed(2)+"%",
+          dropPct>1?"bad":(dropPct>0.2?"warn":"good"));
+      }
+      var rm=(h.renderTotal?((h.renderMissed||0)/h.renderTotal*100):0);
+      out+=cell("render lag",rm.toFixed(2)+"%", rm>1?"bad":(rm>0.2?"warn":"good"));
+      if(typeof h.render==="number") out+=cell("frame time",h.render.toFixed(1)+" ms",
+        h.render>12?"bad":(h.render>8?"warn":""));
+      if(typeof h.cpu==="number") out+=cell("cpu",h.cpu.toFixed(1)+"%",
+        h.cpu>70?"bad":(h.cpu>45?"warn":""));
+      if(typeof h.fps==="number") out+=cell("fps",h.fps);
+      hv.innerHTML=out;
+    }
+  }
+
+  var mp=el("map");
+  if(mp){
+    var cw=ST.cw||1920, ch=ST.ch||1080;
+    mp.innerHTML="";
+    if(eyeOn&&lastFrame){
+      var fr=document.createElement("img");
+      fr.className="mapframe"; fr.alt=""; fr.src=lastFrame;
+      mp.appendChild(fr);
+    }
+    if(!ST.items.length){
+      var e2=document.createElement("div");
+      e2.className="mapempty";
+      e2.textContent=ST.ok?"nothing in this scene":"waiting for the bridge";
+      mp.appendChild(e2);
+    }
+    ST.items.slice().reverse().forEach(function(it){
+      var d=document.createElement("div");
+      var stray=((it.x+it.w<0)||(it.y+it.h<0)||(it.x>cw)||(it.y>ch));
+      var bx=boxOf(it), isPend=!!(pending[it.id]||pendNew[it.id]);
+      var tiny=((bx.w||0)/cw<0.10)||((bx.h||0)/ch<0.10);
+      d.className="mi"+(it.id===selId?" sel":"")+(it.on||pendNew[it.id]?"":" off")+
+        (stray?" stray":"")+(isPend?" pend":"")+(tiny?" tiny":"");
+      d.setAttribute("data-id",it.id);
+      d.setAttribute("data-x",bx.x||0); d.setAttribute("data-y",bx.y||0);
+      d.setAttribute("data-w",bx.w||0); d.setAttribute("data-h",bx.h||0);
+      d.style.left=((bx.x||0)/cw*100)+"%";
+      d.style.top=((bx.y||0)/ch*100)+"%";
+      d.style.width=(Math.max(bx.w||0,cw*0.03)/cw*100)+"%";
+      d.style.height=(Math.max(bx.h||0,ch*0.03)/ch*100)+"%";
+      var s=document.createElement("b"); s.textContent=it.name; d.appendChild(s);
+      if(it.id===selId){
+        ["nw","n","ne","e","se","s","sw","w"].forEach(function(c){
+          var g=document.createElement("i");
+          g.className="hd "+c; g.setAttribute("data-c",c); d.appendChild(g);
+        });
+      }
+      mp.appendChild(d);
+    });
+  }
+
+  var sr=el("srcs");
+  if(sr){
+    sr.innerHTML="";
+    var found=false;
+    ST.items.forEach(function(it){
+      if(it.id===selId) found=true;
+      var b=document.createElement("button");
+      b.className="pill"+(it.id===selId?" sel":"")+(it.on?"":" hidden");
+      b.textContent=it.name;
+      b.onclick=function(){ selId=(selId===it.id?null:it.id); paint(); };
+      sr.appendChild(b);
+    });
+    if(!found) selId=null;
+  }
+
+  var st=el("strip");
+  if(st){
+    st.innerHTML="";
+    var s=sel();
+    if(!s){
+      st.innerHTML='<span class="none">Nothing selected \u2014 click a box, or a name below</span>';
+      return;
+    }
+    var who=document.createElement("span"); who.className="who"; who.textContent=s.name;
+    var nums=document.createElement("span"); nums.className="nums"; nums.id="nums";
+    var sb0=boxOf(s);
+    nums.textContent=sb0.x+", "+sb0.y+"  \u00B7  "+sb0.w+"\u00D7"+sb0.h;
+    st.appendChild(who); st.appendChild(nums);
+    var sp=document.createElement("span"); sp.className="spacer"; st.appendChild(sp);
+
+    function sb2(txt,fn,cls){
+      var b=document.createElement("button");
+      b.className="sbtn"+(cls?" "+cls:""); b.textContent=txt; b.onclick=fn;
+      st.appendChild(b); return b;
+    }
+    sb2(s.on?"hide":"show",function(){ cmd({cmd:"vis",id:s.id,on:!s.on}); });
+    sb2("center",function(){
+      var b=boxOf(s), cw2=ST.cw||1920, ch2=ST.ch||1080;
+      pendScene=pendScene||ST.current;
+      pending[s.id]={x:Math.round((cw2-b.w)/2),y:Math.round((ch2-b.h)/2),w:b.w,h:b.h}; paint();
+    });
+    var rb=sb2("reload",function(){
+      if(/^BRIDGE$/i.test(s.name)){ rb.textContent="not the bridge"; setTimeout(function(){ rb.textContent="reload"; },2200); return; }
+      cmd({cmd:"reload",name:s.name});
+      rb.textContent="sent"; setTimeout(function(){ rb.textContent="reload"; },1600);
+    });
+    sb2("smaller",function(){ resizeBy(s,1-SCALE_STEP); });
+    sb2("bigger",function(){ resizeBy(s,1+SCALE_STEP); });
+    if(ROLE==="owner"){
+      var armed=false, tm=null;
+      var db=sb2("delete",function(){
+        if(!armed){ armed=true; db.textContent="sure?"; db.className="sbtn warn";
+          tm=setTimeout(function(){ armed=false; db.textContent="delete"; db.className="sbtn warn"; },5000); return; }
+        clearTimeout(tm); cmd({cmd:"del",name:s.name,id:s.id}); selId=null;
+      },"warn");
+    }
+  }
+}
+
+/* ---------- gate ---------- */
+function renderGate(){
+  app.innerHTML='<div class="gate"><h1>OBS control</h1>'+
+    '<input class="tin" id="pin" type="password" placeholder="PIN">'+
+    '<button class="btn" id="unlock">Unlock</button>'+
+    '<div class="note" id="gerr"></div></div>';
+  function go(){
+    var v=el("pin").value.trim(); if(!v)return;
+    el("gerr").textContent="checking\u2026";
+    getRole(v).then(function(role){
+      if(role==="owner"||role==="mod"){
+        PIN=v;ROLE=role;
+        localStorage.setItem("slam_pin",v);localStorage.setItem("slam_role",role);
+        render();
+      }else{ el("gerr").textContent="Wrong PIN"; el("pin").value=""; }
+    }).catch(function(){ el("gerr").textContent="Can\u2019t reach the server"; });
+  }
+  el("unlock").onclick=go;
+  el("pin").onkeydown=function(e){ if(e.key==="Enter") go(); };
+}
+
+function render(){ if(IS_BRIDGE) runBridge(); else renderDeck(); }
+render();
+})();
+</script>
+</body>
+</html>

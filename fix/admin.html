@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT FIX // CONTROL ROOM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+
+  :root{
+    --bg:#050506; --panel:#0B0C0F; --panel-2:#121419; --line:#212429;
+    --text:#EDEDEB; --dim:#B4B9BF; --amber:#3A93D6; --amber-dim:#1B4A70;
+    --teal:#B4B9BF; --red:#D8455F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.6}
+  a{color:var(--teal)}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px 80px}
+  .transport{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);
+    padding:14px 20px;margin:0 -20px 34px;background:linear-gradient(180deg,#101314,#0c0e0f);position:sticky;top:0;z-index:5}
+  .led{width:10px;height:10px;border-radius:50%;background:#3a413e;flex:none}
+  .led.open{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+  .wordmark{font-family:'Archivo',system-ui,sans-serif;font-weight:700;letter-spacing:.06em;font-size:15px}
+  .wordmark span{color:var(--dim);font-weight:500}
+  .userline{margin-left:auto;font-size:12px;color:var(--dim);display:flex;gap:12px;align-items:center}
+  .userline b{color:var(--teal);font-weight:500}
+  .userline button{background:none;border:none;color:var(--dim);font-family:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
+
+  h1{font-family:'Archivo',system-ui,sans-serif;font-weight:700;font-size:28px;margin-bottom:6px}
+  .lede{color:var(--dim);margin-bottom:30px;font-size:13px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:22px;margin-bottom:20px}
+  .panel h2{font-family:'Archivo',system-ui,sans-serif;font-size:16px;margin-bottom:14px}
+  label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin:12px 0 5px}
+  input[type=text],input[type=datetime-local]{width:100%;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:4px;color:var(--text);font-family:inherit;font-size:14px;padding:10px 12px;color-scheme:dark}
+  input:focus{outline:none;border-color:var(--amber)}
+  .btn{display:inline-block;font-family:inherit;font-size:13px;font-weight:700;background:var(--amber);color:#161000;
+    border:none;border-radius:4px;padding:10px 18px;cursor:pointer;letter-spacing:.04em}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .btn.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);font-weight:500}
+  .btn.ghost:hover{color:var(--text);border-color:var(--dim)}
+  .btn.danger{background:transparent;color:var(--red);border:1px solid #4b2724;font-weight:500}
+  .btn.small{padding:6px 12px;font-size:12px}
+
+  .winrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .winrow:last-child{border-bottom:none}
+  .winrow .title{font-weight:700;cursor:pointer}
+  .winrow .title:hover{color:var(--amber)}
+  .winrow .dates{color:var(--dim);font-size:12px}
+  .tag{font-size:10px;letter-spacing:.15em;padding:3px 8px;border-radius:3px;border:1px solid var(--line);color:var(--dim)}
+  .tag.live{border-color:var(--amber);color:var(--amber)}
+  .tag.upcoming{border-color:var(--teal);color:var(--teal)}
+  .winrow .actions{margin-left:auto;display:flex;gap:8px}
+
+  .sub{border:1px solid var(--line);border-radius:6px;background:var(--panel-2);padding:16px;margin-bottom:14px}
+  .sub.picked{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset}
+  .sub.roulette{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset}
+  .subhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .subhead .track{font-family:'Archivo',system-ui,sans-serif;font-weight:700;font-size:16px}
+  .subhead .by{color:var(--teal);font-size:12px}
+  .subhead .when{color:var(--dim);font-size:11px;margin-left:auto}
+  .pickedtag{font-size:10px;letter-spacing:.2em;color:var(--amber);border:1px solid var(--amber);border-radius:3px;padding:2px 8px}
+  .note{color:var(--dim);font-size:13px;margin:8px 0;white-space:pre-wrap}
+  .subactions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  audio{width:100%;margin-top:10px;height:36px}
+  .empty{color:var(--dim);text-align:center;padding:30px 0}
+  .status{font-size:12px;color:var(--dim);margin-top:10px;min-height:18px}
+  .status.err{color:var(--red)}
+  .hidden{display:none!important}
+  .bigstate{text-align:center;padding:50px 20px}
+  .bigstate h2{font-family:'Archivo',system-ui,sans-serif;font-size:20px;margin-bottom:10px}
+  .bigstate p{color:var(--dim)}
+  code{background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:2px 6px;font-size:12px;word-break:break-all}
+</style>
+
+<style>
+/* ═══ G-REX SYSTEM RESKIN ═══════════════════════════════════════
+   Palette remapped to the grexofficial.com brand-bible tokens.
+   Black / white / silver, dark blue secondary. No neon, no rave.
+   ═════════════════════════════════════════════════════════════ */
+body:not(.overlay)::after{
+  content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+::selection{background:#3A93D6;color:#050506}
+</style>
+
+<style>
+/* ═══ PR0CESS_LIVE WORDMARK — canonical lockup ══════════════════
+   Code font · .2em tracking · white · blue zero · blue // divider.
+   Identical across hub, battle, queue, project fix and timer.
+   ═════════════════════════════════════════════════════════════ */
+.brand,.logo,.wordmark,.g-brand,.fbrand,.footmark{
+  font-family:'Code','JetBrains Mono',ui-monospace,monospace;
+  font-weight:400;
+  letter-spacing:.2em;
+  color:#fff;
+}
+.brand,.wordmark,.g-brand{font-size:16px}
+.brand .z,.logo .z,.wordmark .z,.g-brand .z,.fbrand .z{color:var(--electric,#3A93D6)}
+.wordmark span,.brand small,.g-brand small{
+  color:var(--dim);font-weight:400;letter-spacing:.2em;
+}
+.wordmark span .z{color:var(--electric,#3A93D6)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="transport">
+    <div class="led open"></div>
+    <div class="wordmark">PR<span class="z">0</span>CESS_LIVE <span><span class="z">//</span> CONTROL ROOM</span></div>
+    <div class="userline hidden" id="userline"><span>ADMIN: <b id="whoami">…</b></span><button id="logoutBtn">log out</button></div>
+  </div>
+
+  <!-- logged out -->
+  <div class="panel bigstate" id="loginPanel">
+    <h2>Admin access</h2>
+    <p style="margin-bottom:18px">Log in with Twitch. Only allowlisted accounts get in.</p>
+    <button class="btn" id="loginBtn">LOG IN WITH TWITCH</button>
+  </div>
+
+  <!-- logged in, not admin -->
+  <div class="panel bigstate hidden" id="deniedPanel">
+    <h2>Not on the list</h2>
+    <p>This account isn't an admin. If it should be, send Isaiah this ID:</p>
+    <p style="margin-top:12px"><code id="myId"></code></p>
+  </div>
+
+  <!-- admin app -->
+  <div id="app" class="hidden">
+    <h1>Control Room</h1>
+    <p class="lede">Open windows, listen through submissions, mark G-REX's picks, wipe files after the stream. <a href="index.html">submit page</a> · <a href="overlay.html" target="_blank" rel="noopener">stream overlay</a> · <a href="qr.html" target="_blank" rel="noopener">qr overlay</a></p>
+
+    <div class="panel" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div>
+        <h2 style="margin-bottom:4px">Stream overlay</h2>
+        <p class="sub" style="margin-bottom:0" id="overlayHint">Show or hide the on-stream badge. Takes a few seconds to update in OBS.</p>
+      </div>
+      <button class="btn" id="overlayToggle" style="margin-left:auto" disabled>…</button>
+    </div>
+
+    <div class="panel">
+      <h2>New submission window</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 16px">
+        <div><label for="nwTitle">Title</label><input type="text" id="nwTitle" placeholder="PROJECT FIX 001 — AUG"></div>
+        <div><label for="nwOpen">Opens</label><input type="datetime-local" id="nwOpen"></div>
+        <div><label for="nwClose">Closes</label><input type="datetime-local" id="nwClose"></div>
+      </div>
+      <div style="margin-top:16px"><button class="btn" id="createWinBtn">CREATE WINDOW</button></div>
+      <div class="status" id="winStatus"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Windows</h2>
+      <div id="winList"><div class="empty">No windows yet — create the first one above.</div></div>
+    </div>
+
+    <div class="panel hidden" id="subsPanel">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+        <h2 id="subsTitle" style="margin-bottom:0">Submissions</h2>
+        <span class="hidden" id="randomControls" style="display:flex;align-items:center;gap:8px">
+          <select id="randomCount" style="background:var(--panel-2);border:1px solid var(--line);border-radius:4px;color:var(--text);font-family:inherit;font-size:13px;padding:8px 10px"></select>
+          <button class="btn small" id="randomBtn">🎲 RANDOM</button>
+        </span>
+      </div>
+      <div class="status" id="subsStatus"></div>
+      <div id="subsList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://cdkzbbrakewvhmejzryj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Rba1RBrB7u0_79fUzEUYhw_Wm_Ev_42";
+/* ========================================== */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+let session = null, windows = [], activeWinId = null, currentSubs = [];
+
+async function init() {
+  const { data } = await sb.auth.getSession();
+  session = data.session;
+  if (!session) return; // stays on login panel
+  $("loginPanel").classList.add("hidden");
+
+  const meta = session.user.user_metadata || {};
+  $("whoami").textContent = (meta.nickname || meta.name || "twitch user").toUpperCase();
+  $("userline").classList.remove("hidden");
+
+  const { data: isAdmin, error } = await sb.rpc("is_admin");
+  if (error || !isAdmin) {
+    $("myId").textContent = session.user.id;
+    $("deniedPanel").classList.remove("hidden");
+    return;
+  }
+  $("app").classList.remove("hidden");
+  loadWindows();
+  loadOverlayToggle();
+}
+
+async function loadOverlayToggle() {
+  const { data } = await sb.from("app_settings").select("overlay_on").eq("id", 1).maybeSingle();
+  paintToggle(data ? data.overlay_on : false);
+}
+
+function paintToggle(on) {
+  const btn = $("overlayToggle");
+  btn.disabled = false;
+  btn.dataset.on = on ? "1" : "0";
+  btn.textContent = on ? "OVERLAY: ON" : "OVERLAY: OFF";
+  btn.className = "btn" + (on ? "" : " ghost");
+}
+
+$("overlayToggle").onclick = async () => {
+  const btn = $("overlayToggle");
+  const next = btn.dataset.on !== "1"; // flip
+  btn.disabled = true;
+  const { error } = await sb.from("app_settings").update({ overlay_on: next }).eq("id", 1);
+  if (error) { alert("Couldn't switch the overlay: " + error.message); btn.disabled = false; return; }
+  paintToggle(next);
+}
+
+$("loginBtn").onclick = () => sb.auth.signInWithOAuth({
+  provider: "twitch",
+  options: { scopes: "user:read:subscriptions", redirectTo: location.origin + location.pathname }
+});
+$("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+/* ---------- windows ---------- */
+async function loadWindows() {
+  const { data, error } = await sb.from("windows").select("*").order("opens_at", { ascending: false });
+  if (error) { $("winStatus").className = "status err"; $("winStatus").textContent = "Couldn't load windows: " + error.message; return; }
+  windows = data || [];
+  const list = $("winList");
+  if (!windows.length) { list.innerHTML = '<div class="empty">No windows yet — create the first one above.</div>'; return; }
+  list.innerHTML = "";
+  const now = new Date();
+  windows.forEach(w => {
+    const opens = new Date(w.opens_at), closes = new Date(w.closes_at);
+    const state = now < opens ? "upcoming" : (now <= closes ? "live" : "past");
+    const row = document.createElement("div");
+    row.className = "winrow";
+    row.innerHTML =
+      '<span class="tag ' + (state === "live" ? "live" : state === "upcoming" ? "upcoming" : "") + '">' + state.toUpperCase() + '</span>' +
+      '<span class="title">' + esc(w.title) + '</span>' +
+      '<span class="dates">' + fmt(w.opens_at) + ' → ' + fmt(w.closes_at) + '</span>' +
+      '<span class="actions"></span>';
+    row.querySelector(".title").onclick = () => openSubs(w);
+    const actions = row.querySelector(".actions");
+
+    const viewBtn = mkBtn("VIEW SUBS", "ghost small", () => openSubs(w));
+    actions.appendChild(viewBtn);
+    if (state === "live") {
+      actions.appendChild(mkBtn("+1 HR", "ghost small", () => extendWindow(w, 1)));
+      actions.appendChild(mkBtn("EDIT TIMES", "ghost small", () => editTimes(row, w)));
+      actions.appendChild(mkBtn("CLOSE NOW", "ghost small", () => closeNow(w)));
+    }
+    if (state === "upcoming") actions.appendChild(mkBtn("EDIT TIMES", "ghost small", () => editTimes(row, w)));
+    if (state === "past" && !w.files_wiped) {
+      actions.appendChild(mkBtn("REOPEN +1 HR", "ghost small", () => reopenWindow(w)));
+      actions.appendChild(mkBtn("WIPE FILES", "danger small", () => wipeFiles(w)));
+    }
+    if (w.files_wiped) { const t = document.createElement("span"); t.className = "tag"; t.textContent = "ARCHIVED"; actions.appendChild(t); }
+    list.appendChild(row);
+  });
+}
+
+$("createWinBtn").onclick = async () => {
+  const st = $("winStatus");
+  st.className = "status"; st.textContent = "";
+  const title = $("nwTitle").value.trim();
+  const o = $("nwOpen").value, c = $("nwClose").value;
+  if (!title || !o || !c) { st.className = "status err"; st.textContent = "Need a title, open time, and close time."; return; }
+  const opens = new Date(o), closes = new Date(c);
+  if (closes <= opens) { st.className = "status err"; st.textContent = "Close time has to be after open time."; return; }
+  const { error } = await sb.from("windows").insert({ title, opens_at: opens.toISOString(), closes_at: closes.toISOString() });
+  if (error) { st.className = "status err"; st.textContent = "Couldn't create: " + error.message; return; }
+  st.textContent = "Window created.";
+  $("nwTitle").value = ""; $("nwOpen").value = ""; $("nwClose").value = "";
+  loadWindows();
+};
+
+async function closeNow(w) {
+  if (!confirm('Close "' + w.title + '" right now? The form stops accepting immediately.')) return;
+  const { error } = await sb.from("windows").update({ closes_at: new Date().toISOString() }).eq("id", w.id);
+  if (error) alert("Couldn't close it: " + error.message);
+  loadWindows();
+}
+
+async function extendWindow(w, hours) {
+  // extend from the scheduled close, or from right now if it already passed
+  const base = Math.max(new Date(w.closes_at).getTime(), Date.now());
+  const newClose = new Date(base + hours * 3600000);
+  const { error } = await sb.from("windows").update({ closes_at: newClose.toISOString() }).eq("id", w.id);
+  if (error) { alert("Couldn't extend: " + error.message); return; }
+  loadWindows();
+}
+
+async function reopenWindow(w) {
+  if (!confirm('Reopen "' + w.title + '" for 1 more hour? The form starts accepting again immediately.')) return;
+  const { error } = await sb.from("windows").update({ closes_at: new Date(Date.now() + 3600000).toISOString() }).eq("id", w.id);
+  if (error) { alert("Couldn't reopen: " + error.message); return; }
+  loadWindows();
+}
+
+function toLocalInput(iso) {
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+function editTimes(row, w) {
+  if (row.querySelector(".timeedit")) return; // already open on this row
+  const box = document.createElement("div");
+  box.className = "timeedit";
+  box.style.cssText = "flex-basis:100%;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;padding-top:10px";
+  box.innerHTML =
+    '<div><label>Opens</label><input type="datetime-local" class="eo"></div>' +
+    '<div><label>Closes</label><input type="datetime-local" class="ec"></div>';
+  box.appendChild(mkBtn("SAVE", "small", async () => {
+    const o = box.querySelector(".eo").value, c = box.querySelector(".ec").value;
+    if (!o || !c) { alert("Both times are needed."); return; }
+    const opens = new Date(o), closes = new Date(c);
+    if (closes <= opens) { alert("Close time has to be after open time."); return; }
+    const { error } = await sb.from("windows").update({
+      opens_at: opens.toISOString(), closes_at: closes.toISOString()
+    }).eq("id", w.id);
+    if (error) { alert("Couldn't save: " + error.message); return; }
+    loadWindows();
+  }));
+  box.appendChild(mkBtn("CANCEL", "ghost small", () => box.remove()));
+  box.querySelector(".eo").value = toLocalInput(w.opens_at);
+  box.querySelector(".ec").value = toLocalInput(w.closes_at);
+  row.appendChild(box);
+}
+
+async function wipeFiles(w) {
+  if (!confirm('Delete ALL audio files for "' + w.title + '"? Track names, notes, and picks stay as the archive, but the MP3s are gone for good. Do this after the stream, not before.')) return;
+  const { data: files, error } = await sb.storage.from("renders").list(w.id, { limit: 1000 });
+  if (error) { alert("Couldn't list files: " + error.message); return; }
+  if (files && files.length) {
+    const paths = files.map(f => w.id + "/" + f.name);
+    const { error: delErr } = await sb.storage.from("renders").remove(paths);
+    if (delErr) { alert("Couldn't delete: " + delErr.message); return; }
+  }
+  const { error: flagErr } = await sb.from("windows").update({ files_wiped: true }).eq("id", w.id);
+  if (flagErr) { alert("Files deleted, but couldn't archive the window: " + flagErr.message); }
+  alert("Wiped. Window is now archived — picks and titles stay, audio is gone.");
+  await loadWindows();
+  const updated = windows.find(x => x.id === w.id);
+  if (activeWinId === w.id && updated) openSubs(updated);
+}
+
+/* ---------- submissions ---------- */
+async function openSubs(w) {
+  activeWinId = w.id;
+  $("subsPanel").classList.remove("hidden");
+  $("subsTitle").textContent = 'Submissions — ' + w.title;
+  $("subsStatus").className = "status"; $("subsStatus").textContent = "Loading…";
+  const { data, error } = await sb.from("submissions").select("*")
+    .eq("window_id", w.id).order("created_at", { ascending: true });
+  const list = $("subsList");
+  list.innerHTML = "";
+  currentSubs = data || [];
+  if (error) { $("subsStatus").className = "status err"; $("subsStatus").textContent = "Couldn't load: " + error.message; $("randomControls").classList.add("hidden"); return; }
+  if (!data.length) { $("subsStatus").textContent = ""; $("randomControls").classList.add("hidden"); list.innerHTML = '<div class="empty">Nothing submitted yet.</div>'; return; }
+  $("subsStatus").textContent = data.length + " submission(s) · " + data.filter(s => s.picked).length + " picked" + (w.files_wiped ? " · ARCHIVED — audio wiped, picks locked" : "");
+  const unpicked = data.filter(s => !s.picked).length;
+  const showRandom = !w.files_wiped && unpicked > 0;
+  $("randomControls").classList.toggle("hidden", !showRandom);
+  if (showRandom) {
+    const sel = $("randomCount");
+    sel.innerHTML = "";
+    for (let i = 1; i <= unpicked; i++) {
+      const o = document.createElement("option");
+      o.value = i; o.textContent = "PICK " + i;
+      sel.appendChild(o);
+    }
+  }
+  data.forEach(s => list.appendChild(renderSub(s, w)));
+  $("subsPanel").scrollIntoView({ behavior: "smooth" });
+}
+
+/* ---------- random picker ---------- */
+let rouletteRunning = false;
+$("randomBtn").onclick = async () => {
+  if (rouletteRunning) return;
+  const w = windows.find(x => x.id === activeWinId);
+  if (!w || w.files_wiped) return;
+  let candidates = currentSubs.map((s, i) => ({ s, i })).filter(o => !o.s.picked);
+  if (!candidates.length) return;
+  const count = Math.min(parseInt($("randomCount").value || "1", 10) || 1, candidates.length);
+
+  rouletteRunning = true;
+  $("randomBtn").disabled = true;
+  const cards = Array.from(document.querySelectorAll("#subsList .sub"));
+  const winners = [];
+
+  const spinOnce = () => new Promise(resolve => {
+    const winner = candidates[Math.floor(Math.random() * candidates.length)];
+    let last = null, ticks = 0;
+    const totalTicks = 20; // ~2s of bouncing per pick
+    const spin = setInterval(() => {
+      if (last) last.classList.remove("roulette");
+      ticks++;
+      if (ticks < totalTicks) {
+        const rand = candidates[Math.floor(Math.random() * candidates.length)];
+        last = cards[rand.i];
+        if (last) last.classList.add("roulette");
+        return;
+      }
+      // land on this spin's winner and lock it amber
+      clearInterval(spin);
+      const card = cards[winner.i];
+      if (card) {
+        card.classList.remove("roulette");
+        card.classList.add("picked");
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      winners.push(winner.s.id);
+      candidates = candidates.filter(c => c.s.id !== winner.s.id);
+      setTimeout(resolve, 650);
+    }, 100);
+  });
+
+  for (let n = 0; n < count; n++) await spinOnce();
+
+  const { error } = await sb.from("submissions").update({ picked: true }).in("id", winners);
+  rouletteRunning = false;
+  $("randomBtn").disabled = false;
+  if (error) { alert("Couldn't save the picks: " + error.message); return; }
+  openSubs(w);
+};
+
+function renderSub(s, w) {
+  const el = document.createElement("div");
+  el.className = "sub" + (s.picked ? " picked" : "");
+  el.innerHTML =
+    '<div class="subhead">' +
+      '<span class="track">' + esc(s.track_name) + '</span>' +
+      '<span class="by">@' + esc(s.twitch_username) + '</span>' +
+      (s.picked ? '<span class="pickedtag">SELECTED</span>' : '') +
+      '<span class="when">' + fmt(s.created_at) + '</span>' +
+    '</div>' +
+    (s.note ? '<div class="note">' + esc(s.note) + '</div>' : '') +
+    '<div class="subactions"></div>' +
+    '<div class="audioSlot"></div>';
+  const actions = el.querySelector(".subactions");
+
+  if (!w.files_wiped) {
+    actions.appendChild(mkBtn("▶ LOAD AUDIO", "ghost small", async (btn) => {
+    btn.disabled = true; btn.textContent = "LOADING…";
+    const { data, error } = await sb.storage.from("renders").createSignedUrl(s.audio_path, 3600);
+    if (error) { btn.textContent = "AUDIO ERROR"; return; }
+    const audio = document.createElement("audio");
+    audio.controls = true; audio.src = data.signedUrl;
+    el.querySelector(".audioSlot").appendChild(audio);
+    btn.remove();
+    }));
+
+    actions.appendChild(mkBtn("⬇ DOWNLOAD MP3", "ghost small", async (btn) => {
+    const { data, error } = await sb.storage.from("renders").createSignedUrl(s.audio_path, 3600, { download: true });
+    if (error) { btn.textContent = "ERROR"; return; }
+    window.open(data.signedUrl, "_blank");
+    }));
+  }
+
+  if (s.project_link) {
+    const a = document.createElement("a");
+    a.href = s.project_link; a.target = "_blank"; a.rel = "noopener";
+    a.className = "btn ghost small"; a.style.textDecoration = "none";
+    a.textContent = "PROJECT FOLDER ↗";
+    actions.appendChild(a);
+  }
+
+  if (!w.files_wiped) {
+    actions.appendChild(mkBtn(s.picked ? "UNPICK" : "★ PICK THIS", s.picked ? "ghost small" : "small", async () => {
+    if (rouletteRunning) return; // don't let hand-picks fight the roulette mid-spin
+    const { error } = await sb.from("submissions").update({ picked: !s.picked }).eq("id", s.id);
+    if (error) { alert("Couldn't update pick: " + error.message); return; }
+    openSubs(windows.find(x => x.id === activeWinId) || w);
+    }));
+  }
+
+  return el;
+}
+
+/* ---------- helpers ---------- */
+function mkBtn(text, cls, fn) {
+  const b = document.createElement("button");
+  b.className = "btn " + cls; b.textContent = text;
+  b.onclick = () => fn(b);
+  return b;
+}
+function fmt(iso) { return new Date(iso).toLocaleString(undefined, { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }); }
+function esc(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+
+init();
+</script>
+</body>
+</html>
