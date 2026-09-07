@@ -116,6 +116,17 @@ body.bridge{background:transparent}
 .hint kbd{background:var(--panel2);border:1px solid var(--line2);border-radius:4px;
   padding:1px 6px;font:inherit;font-size:11.5px;color:var(--dim)}
 
+.urow{border-top:1px solid var(--line);padding:9px 0}
+.urow:first-child{border-top:none}
+.uname{color:var(--dim);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding-bottom:5px}
+.urow .tin{margin:0}
+.urow.chg .tin{border-color:var(--acc);color:var(--text)}
+.urow.okd .tin{border-color:var(--win)}
+.urow.bad .tin{border-color:var(--hot)}
+.usave{background:transparent;border:1px solid var(--line2);color:var(--dim);font:inherit;
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;margin-top:6px;
+  border-radius:2px;cursor:pointer}
+.usave:hover{border-color:var(--acc);color:var(--text)}
 /* owner drawer */
 .drawer{margin-top:34px;border-top:1px solid var(--line);padding-top:8px}
 .dtoggle{width:100%;background:transparent;border:none;color:var(--dimmer);font:inherit;
@@ -457,6 +468,42 @@ function runBridge(){
       });
       return;
     }
+    if(p.cmd==="urls"){
+      obs("GetInputList",{}).then(function(li){
+        var ins=((li&&li.inputs)||[]).filter(function(i){
+          return (i.inputKind||"").indexOf("browser")===0 && !/^BRIDGE$/i.test(i.inputName||"");
+        });
+        if(!ins.length){ send("urls",{list:[]}); return; }
+        Promise.all(ins.map(function(i){
+          return obs("GetInputSettings",{inputName:i.inputName}).then(function(si){
+            return {name:i.inputName,url:(((si||{}).inputSettings)||{}).url||""};
+          });
+        })).then(function(list){ send("urls",{list:list}); });
+      });
+      return;
+    }
+    if(p.cmd==="seturl"){
+      var un=p.name||"", uu=(p.url||"").trim();
+      if(/^BRIDGE$/i.test(un)){ send("urlres",{name:un,ok:false,msg:"that\u2019s the bridge"}); return; }
+      if(!/^https?:\/\//i.test(uu)){ send("urlres",{name:un,ok:false,msg:"needs to start with https://"}); return; }
+      obs("GetInputSettings",{inputName:un}).then(function(si){
+        if(!si){ send("urlres",{name:un,ok:false,msg:"couldn\u2019t read that source"}); return; }
+        if((si.inputKind||"").indexOf("browser")!==0){ send("urlres",{name:un,ok:false,msg:"not a browser source"}); return; }
+        var was=((si.inputSettings)||{}).url||"";
+        obs("SetInputSettings",{inputName:un,inputSettings:{url:uu},overlay:true}).then(function(r){
+          if(!r){ send("urlres",{name:un,ok:false,msg:lastErr||"failed"}); return; }
+          pushUndo("url "+un,function(){
+            obs("SetInputSettings",{inputName:un,inputSettings:{url:was},overlay:true}).then(function(){
+              obs("PressInputPropertiesButton",{inputName:un,propertyName:"refreshnocache"});
+            });
+          });
+          obs("PressInputPropertiesButton",{inputName:un,propertyName:"refreshnocache"});
+          note("url set "+un);
+          send("urlres",{name:un,ok:true,url:uu});
+        });
+      });
+      return;
+    }
     if(p.cmd==="eye"){
       eyeOn=!!p.on;
       if(p.q) eyeQ=p.q;
@@ -764,6 +811,8 @@ function deckConnect(){
     var im=document.querySelector(".mapframe");
     if(im) im.src=lastFrame; else paint();
   });
+  channel.on("broadcast",{event:"urls"},function(m){ paintUrls(((m.payload)||{}).list||[]); });
+  channel.on("broadcast",{event:"urlres"},function(m){ urlResult(m.payload||{}); });
   channel.on("broadcast",{event:"said"},function(m){
     if(m.payload&&m.payload.t) said(m.payload.t);
   });
@@ -843,6 +892,13 @@ function renderDeck(){
               '<button class="btn quiet" id="d_nuke">Remove all drops</button>'+
               '<div class="note" id="d_note">Lands on whatever scene is live right now.</div>'+
             '</div>'+
+            '<div>'+
+              '<div class="lab">Browser source links</div>'+
+              '<div id="u_list"><div class="note">Press reload to pull them from OBS.</div></div>'+
+              '<button class="btn quiet" id="u_load">Reload the list</button>'+
+              '<button class="btn quiet" id="u_mig" style="margin-top:10px">Point them at pr0cess.grexofficial.com</button>'+
+              '<div class="note" id="u_note">Changing a link refreshes that source straight away. Undo puts the old one back.</div>'+
+            '</div>'+
           '</div>'+
         '</div>'
       : '')+
@@ -880,7 +936,7 @@ function renderDeck(){
       var b=el("dbody"); var open=b.classList.toggle("open");
       this.textContent=(open?"\u2212":"+")+" add a source, or drop something on his screen";
     };
-    wireBuild(); wireDrop();
+    wireBuild(); wireDrop(); wireUrls();
   }
 
   window.onbeforeunload=function(){
@@ -1076,6 +1132,77 @@ function wireBuild(){
     cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SLAM_OVERLAY});
     bnote("Slam overlay added");
   };
+}
+var URLS=[];
+function uesc(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+var MIGMAP=[
+  ["nobeatsattached.github.io/pr0cess-slam/","pr0cess.grexofficial.com/slam/"],
+  ["nobeatsattached.github.io/pr0cesstimer/","pr0cess.grexofficial.com/timer/"],
+  ["nobeatsattached.github.io/grex-project-fix/","pr0cess.grexofficial.com/fix/"],
+  ["nobeatsattached.github.io/Beatbattlebracket/","pr0cess.grexofficial.com/battle/"],
+  ["nobeatsattached.github.io/pr0cess-que/","pr0cess.grexofficial.com/queue/"],
+  ["nobeatsattached.github.io/pr0cess-live/","pr0cess.grexofficial.com/"],
+  ["nobeatsattached.github.io/live/","pr0cess.grexofficial.com/"]
+];
+function migrate(u){
+  for(var i=0;i<MIGMAP.length;i++){
+    if(u.indexOf(MIGMAP[i][0])!==-1) return u.split(MIGMAP[i][0]).join(MIGMAP[i][1]);
+  }
+  return u;
+}
+function unote(t){ var n=el("u_note"); if(n) n.textContent=t; }
+function paintUrls(list){
+  URLS=list||[];
+  var box=el("u_list"); if(!box) return;
+  if(!URLS.length){ box.innerHTML='<div class="note">No browser sources found in OBS.</div>'; return; }
+  box.innerHTML=URLS.map(function(u,i){
+    return '<div class="urow" data-i="'+i+'">'+
+             '<div class="uname">'+uesc(u.name)+'</div>'+
+             '<input class="tin uin" type="text" spellcheck="false" value="'+uesc(u.url)+'">'+
+             '<button class="usave">Save + refresh</button>'+
+           '</div>';
+  }).join("");
+  Array.prototype.forEach.call(box.querySelectorAll(".urow"),function(row){
+    var inp=row.querySelector(".uin"), btn=row.querySelector(".usave");
+    var name=URLS[+row.getAttribute("data-i")].name;
+    inp.oninput=function(){ row.className="urow chg"; };
+    btn.onclick=function(){ cmd({cmd:"seturl",name:name,url:inp.value}); unote("Sending \u2026"); };
+  });
+}
+function urlResult(r){
+  var box=el("u_list"); if(!box) return;
+  Array.prototype.forEach.call(box.querySelectorAll(".urow"),function(row){
+    var i=+row.getAttribute("data-i");
+    if(!URLS[i]||URLS[i].name!==r.name) return;
+    row.className="urow "+(r.ok?"okd":"bad");
+    if(r.ok){ URLS[i].url=r.url; }
+  });
+  unote(r.ok?("Changed "+r.name+" \u2014 refreshed."):("Failed on "+r.name+": "+(r.msg||"unknown")));
+}
+function wireUrls(){
+  var load=el("u_load"), mig=el("u_mig");
+  if(load) load.onclick=function(){ cmd({cmd:"urls"}); unote("Reading OBS \u2026"); };
+  if(mig) mig.onclick=function(){
+    var box=el("u_list"); if(!box||!URLS.length){ unote("Reload the list first."); return; }
+    var rows=box.querySelectorAll(".urow"), n=0, changed=[];
+    Array.prototype.forEach.call(rows,function(row){
+      var i=+row.getAttribute("data-i"), inp=row.querySelector(".uin");
+      var nu=migrate(inp.value);
+      if(nu!==inp.value){ inp.value=nu; row.className="urow chg"; n++; changed.push({name:URLS[i].name,url:nu}); }
+    });
+    if(!n){ unote("Nothing here points at the old addresses."); return; }
+    if(mig.getAttribute("data-armed")==="1"){
+      changed.forEach(function(c,k){ setTimeout(function(){ cmd({cmd:"seturl",name:c.name,url:c.url}); },k*260); });
+      mig.removeAttribute("data-armed"); mig.textContent="Point them at pr0cess.grexofficial.com";
+      unote("Applying "+n+" \u2014 watch each row.");
+    }else{
+      mig.setAttribute("data-armed","1");
+      mig.textContent="Apply these "+n+" \u2014 press again";
+      unote(n+" would change. Check the boxes, then press again to send it.");
+    }
+  };
+  cmd({cmd:"urls"});
 }
 function wireDrop(){
   var secs=6, sw=el("d_secs");
