@@ -139,6 +139,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
     <input type="text" id="sched" autocomplete="off" />
     <label style="margin-top:16px">SCROLL SPEED — <span id="spdVal">55</span> PX/SEC</label>
     <input type="range" id="spd" min="30" max="140" step="5" />
+    <label style="margin-top:16px">BAR HEIGHT — <span id="hVal">58</span> PX</label>
+    <input type="range" id="hgt" min="34" max="110" step="2" />
     <button class="big" id="push">FORCE PUSH TO OVERLAY</button>
     <div class="hint">Overlay URL — add as a Browser Source, 1920×1080:</div>
     <input type="text" id="ovurl" readonly onclick="this.select()"
@@ -177,7 +179,8 @@ var DEFAULTS={
     {t:"CHECK OUT THE HUB [!PROCESSHUB]",on:1}
   ],
   sched:"MON & WED 5PM \u00b7 TUE 4PM \u00b7 ET",
-  speed:55
+  speed:55,
+  h:58
 };
 function loadState(){
   try{ var s=JSON.parse(localStorage.getItem("tk_state")||"null"); if(s&&s.msgs) return s; }catch(e){}
@@ -198,7 +201,7 @@ function connect(){
 
   channel.on("broadcast",{event:"state"},function(m){
     if(!IS_OVERLAY) return;
-    if(m.payload&&m.payload.msgs){ ST=m.payload; saveState(ST); renderOverlay(); }
+    if(m.payload&&m.payload.msgs){ ST=m.payload; saveState(ST); applyHeight(); renderOverlay(); }
   });
   /* a fresh overlay asks any open deck for the current loop */
   channel.on("broadcast",{event:"req"},function(){
@@ -252,9 +255,19 @@ function renderOverlay(){
     bar.classList.add("in");
   });
 }
+function applyHeight(){
+  if(location.search.indexOf("scale=")>-1) return;   /* a URL scale overrides the deck */
+  var h=parseInt(ST.h,10)||58;
+  var k=h/58;
+  document.body.style.setProperty("--h",h+"px");
+  document.body.style.setProperty("--fs",Math.round(17*k)+"px");
+  document.body.style.setProperty("--pad",Math.round(20*k)+"px");
+}
+
 function bootOverlay(){
   document.body.className="ov";
   document.body.dataset.pos=(q.get("pos")||"top").toLowerCase();
+  applyHeight();
   var s=parseFloat(q.get("scale")||"1");
   if(s&&s!==1){
     document.body.style.setProperty("--h",(58*s)+"px");
@@ -363,6 +376,8 @@ function bootDeck(){
   document.getElementById("sched").value=ST.sched||DEFAULTS.sched;
   document.getElementById("spd").value=ST.speed||55;
   document.getElementById("spdVal").textContent=ST.speed||55;
+  document.getElementById("hgt").value=ST.h||58;
+  document.getElementById("hVal").textContent=ST.h||58;
   paintList(); paintStatus(); connect();
 
   function addMsg(){
@@ -382,6 +397,12 @@ function bootDeck(){
   });
   document.getElementById("spd").addEventListener("change",function(){
     ST.speed=parseInt(this.value,10); pushState();
+  });
+  document.getElementById("hgt").addEventListener("input",function(){
+    document.getElementById("hVal").textContent=this.value;
+  });
+  document.getElementById("hgt").addEventListener("change",function(){
+    ST.h=parseInt(this.value,10); pushState();
   });
   document.getElementById("push").onclick=function(){
     pushState(); this.textContent="PUSHED"; var b=this;
