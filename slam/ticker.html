@@ -201,7 +201,7 @@ function connect(){
 
   channel.on("broadcast",{event:"state"},function(m){
     if(!IS_OVERLAY) return;
-    if(m.payload&&m.payload.msgs){ ST=m.payload; saveState(ST); applyHeight(); renderOverlay(); }
+    if(m.payload&&m.payload.msgs){ ST=m.payload; saveState(ST); applyHeight(); queueRender(); }
   });
   /* a fresh overlay asks any open deck for the current loop */
   channel.on("broadcast",{event:"req"},function(){
@@ -229,6 +229,8 @@ function connect(){
 
 /* ---------------- OVERLAY ---------------- */
 var bar,track,tickwrap;
+var pendingRender=false, swapArmed=false;
+
 function renderOverlay(){
   var live=ST.msgs.filter(function(m){return m.on;});
   if(!live.length) live=[{t:"**"+(ST.sched||DEFAULTS.sched)+"**"}];
@@ -242,9 +244,21 @@ function renderOverlay(){
     });
     return d;
   }
+
   track.classList.remove("run");
   track.innerHTML="";
-  var a=seq(); track.appendChild(a); track.appendChild(seq());
+  var a=seq(); track.appendChild(a);
+
+  /* if one pass is narrower than the bar there would be dead space before it
+     comes back around — repeat the run until it comfortably overfills */
+  var wrapW=(tickwrap&&tickwrap.getBoundingClientRect().width)||1920;
+  var guard=0;
+  while(a.getBoundingClientRect().width<wrapW && guard<12){
+    var extra=seq();
+    while(extra.firstChild) a.appendChild(extra.firstChild);
+    guard++;
+  }
+  track.appendChild(a.cloneNode(true));
 
   requestAnimationFrame(function(){
     var w=a.getBoundingClientRect().width||1200;
@@ -253,7 +267,22 @@ function renderOverlay(){
     void track.offsetWidth;
     track.classList.add("run");
     bar.classList.add("in");
+    armSwap();
   });
+}
+
+/* an edit mid-scroll used to snap the bar back to the start.
+   hold the new copy until the loop reaches its seam, then swap. */
+function armSwap(){
+  if(swapArmed||!track)return;
+  swapArmed=true;
+  track.addEventListener("animationiteration",function(){
+    if(pendingRender){ pendingRender=false; renderOverlay(); }
+  });
+}
+function queueRender(){
+  if(!track||!track.classList.contains("run")){ renderOverlay(); return; }
+  pendingRender=true;
 }
 function applyHeight(){
   if(location.search.indexOf("scale=")>-1) return;   /* a URL scale overrides the deck */
