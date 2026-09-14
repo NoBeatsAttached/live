@@ -237,6 +237,17 @@ body:not(.overlay)::after{
   color:var(--dim);font-weight:400;letter-spacing:.2em;
 }
 .wordmark span .z{color:var(--electric,#3A93D6)}
+
+body:not(.overlay) .netbanner{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:var(--hot-soft);
+  border-top:1px solid var(--hot);color:var(--text);font-size:12.5px;line-height:1.6;
+  padding:12px 18px;text-align:center;letter-spacing:.02em}
+body:not(.overlay) .netbanner b{color:var(--hot)}
+body:not(.overlay) .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:10000;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:9px;
+  padding:12px 20px;font-size:12.5px;color:var(--text);
+  box-shadow:0 10px 34px rgba(0,0,0,.6);transition:opacity .35s,transform .35s}
+.toast.bad{border-color:var(--hot);color:var(--hot)}
+.toast.out{opacity:0;transform:translateX(-50%) translateY(8px)}
 </style>
 </head>
 <body>
@@ -279,15 +290,38 @@ function current(){return State.items.filter(function(i){return i.status==="revi
 function queued(){return State.items.filter(function(i){return i.status==="queued";}).sort(function(a,b){return a.sort_key-b.sort_key;});}
 function reviewed(){return State.items.filter(function(i){return i.status==="done"||i.status==="skipped";});}
 
+/* Connection health. A paused or unreachable database used to render as
+   "Queue's empty" — which is a lie, and the worst one to tell mid-stream.
+   Two failures in a row and it says so on screen instead. */
+var NETFAIL = 0, LOADED = false;
+function onOverlay(){ return route()==="overlay" || document.body.classList.contains("overlay"); }
+function netBanner(){
+  var el = document.getElementById("netbanner");
+  // NEVER draw chrome on the OBS source - it would paint a red bar on stream
+  if(onOverlay()){ if(el) el.remove(); return; }
+  if(NETFAIL < 2){ if(el) el.remove(); return; }
+  if(!el){
+    el = document.createElement("div");
+    el.id = "netbanner"; el.className = "netbanner";
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<b>Can\u2019t reach the database.</b> ' +
+    (LOADED ? 'Showing the last data received \u2014 nothing is saving right now.'
+            : 'Check the Supabase project isn\u2019t paused, then refresh.');
+}
 function refresh(){
   if(!sb) return Promise.resolve();
   return Promise.all([
     sb.from("queue").select("*"),
     sb.from("session").select("open").eq("id",1).single()
   ]).then(function(res){
+    if(res[0].error && res[1].error){ NETFAIL++; netBanner(); return; }
+    NETFAIL = 0; LOADED = true; netBanner();
     if(!res[0].error) State.items=res[0].data||[];
     if(!res[1].error && res[1].data) State.open=!!res[1].data.open;
     emit();
+  }).catch(function(){
+    NETFAIL++; netBanner();      // was an unhandled rejection: page froze silently
   });
 }
 function startLive(){
@@ -306,13 +340,24 @@ function startLive(){
 var PIN = localStorage.getItem("pq_pin")||"";
 var ROLE = localStorage.getItem("pq_role")||"";
 function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+/* alert() blocks every other click until dismissed. Mid-show that's the
+   last thing you want, so failures surface as a toast instead. */
+function toast(msg, bad){
+  if(onOverlay()) return;          // same reason: nothing renders on the stream source
+  var t=document.createElement("div");
+  t.className="toast"+(bad?" bad":"");
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.classList.add("out"); },2600);
+  setTimeout(function(){ if(t.parentNode) t.remove(); },3100);
+}
 function isOwner(){ return ROLE==="owner"; }
 function admin(cmd,id){
   return sb.rpc("pq_admin",{p_pin:PIN,p_cmd:cmd,p_id:id||null}).then(function(r){
     if(r.error){
       if(/bad pin/i.test(r.error.message)){ PIN=""; ROLE=""; localStorage.removeItem("pq_pin"); localStorage.removeItem("pq_role"); render(); }
-      else if(/not allowed/i.test(r.error.message)){ alert("That action is crew-only."); }
-      else alert("Action failed: "+r.error.message);
+      else if(/not allowed/i.test(r.error.message)){ toast("That action is crew-only.", true); }
+      else toast("Action failed: "+r.error.message, true);
     }
     return refresh();
   });
@@ -426,7 +471,13 @@ function renderDashboard(){
     '<div class="seclabel">Reviewed</div>'+
     '<div id="d-done" class="rack"></div>'+
     '<div class="foot"><span>v1.2.0</span><span>LIVE</span></div></div>';
-  var dc=document.getElementById("d-clear"); if(dc) dc.onclick=function(){ admin("clear_reviewed"); };
+  var dc=document.getElementById("d-clear");
+  if(dc) dc.onclick=function(){
+    var n=reviewed().length;
+    if(!n){ toast("Nothing reviewed yet."); return; }
+    if(!confirm("Clear "+n+" reviewed track"+(n===1?"":"s")+" from the board?\n\nThis can\u2019t be undone.")) return;
+    admin("clear_reviewed");
+  };
   document.getElementById("d-lock").onclick=function(){ PIN=""; ROLE=""; localStorage.removeItem("pq_pin"); localStorage.removeItem("pq_role"); render(); };
   onState(function(){
     var p=document.getElementById("pill"); if(p) p.innerHTML=pill();
@@ -450,7 +501,15 @@ function renderDashboard(){
         '<button data-a="requeue" data-id="'+it.id+'">Re-queue</button>'+
         '<button class="kill" data-a="delete" data-id="'+it.id+'">✕</button>');}).join("")
       : '<div class="empty" style="padding:18px">Nothing reviewed yet this session.</div>';
-    app.querySelectorAll("[data-a]").forEach(function(b){ b.onclick=function(){ admin(b.getAttribute("data-a"), b.getAttribute("data-id")); }; });
+    app.querySelectorAll("[data-a]").forEach(function(b){ b.onclick=function(){
+      var act=b.getAttribute("data-a"), id=b.getAttribute("data-id");
+      if(act==="delete"){
+        var it=State.items.filter(function(x){return String(x.id)===String(id);})[0];
+        var who=it?(it.handle+' \u2014 "'+it.title+'"'):"this entry";
+        if(!confirm("Delete "+who+" from the queue?\n\nThey\u2019d have to submit again.")) return;
+      }
+      admin(act, id);
+    }; });
   });
 }
 function renderPinGate(){
