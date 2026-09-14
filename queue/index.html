@@ -192,8 +192,7 @@ body.overlay{background:transparent}
   letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
-.ovl .now.closednow{color:#B4B9BF;
-  text-shadow:-3px 0 rgba(58,147,214,.7),3px 0 rgba(216,69,95,.9),0 2px 18px rgba(0,0,0,.9)}
+.ovl .now.closednow{color:#B4B9BF;text-shadow:0 2px 8px rgba(0,0,0,.92)}
 
 /* ---- brand font: display moments only ---- */
 .brand{font-size:16px;letter-spacing:.2em;color:#fff}
@@ -270,7 +269,7 @@ window.PQ_CONFIG = {
   SUPABASE_URL:      "https://tewcgwhumtmjvfxcvbxl.supabase.co",
   SUPABASE_ANON_KEY: "sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn",
 
-  BRAND:      "PR0CESS",
+  BRAND:      "PR0CESS_LIVE",
   BRAND_TAIL: "QUEUE",
   BRAND_SUB:  "PR0CESS_LIVE // FEEDBACK STREAMS",
   GENRES: ["Tearout","Midtempo","Experimental","Hybrid Trap","Riddim","Other"]
@@ -550,11 +549,11 @@ function renderOverlay(){
     var c=current(), list=queued(), next=list[0], o=document.getElementById("ovl"); if(!o) return;
     if(!c){
       if(!State.open){
-        o.innerHTML='<div class="lab">'+BRAND+' // '+BRAND_TAIL+'</div>'+
+        o.innerHTML='<div class="lab">'+wordmark()+'</div>'+
           '<div class="now closednow">QUEUE CLOSED</div>'+
           (list.length?'<div class="next">'+list.length+' still waiting</div>':''); return;
       }
-      o.innerHTML='<div class="lab">'+BRAND+' // '+BRAND_TAIL+'</div>'+
+      o.innerHTML='<div class="lab">'+wordmark()+'</div>'+
         '<div class="now">'+(list.length?(list.length+" in the queue"):"queue is open")+'</div>'+
         (next?'<div class="next">UP NEXT &nbsp; <b>'+esc(next.handle)+'</b></div>':''); return;
     }
