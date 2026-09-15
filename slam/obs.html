@@ -116,6 +116,23 @@ body.bridge{background:transparent}
 .hs .v.warn{color:var(--amber)}
 .hs .v.bad{color:var(--red)}
 .hs .v.idle{color:var(--dimmer)}
+.mix{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}
+.mixlab{font-size:12.5px;color:var(--dimmer);margin-bottom:12px}
+.ch{display:flex;align-items:center;gap:13px;padding:8px 0}
+.ch .cname{width:160px;flex:none;font-size:13.5px;color:var(--dim);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.ch.muted .cname{color:var(--dimmer);text-decoration:line-through}
+.lvl{flex:1;min-width:90px;height:7px;background:var(--panel2);border-radius:3px;overflow:hidden}
+.lvl i{display:block;height:100%;width:0;background:var(--green);border-radius:3px;transition:width .12s linear}
+.ch.muted .lvl i{background:var(--red)}
+.fader{width:150px;flex:none;accent-color:var(--amber);height:22px}
+.ch .db{width:54px;flex:none;text-align:right;font-size:12.5px;color:var(--dimmer);
+  font-variant-numeric:tabular-nums}
+.mbtn{flex:none;background:var(--panel2);border:1px solid var(--line2);color:var(--dim);font:inherit;
+  font-size:12.5px;padding:7px 13px;border-radius:7px;cursor:pointer;transition:.14s}
+.mbtn:hover{color:var(--text);border-color:var(--dimmer)}
+.mbtn.on{background:var(--red);border-color:var(--red);color:#0A0A0A}
+.mtag{flex:none;font-size:11.5px;color:var(--red);border:1px solid var(--red);padding:3px 9px;border-radius:6px}
 .hint{font-size:12.5px;color:var(--dimmer);margin-top:11px}
 .hint kbd{background:var(--panel2);border:1px solid var(--line2);border-radius:4px;
   padding:1px 6px;font:inherit;font-size:11.5px;color:var(--dim)}
@@ -168,7 +185,7 @@ body.bridge{background:transparent}
 var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
 var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
 var CHANNEL="ch-obs-4bn7yq2";
-var BUILD=12;   /* bump when the bridge gains a command */
+var BUILD=13;   /* bump when the bridge gains a command */
 var OBS_PORT=4455;
 var NUDGE=20;
 var SCALE_STEP=.06;
@@ -318,6 +335,16 @@ function runBridge(){
             p.res(null);
           } }
       }
+      if(m.op===5&&m.d.eventType==="InputVolumeMeters"){
+        if(!audioOn)return;
+        var mi=(m.d.eventData&&m.d.eventData.inputs)||[];
+        mi.forEach(function(x){
+          var lv=x.inputLevelsMul||[], best=0;
+          lv.forEach(function(ch){ if(ch&&ch.length&&ch[1]>best) best=ch[1]; });
+          meterPeaks[x.inputName]=best;
+        });
+        return;
+      }
       if(m.op===5){ // something changed in OBS — refresh the deck
         if(/Scene|SceneItem|Input/.test(m.d.eventType||"")) schedulePush();
       }
@@ -410,6 +437,23 @@ function runBridge(){
     });
   }
 
+  function pushAudioList(){
+    if(!audioOn||!obsReady)return;
+    obs("GetInputList",{}).then(function(r){
+      var ins=((r&&r.inputs)||[]).map(function(i){ return i.inputName; });
+      Promise.all(ins.map(function(n){
+        return obs("GetInputVolume",{inputName:n}).then(function(v){
+          if(!v||typeof v.inputVolumeDb!=="number") return null;
+          return obs("GetInputMute",{inputName:n}).then(function(mm){
+            return {name:n,db:Math.round(v.inputVolumeDb*10)/10,muted:!!(mm&&mm.inputMuted)};
+          });
+        });
+      })).then(function(rows){
+        send("audio",{list:rows.filter(Boolean)});
+      });
+    });
+  }
+
   function listTargets(name){
     var props=["display_uuid","display","monitor_id","monitor","window","application","capture_source_list"];
     var found=false;
@@ -468,6 +512,43 @@ function runBridge(){
       pushUndo("reveal",function(){ obs("RemoveInput",{inputName:rn}).then(schedulePush); });
       if(rs) setTimeout(function(){ obs("RemoveInput",{inputName:rn}).then(schedulePush); },rs*1000);
       note("revealed "+rn);
+      return;
+    }
+    if(p.cmd==="audio"){
+      audioOn=!!p.on;
+      try{ ws.send(JSON.stringify({op:3,d:{eventSubscriptions:audioOn?(SUB_BASE|SUB_METERS):SUB_BASE}})); }catch(e){}
+      clearInterval(meterTimer); meterTimer=null; meterPeaks={};
+      if(!audioOn){ setRow("b_last","audio off"); return; }
+      pushAudioList();
+      meterTimer=setInterval(function(){
+        if(!deckHere||!audioOn)return;
+        var out={},k,any=false;
+        for(k in meterPeaks){ out[k]=Math.round(meterPeaks[k]*1000)/1000; any=true; }
+        if(any){ try{ channel.send({type:"broadcast",event:"meters",payload:out}); }catch(e){} }
+      },180);
+      return;
+    }
+    if(p.cmd==="audiolist"){ pushAudioList(); return; }
+    if(p.cmd==="vol"){
+      var vn=p.name;
+      obs("GetInputVolume",{inputName:vn}).then(function(v){
+        var prev=(v&&typeof v.inputVolumeDb==="number")?v.inputVolumeDb:0;
+        pushUndo("volume",function(){
+          obs("SetInputVolume",{inputName:vn,inputVolumeDb:prev}).then(pushAudioList);
+        });
+        obs("SetInputVolume",{inputName:vn,inputVolumeDb:p.db}).then(pushAudioList);
+      });
+      return;
+    }
+    if(p.cmd==="mute"){
+      var qn=p.name, was=!p.on;
+      pushUndo(p.on?"mute":"unmute",function(){
+        obs("SetInputMute",{inputName:qn,inputMuted:was}).then(pushAudioList);
+      });
+      obs("SetInputMute",{inputName:qn,inputMuted:!!p.on}).then(function(){
+        setRow("b_last",(p.on?"muted ":"unmuted ")+qn);
+        pushAudioList();
+      });
       return;
     }
     if(p.cmd==="newscene"){
@@ -865,6 +946,10 @@ function runBridge(){
     Object.keys(st).forEach(function(k){ st[k].forEach(function(x){ if(x.role==="deck") f=true; }); });
     deckHere=f;
     if(!f&&eyeTimer){ clearInterval(eyeTimer); eyeTimer=null; eyeOn=false; setRow("b_shot","off"); }
+    if(!f&&audioOn){
+      audioOn=false; clearInterval(meterTimer); meterTimer=null; meterPeaks={};
+      try{ ws.send(JSON.stringify({op:3,d:{eventSubscriptions:SUB_BASE}})); }catch(e){}
+    }
     if(f) shot();
   });
   channel.subscribe(function(st){
@@ -884,6 +969,8 @@ var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_ro
 var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
 var selId=null, bridgeUp=false, dragging=false, eyeOn=false, lastFrame=null;
 var pending={}, pendNew={}, pendScene="", urlTarget="", tgtName="", tgtProp="";
+var audioOn=false, audioRows=[], meters={}, lastMeter=0;
+function metersLive(){ return (Date.now()-lastMeter)<2500; }
 function hasPending(){ var k; for(k in pending) return true; for(k in pendNew) return true; return false; }
 function boxOf(it){ return pending[it.id]||{x:it.x,y:it.y,w:it.w,h:it.h}; }
 var SLAM_OVERLAY="https://nobeatsattached.github.io/pr0cess-slam/#overlay";
@@ -892,6 +979,10 @@ function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){ret
 function cmd(p){ if(channel){ if(!p.scene) p.scene=ST.current; try{ channel.send({type:"broadcast",event:"cmd",payload:p}); }catch(e){} } }
 function el(id){ return document.getElementById(id); }
 var saidTimer=null;
+function cssEsc(s){
+  if(window.CSS&&CSS.escape) return CSS.escape(s);
+  return String(s).replace(/["\\]/g,"\\$&");
+}
 function said(t){
   var h=el("saidbar"); if(!h)return;
   h.textContent=t; h.style.display="block";
@@ -923,6 +1014,24 @@ function deckConnect(){
     lastFrame=m.payload.img;
     var im=document.querySelector(".mapframe");
     if(im) im.src=lastFrame; else paint();
+  });
+  channel.on("broadcast",{event:"audio"},function(m){
+    if(!m.payload)return;
+    audioRows=m.payload.list||[];
+    paintAudio();
+  });
+  channel.on("broadcast",{event:"meters"},function(m){
+    meters=m.payload||{}; lastMeter=Date.now();
+    var k;
+    for(k in meters){
+      var bar=document.querySelector('.lvl i[data-n="'+cssEsc(k)+'"]');
+      if(bar){
+        var v=meters[k];
+        var db=(v>0)?20*Math.log(v)/Math.LN10:-60;
+        bar.style.width=Math.max(0,Math.min(100,((Math.max(-60,db)+60)/60)*100))+"%";
+      }
+    }
+    if(!document.querySelector(".fader")) paintAudio();
   });
   channel.on("broadcast",{event:"targets"},function(m){
     if(!m.payload)return;
@@ -996,6 +1105,7 @@ function renderDeck(){
       '<span class="dot" id="dot"></span>'+
       '<span class="scene bad" id="scene">connecting</span>'+
       '<span class="spacer"></span>'+
+      '<button class="eye" id="audiotog">audio</button>'+
       '<button class="eye" id="eye">live view</button>'+
       '<button class="eye qbtn" id="eyeq" style="display:none">soft</button>'+
       '<span id="stale" style="display:none;background:var(--red);color:#0A0A0A;font-size:11px;'+
@@ -1008,6 +1118,7 @@ function renderDeck(){
     '<div class="map" id="map"></div>'+
     '<div class="strip" id="strip"></div>'+
     '<div id="commitbar" class="commit" style="display:none"></div>'+
+    '<div id="audiopanel" style="display:none"></div>'+
     '<div id="targetbar" style="display:none;margin-top:10px;background:var(--panel);border:1px solid var(--amber);'+
       'border-radius:9px;padding:12px 14px">'+
       '<div style="font-size:12px;color:var(--dimmer);margin-bottom:8px" id="tgtwho"></div>'+
@@ -1073,6 +1184,14 @@ function renderDeck(){
   '</div>';
 
   el("undo").onclick=function(){ cmd({cmd:"undo"}); };
+  el("audiotog").onclick=function(){
+    audioOn=!audioOn;
+    this.className="eye"+(audioOn?" on":"");
+    el("audiopanel").style.display=audioOn?"block":"none";
+    if(!audioOn){ audioRows=[]; meters={}; lastMeter=0; el("audiopanel").innerHTML=""; }
+    cmd({cmd:"audio",on:audioOn});
+    if(audioOn) paintAudio();
+  };
   el("eye").onclick=function(){
     eyeOn=!eyeOn;
     this.className="eye"+(eyeOn?" on":"");
@@ -1536,6 +1655,52 @@ function paint(){
       },"warn");
     }
   }
+}
+
+function paintAudio(){
+  var w=el("audiopanel");
+  if(!w||!audioOn)return;
+  var live=metersLive();
+  if(!audioRows.length){
+    w.innerHTML='<div class="mix"><div class="mixlab">Audio \u2014 waiting for his OBS\u2026</div></div>';
+    return;
+  }
+  w.innerHTML='<div class="mix"><div class="mixlab">Audio'+
+    (live?'':' \u2014 no meters yet, controls locked')+'</div><div id="chs"></div></div>';
+  var chs=el("chs");
+  audioRows.forEach(function(a){
+    var row=document.createElement("div");
+    row.className="ch"+(a.muted?" muted":"");
+    var nm=document.createElement("div"); nm.className="cname"; nm.textContent=a.name;
+    row.appendChild(nm);
+
+    var track=document.createElement("div"); track.className="lvl";
+    var fill=document.createElement("i"); fill.setAttribute("data-n",a.name); fill.style.width="0%";
+    track.appendChild(fill); row.appendChild(track);
+
+    if(live){
+      var sl=document.createElement("input");
+      sl.type="range"; sl.className="fader";
+      sl.min="-60"; sl.max="0"; sl.step="0.5";
+      sl.value=String(Math.max(-60,Math.min(0,a.db)));
+      var db=document.createElement("div"); db.className="db";
+      function show(v){ db.textContent=(v<=-60?"-inf":(v>0?"+":"")+v.toFixed(1)); }
+      show(parseFloat(sl.value));
+      sl.oninput=function(){ show(parseFloat(sl.value)); };
+      sl.onchange=function(){ cmd({cmd:"vol",name:a.name,db:parseFloat(sl.value)}); };
+      var mb=document.createElement("button");
+      mb.className="mbtn"+(a.muted?" on":"");
+      mb.textContent=a.muted?"muted":"mute";
+      mb.onclick=function(){ cmd({cmd:"mute",name:a.name,on:!a.muted}); };
+      row.appendChild(sl); row.appendChild(db); row.appendChild(mb);
+    }else{
+      var db2=document.createElement("div"); db2.className="db";
+      db2.textContent=(a.db<=-60?"-inf":(a.db>0?"+":"")+a.db.toFixed(1));
+      row.appendChild(db2);
+      if(a.muted){ var tg=document.createElement("span"); tg.className="mtag"; tg.textContent="muted"; row.appendChild(tg); }
+    }
+    chs.appendChild(row);
+  });
 }
 
 /* ---------- gate ---------- */
