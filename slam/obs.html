@@ -1665,7 +1665,12 @@ function paintAudio(){
   if(!w||!audioOn)return;
   var live=metersLive();
   if(!audioRows.length){
-    w.innerHTML='<div class="mix"><div class="mixlab">Audio \u2014 waiting for his OBS\u2026</div></div>';
+    var his=(ST.build||0);
+    var why=(his<13)
+      ? "Audio needs bridge v13 or newer \u2014 his OBS is running v"+his+
+        ". Click the red badge up top to update it."
+      : "Waiting for his OBS\u2026";
+    w.innerHTML='<div class="mix"><div class="mixlab">Audio \u2014 '+why+'</div></div>';
     return;
   }
   w.innerHTML='<div class="mix"><div class="mixlab">Audio'+
