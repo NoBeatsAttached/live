@@ -185,7 +185,7 @@ body.bridge{background:transparent}
 var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
 var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
 var CHANNEL="ch-obs-4bn7yq2";
-var BUILD=13;   /* bump when the bridge gains a command */
+var BUILD=14;   /* bump when the bridge gains a command */
 var OBS_PORT=4455;
 var NUDGE=20;
 var SCALE_STEP=.06;
@@ -537,17 +537,6 @@ function runBridge(){
           obs("SetInputVolume",{inputName:vn,inputVolumeDb:prev}).then(pushAudioList);
         });
         obs("SetInputVolume",{inputName:vn,inputVolumeDb:p.db}).then(pushAudioList);
-      });
-      return;
-    }
-    if(p.cmd==="mute"){
-      var qn=p.name, was=!p.on;
-      pushUndo(p.on?"mute":"unmute",function(){
-        obs("SetInputMute",{inputName:qn,inputMuted:was}).then(pushAudioList);
-      });
-      obs("SetInputMute",{inputName:qn,inputMuted:!!p.on}).then(function(){
-        setRow("b_last",(p.on?"muted ":"unmuted ")+qn);
-        pushAudioList();
       });
       return;
     }
@@ -1688,11 +1677,11 @@ function paintAudio(){
       show(parseFloat(sl.value));
       sl.oninput=function(){ show(parseFloat(sl.value)); };
       sl.onchange=function(){ cmd({cmd:"vol",name:a.name,db:parseFloat(sl.value)}); };
-      var mb=document.createElement("button");
-      mb.className="mbtn"+(a.muted?" on":"");
-      mb.textContent=a.muted?"muted":"mute";
-      mb.onclick=function(){ cmd({cmd:"mute",name:a.name,on:!a.muted}); };
-      row.appendChild(sl); row.appendChild(db); row.appendChild(mb);
+      row.appendChild(sl); row.appendChild(db);
+      if(a.muted){
+        var tg2=document.createElement("span"); tg2.className="mtag";
+        tg2.textContent="muted in OBS"; row.appendChild(tg2);
+      }
     }else{
       var db2=document.createElement("div"); db2.className="db";
       db2.textContent=(a.db<=-60?"-inf":(a.db>0?"+":"")+a.db.toFixed(1));
