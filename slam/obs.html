@@ -968,6 +968,7 @@ var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
 var selId=null, bridgeUp=false, dragging=false, eyeOn=false, lastFrame=null;
 var pending={}, pendNew={}, pendScene="", urlTarget="", tgtName="", tgtProp="";
 var audioOn=false, audioRows=[], meters={}, lastMeter=0;
+var upAnchor=0, upTick=null, upManual=0;
 function metersLive(){ return (Date.now()-lastMeter)<2500; }
 function hasPending(){ var k; for(k in pending) return true; for(k in pendNew) return true; return false; }
 function boxOf(it){ return pending[it.id]||{x:it.x,y:it.y,w:it.w,h:it.h}; }
@@ -1506,7 +1507,29 @@ function paint(){
       var out="";
       out+=cell("stream", h.live?"live":"offline", h.live?"good":"idle");
       if(h.live){
-        out+=cell("uptime",dur(h.up||0));
+        /* OBS only reports this every poll, so anchor it and run it locally */
+        /* OBS's own duration counter carries over between streams.
+           frames sent / framerate is the honest elapsed time. */
+        var reported=h.up||0;
+        if(h.total&&h.fps) reported=(h.total/h.fps)*1000;
+        if(upManual) reported=Date.now()-upManual;
+        var implied=Date.now()-reported;
+        if(!upAnchor||Math.abs(implied-upAnchor)>3000) upAnchor=implied;
+        out+=cell("uptime",'<span id="uptick" style="cursor:pointer" '+
+          'title="click to reset this to zero">'+dur(Date.now()-upAnchor)+'</span>');
+        if(!upTick) upTick=setInterval(function(){
+          var t=el("uptick");
+          if(t&&upAnchor) t.textContent=dur(Date.now()-upAnchor);
+        },1000);
+        setTimeout(function(){
+          var t=el("uptick");
+          if(t) t.onclick=function(){ upManual=Date.now(); upAnchor=Date.now(); said("Uptime reset."); };
+        },0);
+      }else{
+        upAnchor=0; upManual=0;
+        if(upTick){ clearInterval(upTick); upTick=null; }
+      }
+      if(h.live){
         if(typeof h.kbps==="number") out+=cell("bitrate",h.kbps+" kbps");
         var dropPct=(h.total?((h.skipped||0)/h.total*100):0);
         out+=cell("dropped",dropPct.toFixed(2)+"%",
@@ -1514,8 +1537,13 @@ function paint(){
       }
       var rm=(h.renderTotal?((h.renderMissed||0)/h.renderTotal*100):0);
       out+=cell("render lag",rm.toFixed(2)+"%", rm>1?"bad":(rm>0.2?"warn":"good"));
-      if(typeof h.render==="number") out+=cell("frame time",h.render.toFixed(1)+" ms",
-        h.render>12?"bad":(h.render>8?"warn":""));
+      if(typeof h.render==="number"){
+        /* judge against the actual frame budget, not a fixed number */
+        var budget=1000/(h.fps||30);
+        var frac=h.render/budget;
+        out+=cell("frame time",h.render.toFixed(1)+" ms",
+          frac>0.8?"bad":(frac>0.5?"warn":""));
+      }
       if(typeof h.cpu==="number") out+=cell("cpu",h.cpu.toFixed(1)+"%",
         h.cpu>70?"bad":(h.cpu>45?"warn":""));
       if(typeof h.fps==="number") out+=cell("fps",h.fps);
