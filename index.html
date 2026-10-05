@@ -199,6 +199,7 @@ body:not(.overlay)::after{
 
   <div class="crewtag">
     <a href="#" id="crewlink">crew access</a>
+    <a href="#" id="crewlock" style="display:none">lock / switch PIN</a>
     <div id="crewform" style="display:none;margin-top:12px">
       <input id="crewpin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" />
       <button id="crewgo" class="crewbtn">Enter</button>
@@ -288,8 +289,19 @@ body:not(.overlay)::after{
       for(i=0;i<o.length;i++) o[i].style.display="";
     }
     crew.style.display="none";
+    var lk=document.getElementById("crewlock"); if(lk) lk.style.display="";
     var f=document.getElementById("crewform"); if(f) f.style.display="none";
   }
+  // lock / switch PIN: forget saved PINs on this origin and re-hide crew tiles
+  var lockbtn=document.getElementById("crewlock");
+  if(lockbtn) lockbtn.addEventListener("click",function(e){
+    e.preventDefault();
+    if(!confirm("Lock crew tools and forget the saved PIN on this browser? Other open tools (timer, decks) will ask for the PIN again.")) return;
+    ["pq_pin","pq_role","slam_pin","slam_role","tk_pin","tk_role","cl_pin","cl_role"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(x){} });
+    var els=document.querySelectorAll(".crewonly,.owneronly");
+    for(var i=0;i<els.length;i++) els[i].style.display="none";
+    lockbtn.style.display="none"; crew.style.display="";
+  });
   // if a PIN is already saved from another site, verify it's still valid then show
   var saved = localStorage.getItem("pq_pin");
   if(saved){
