@@ -121,7 +121,7 @@ function syncClock(){
     if(r.error || r.data == null) return;
     var t1 = Date.now();
     var latency = (t1 - t0) / 2;                 // assume symmetric round trip
-    SKEW = (Number(r.data) + latency) - t1;
+    SKEW = Math.round((Number(r.data) + latency) - t1);
   }).catch(function(){});
 }
 function route(){return (location.hash.replace("#","")||"control");}
@@ -163,8 +163,9 @@ function live(){
   setInterval(pull, 4000);
 }
 function push(){
+  function ri(v){ return (v===null||v===undefined||isNaN(v)) ? null : Math.round(Number(v)); }
   return sb.rpc("tv_set",{p_pin:PIN,p_mode:T.mode,p_running:T.running,
-    p_end:T.end_ts,p_rem:T.remaining_ms,p_start:T.start_ts,p_el:T.elapsed_ms}).then(function(r){
+    p_end:ri(T.end_ts),p_rem:ri(T.remaining_ms),p_start:ri(T.start_ts),p_el:ri(T.elapsed_ms)}).then(function(r){
     if(r.error){ if(/bad pin/i.test(r.error.message)){PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render();} }
     return pull();
   });
