@@ -170,6 +170,7 @@ body.editing .tile{border-color:var(--hot)}
 <div id="sheet"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="seal.js?v=1"></script>
 <script>
 /* PR0CESS_LIVE // SLAM DECK
    (no hash) -> PIN-gated control deck.  #overlay -> transparent OBS source.
@@ -190,6 +191,7 @@ var flash=document.getElementById("flash");
 
 /* own storage keys — deliberately NOT pq_* so this can never log you out of the timer */
 var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_role")||"";
+if(PIN) SEAL.fetchKey(sb,PIN);
 var IS_OVERLAY=(location.hash.replace("#","").toLowerCase()==="overlay");
 var channel=null, overlayUp=false, editing=false;
 var pickStyle=null, pickHold=2500, shots=[];
@@ -198,13 +200,14 @@ function loadBoard(){ try{ return JSON.parse(localStorage.getItem("slam_board")|
 function saveBoard(b){ localStorage.setItem("slam_board",JSON.stringify(b)); }
 var BOARD=loadBoard();
 
-function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){var role=r.error?null:r.data; if(role==="owner"||role==="mod") return SEAL.fetchKey(sb,pin).then(function(){return role;}); return role;}); }
 
 function connect(){
   var key=IS_OVERLAY?"overlay":("deck-"+Math.random().toString(36).slice(2,7));
   channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:key}}});
-  channel.on("broadcast",{event:"slam"},function(m){ if(IS_OVERLAY) fire(m.payload); });
-  channel.on("broadcast",{event:"clear"},function(){ if(IS_OVERLAY) stage.innerHTML=""; });
+  if(!IS_OVERLAY) SEAL.watch(channel);
+  SEAL.on(channel,"slam",function(m){ if(IS_OVERLAY) fire(m.payload); });
+  SEAL.on(channel,"clear",function(){ if(IS_OVERLAY) stage.innerHTML=""; });
   channel.on("presence",{event:"sync"},function(){
     if(IS_OVERLAY)return;
     var st=channel.presenceState(), found=false;
@@ -213,7 +216,7 @@ function connect(){
   });
   channel.subscribe(function(status){
     if(status==="SUBSCRIBED"){
-      channel.track({role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
+      channel.track({locked:SEAL.locked,role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
       if(!IS_OVERLAY) paintStatus();
     }
     if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
@@ -278,7 +281,7 @@ function renderDeck(){
   buildChips(); buildBoard(); paintLog();
 
   document.getElementById("kill").onclick=function(){
-    if(channel){ try{ channel.send({type:"broadcast",event:"clear",payload:{}}); }catch(e){} }
+    if(channel){ try{ SEAL.send(channel,"clear",{}); }catch(e){} }
     addLog("Cleared"); if(navigator.vibrate) navigator.vibrate([12,40,12]);
   };
   document.getElementById("editlink").onclick=function(e){
@@ -289,8 +292,9 @@ function renderDeck(){
   document.getElementById("sharelink").onclick=function(e){ e.preventDefault(); openShare(); };
   (function(){
     var f=document.getElementById("ovurl"); if(!f)return;
-    var u=location.origin+location.pathname+"#overlay";
+    var u=SEAL.link(location.origin+location.pathname,"#overlay");
     f.value=u;
+    SEAL.onKey(function(){ u=SEAL.link(location.origin+location.pathname,"#overlay"); f.value=u; });
     var b=document.getElementById("copyov");
     if(b) b.onclick=function(e){
       e.preventDefault(); f.select();
@@ -371,7 +375,7 @@ function buildBoard(){
 function shoot(s,tile){
   if(tile.classList.contains("locked"))return;
   var payload={src:s.src,style:pickStyle||s.style||"slam",size:s.size||32,hold:pickHold};
-  if(channel){ try{ channel.send({type:"broadcast",event:"slam",payload:payload}); }catch(e){} }
+  if(channel){ try{ SEAL.send(channel,"slam",payload); }catch(e){} }
   tile.classList.add("locked","fired"); void tile.offsetWidth;
   setTimeout(function(){ tile.classList.remove("locked","fired"); },COOLDOWN);
   addLog(s.label);

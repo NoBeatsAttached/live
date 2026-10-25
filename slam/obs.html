@@ -175,6 +175,7 @@ body.bridge{background:transparent}
 <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="seal.js?v=1"></script>
 <script>
 /* OBS CONTROL
    obs.html               -> control deck
@@ -495,7 +496,7 @@ function runBridge(){
       var kb=Math.round(r.imageData.length/1024);
       if(kb>220){ setRow("b_shot",kb+"kb too big","bad"); return; }
       try{
-        channel.send({type:"broadcast",event:"shot",payload:{img:r.imageData}});
+        SEAL.send(channel,"shot",{img:r.imageData});
         setRow("b_shot",kb+"kb","ok");
       }catch(e){ setRow("b_shot","send failed","bad"); }
     });
@@ -533,7 +534,7 @@ function runBridge(){
         if(!deckHere||!audioOn)return;
         var out={},k,any=false;
         for(k in meterPeaks){ out[k]=Math.round(meterPeaks[k]*1000)/1000; any=true; }
-        if(any){ try{ channel.send({type:"broadcast",event:"meters",payload:out}); }catch(e){} }
+        if(any){ try{ SEAL.send(channel,"meters",out); }catch(e){} }
       },180);
       return;
     }
@@ -911,7 +912,7 @@ function runBridge(){
   }
 
   function send(event,payload){
-    if(channel){ try{ channel.send({type:"broadcast",event:event,payload:payload}); }catch(e){} }
+    if(channel){ try{ SEAL.send(channel,event,payload); }catch(e){} }
   }
 
   function shot(){
@@ -932,13 +933,13 @@ function runBridge(){
     var kb=Math.round(img.length/1024);
     if(kb>200){ setRow("b_shot",kb+"kb — too big","bad"); return; }
     try{
-      channel.send({type:"broadcast",event:"shot",payload:{img:img}});
+      SEAL.send(channel,"shot",{img:img});
       setRow("b_shot","sending "+kb+"kb","ok");
     }catch(e){ setRow("b_shot","send failed","bad"); }
   }
 
   channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"bridge"}}});
-  channel.on("broadcast",{event:"cmd"},function(m){ handle(m.payload); });
+  SEAL.on(channel,"cmd",function(m){ handle(m.payload); });
   channel.on("presence",{event:"sync"},function(){
     var st=channel.presenceState(), f=false;
     Object.keys(st).forEach(function(k){ st[k].forEach(function(x){ if(x.role==="deck") f=true; }); });
@@ -951,7 +952,7 @@ function runBridge(){
     if(f) shot();
   });
   channel.subscribe(function(st){
-    if(st==="SUBSCRIBED"){ channel.track({role:"bridge",at:Date.now()}); setRow("b_rel","connected","ok"); pushState(); }
+    if(st==="SUBSCRIBED"){ channel.track({locked:SEAL.locked,role:"bridge",at:Date.now()}); setRow("b_rel","connected","ok"); pushState(); }
     if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED"){
       setRow("b_rel","reconnecting","bad");
       setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} location.reload(); },4000);
@@ -964,6 +965,7 @@ function runBridge(){
    DECK
    ========================================================== */
 var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_role")||"";
+if(PIN&&!IS_BRIDGE) SEAL.fetchKey(sb,PIN);
 var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
 var selId=null, bridgeUp=false, dragging=false, eyeOn=false, lastFrame=null;
 var pending={}, pendNew={}, pendScene="", urlTarget="", tgtName="", tgtProp="";
@@ -974,8 +976,8 @@ function hasPending(){ var k; for(k in pending) return true; for(k in pendNew) r
 function boxOf(it){ return pending[it.id]||{x:it.x,y:it.y,w:it.w,h:it.h}; }
 var SLAM_OVERLAY="https://nobeatsattached.github.io/pr0cess-slam/#overlay";
 
-function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
-function cmd(p){ if(channel){ if(!p.scene) p.scene=ST.current; try{ channel.send({type:"broadcast",event:"cmd",payload:p}); }catch(e){} } }
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){var role=r.error?null:r.data; if(role==="owner"||role==="mod") return SEAL.fetchKey(sb,pin).then(function(){return role;}); return role;}); }
+function cmd(p){ if(channel){ if(!p.scene) p.scene=ST.current; try{ SEAL.send(channel,"cmd",p); }catch(e){} } }
 function el(id){ return document.getElementById(id); }
 var saidTimer=null;
 function cssEsc(s){
@@ -992,34 +994,35 @@ function sel(){ var f=null; ST.items.forEach(function(it){ if(it.id===selId) f=i
 
 function deckConnect(){
   channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"deck-"+Math.random().toString(36).slice(2,7)}}});
-  channel.on("broadcast",{event:"state"},function(m){ ST=m.payload||ST; paint(); });
-  channel.on("broadcast",{event:"undo"},function(m){
+  SEAL.watch(channel);
+  SEAL.on(channel,"state",function(m){ ST=m.payload||ST; paint(); });
+  SEAL.on(channel,"undo",function(m){
     var b=el("undo"); if(!b||!m.payload)return;
     var n=m.payload.n||0;
     b.disabled=(n===0);
     b.className="undo"+(n?" armed":"");
     b.textContent=n?("undo "+(m.payload.last||"")):"undo";
   });
-  channel.on("broadcast",{event:"made"},function(m){
+  SEAL.on(channel,"made",function(m){
     if(!m.payload)return;
     pendScene=pendScene||ST.current;
     pendNew[m.payload.id]={name:m.payload.name,secs:m.payload.secs||0};
     selId=m.payload.id;
     cmd({cmd:"ping"});
   });
-  channel.on("broadcast",{event:"shot"},function(m){
+  SEAL.on(channel,"shot",function(m){
     if(!m.payload||!m.payload.img)return;
     if(!eyeOn) return;
     lastFrame=m.payload.img;
     var im=document.querySelector(".mapframe");
     if(im) im.src=lastFrame; else paint();
   });
-  channel.on("broadcast",{event:"audio"},function(m){
+  SEAL.on(channel,"audio",function(m){
     if(!m.payload)return;
     audioRows=m.payload.list||[];
     paintAudio();
   });
-  channel.on("broadcast",{event:"meters"},function(m){
+  SEAL.on(channel,"meters",function(m){
     meters=m.payload||{}; lastMeter=Date.now();
     var k;
     for(k in meters){
@@ -1032,7 +1035,7 @@ function deckConnect(){
     }
     if(!document.querySelector(".fader")) paintAudio();
   });
-  channel.on("broadcast",{event:"targets"},function(m){
+  SEAL.on(channel,"targets",function(m){
     if(!m.payload)return;
     var box=el("targetbar"); if(!box)return;
     tgtName=m.payload.name; tgtProp=m.payload.prop;
@@ -1045,7 +1048,7 @@ function deckConnect(){
     });
     box.style.display="block";
   });
-  channel.on("broadcast",{event:"url"},function(m){
+  SEAL.on(channel,"url",function(m){
     if(!m.payload)return;
     var box=el("urlbar"); if(!box)return;
     urlTarget=m.payload.name;
@@ -1054,10 +1057,10 @@ function deckConnect(){
     box.style.display="block";
     el("urlfield").focus(); el("urlfield").select();
   });
-  channel.on("broadcast",{event:"said"},function(m){
+  SEAL.on(channel,"said",function(m){
     if(m.payload&&m.payload.t) said(m.payload.t);
   });
-  channel.on("broadcast",{event:"raw"},function(m){
+  SEAL.on(channel,"raw",function(m){
     var box=el("rawout"); if(!box||!m.payload)return;
     box.style.display="block"; box.value=JSON.stringify(m.payload); box.focus(); box.select();
   });
@@ -1067,7 +1070,7 @@ function deckConnect(){
     bridgeUp=f; paintStatus();
   });
   channel.subscribe(function(s){
-    if(s==="SUBSCRIBED"){ channel.track({role:"deck",at:Date.now()}); cmd({cmd:"ping"}); paintStatus(); }
+    if(s==="SUBSCRIBED"){ channel.track({locked:SEAL.locked,role:"deck",at:Date.now()}); cmd({cmd:"ping"}); paintStatus(); }
     if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED"){
       bridgeUp=false; paintStatus();
       setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} deckConnect(); },3000);
@@ -1439,7 +1442,7 @@ function wireBuild(){
     el("b_name").value=""; el("b_val").value=""; bnote("Added");
   };
   el("b_slam").onclick=function(){
-    cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SLAM_OVERLAY});
+    cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SEAL.link("https://nobeatsattached.github.io/pr0cess-slam/","#overlay")});
     bnote("Slam overlay added");
   };
 }

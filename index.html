@@ -236,12 +236,17 @@ body:not(.overlay)::after{
     "sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn"
   );
   var crew = document.getElementById("crewlink");
-  function buildLinks(){
+  function withKey(path,k){
+    if(!k) return path;
+    var h=path.indexOf("#"); return h<0 ? path+"?k="+k : path.slice(0,h)+"?k="+k+path.slice(h);
+  }
+  function buildLinks(k){
     var base=location.origin+location.pathname.replace(/[^\/]*$/,"")+"slam/";
     var rows=[["FOLLOW BAR","follow.html","440 \u00d7 200"],
               ["TICKER","ticker.html#overlay","1920 \u00d7 1080"],
               ["SLAM OVERLAY","index.html#overlay","1920 \u00d7 1080"],
               ["CLIP PLAYER (BRB scene)","clips.html#overlay","1920 \u00d7 1080"]];
+    if(k) rows.push(["OBS BRIDGE \u2014 add to the END of its current link","&k="+k,"keep the pw"]);
     var w=document.getElementById("lnks"); if(!w)return;
     w.innerHTML="";
     rows.forEach(function(r){
@@ -251,7 +256,7 @@ body:not(.overlay)::after{
       n.style.cssText="font-size:12px;letter-spacing:.1em;color:var(--text);width:210px;flex:none";
       n.textContent=r[0];
       var i=document.createElement("input");
-      i.readOnly=true; i.value=base+r[1];
+      i.readOnly=true; i.value=(r[1].charAt(0)==="&") ? r[1] : base+withKey(r[1],k);
       i.onclick=function(){ this.select(); };
       i.style.cssText="flex:1;min-width:240px;background:#0A0A0A;border:1px solid var(--line2);color:var(--dim);font:inherit;font-size:11px;padding:8px 10px";
       var s2=document.createElement("span");
@@ -280,8 +285,9 @@ body:not(.overlay)::after{
     });
   }
 
-  function reveal(role){
-    buildLinks();
+  function reveal(role,pin){
+    buildLinks("");
+    sb.rpc("ov_key",{p_pin:pin}).then(function(r){ if(!r.error&&r.data) buildLinks(String(r.data)); });
     var i, c=document.querySelectorAll(".crewonly");
     for(i=0;i<c.length;i++) c[i].style.display="";
     if(role==="owner"){
@@ -306,7 +312,7 @@ body:not(.overlay)::after{
   var saved = localStorage.getItem("pq_pin");
   if(saved){
     sb.rpc("pq_role",{p_pin:saved}).then(function(r){
-      if(!r.error && (r.data==="owner"||r.data==="mod")) reveal(r.data);
+      if(!r.error && (r.data==="owner"||r.data==="mod")) reveal(r.data,saved);
     });
   }
   var form = document.getElementById("crewform");
@@ -326,7 +332,7 @@ body:not(.overlay)::after{
       if(!r.error && (r.data==="owner"||r.data==="mod")){
         localStorage.setItem("pq_pin",p);
         localStorage.setItem("pq_role",r.data);
-        reveal(r.data);
+        reveal(r.data,p);
       } else {
         errbox.textContent="Wrong PIN";
         field.value="";

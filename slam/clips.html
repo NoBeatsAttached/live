@@ -83,6 +83,7 @@ body.ov #stage{display:block}
 <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="seal.js?v=1"></script>
 <script>
 /* CLIP PLAYER
    clips.html          -> PIN-gated deck (manage the reel)
@@ -248,15 +249,15 @@ function runOverlay(){
   function restart(){ order=[]; at=0; fails=0; next(); startWatchdog(); }
 
   channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"clipov"}}});
-  channel.on("broadcast",{event:"list"},function(m){
+  SEAL.on(channel,"list",function(m){
     if(!m.payload||!m.payload.list)return;
     LIST=m.payload.list; saveList(LIST); restart();
   });
-  channel.on("broadcast",{event:"skip"},function(){ next(); });
+  SEAL.on(channel,"skip",function(){ next(); });
   channel.subscribe(function(s){
     if(s==="SUBSCRIBED"){
-      channel.track({role:"overlay",at:Date.now()});
-      try{ channel.send({type:"broadcast",event:"req",payload:{}}); }catch(e){}
+      channel.track({locked:SEAL.locked,role:"overlay",at:Date.now()});
+      try{ SEAL.send(channel,"req",{}); }catch(e){}
     }
   });
   restart();
@@ -266,24 +267,26 @@ function runOverlay(){
    DECK
    ========================================================== */
 var PIN=localStorage.getItem("cl_pin")||"", ROLE=localStorage.getItem("cl_role")||"";
+if(PIN) SEAL.fetchKey(sb,PIN);
 var ovUp=false;
 
-function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){var role=r.error?null:r.data; if(role==="owner"||role==="mod") return SEAL.fetchKey(sb,pin).then(function(){return role;}); return role;}); }
 function push(){
   if(!channel)return;
-  try{ channel.send({type:"broadcast",event:"list",payload:{list:LIST}}); }catch(e){}
+  try{ SEAL.send(channel,"list",{list:LIST}); }catch(e){}
 }
 
 function deckConnect(){
   channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:"deck-"+Math.random().toString(36).slice(2,7)}}});
-  channel.on("broadcast",{event:"req"},function(){ push(); });
+  SEAL.watch(channel);
+  SEAL.on(channel,"req",function(){ push(); });
   channel.on("presence",{event:"sync"},function(){
     var st=channel.presenceState(), f=false;
     Object.keys(st).forEach(function(k){ st[k].forEach(function(x){ if(x.role==="overlay") f=true; }); });
     ovUp=f; paintStatus();
   });
   channel.subscribe(function(s){
-    if(s==="SUBSCRIBED"){ channel.track({role:"deck",at:Date.now()}); paintStatus(); }
+    if(s==="SUBSCRIBED"){ channel.track({locked:SEAL.locked,role:"deck",at:Date.now()}); paintStatus(); }
     if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED"){
       ovUp=false; paintStatus();
       setTimeout(function(){ try{sb.removeChannel(channel);}catch(e){} deckConnect(); },3000);
@@ -330,11 +333,12 @@ function renderDeck(){
   '</div>';
 
   el("c_add").onclick=addClip;
-  el("skip").onclick=function(){ if(channel){ try{ channel.send({type:"broadcast",event:"skip",payload:{}}); }catch(e){} } };
+  el("skip").onclick=function(){ if(channel){ try{ SEAL.send(channel,"skip",{}); }catch(e){} } };
   el("lock").onclick=function(){
     PIN="";ROLE="";localStorage.removeItem("cl_pin");localStorage.removeItem("cl_role");render(); };
-  var f=el("ovurl"), u=location.origin+location.pathname+"#overlay";
+  var f=el("ovurl"), u=SEAL.link(location.origin+location.pathname,"#overlay");
   f.value=u;
+  SEAL.onKey(function(){ u=SEAL.link(location.origin+location.pathname,"#overlay"); f.value=u; });
   el("copyov").onclick=function(){
     f.select();
     var ok=false; try{ ok=document.execCommand("copy"); }catch(e){}

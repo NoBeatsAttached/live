@@ -153,6 +153,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="seal.js?v=1"></script>
 <script>
 (function(){
 "use strict";
@@ -164,6 +165,7 @@ var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{realtime:{pa
 
 /* own storage keys — deliberately NOT pq_* or slam_* */
 var PIN=localStorage.getItem("tk_pin")||"", ROLE=localStorage.getItem("tk_role")||"";
+if(PIN) SEAL.fetchKey(sb,PIN);
 var IS_OVERLAY=(location.hash.replace("#","").toLowerCase()==="overlay");
 var q=new URLSearchParams(location.search);
 var channel=null, overlayUp=false;
@@ -198,15 +200,16 @@ function fmt(s){
 function connect(){
   var key=IS_OVERLAY?"overlay":("deck-"+Math.random().toString(36).slice(2,7));
   channel=sb.channel(CHANNEL,{config:{broadcast:{self:false},presence:{key:key}}});
+  if(!IS_OVERLAY) SEAL.watch(channel);
 
-  channel.on("broadcast",{event:"state"},function(m){
+  SEAL.on(channel,"state",function(m){
     if(!IS_OVERLAY) return;
     if(m.payload&&m.payload.msgs){ ST=m.payload; saveState(ST); applyHeight(); queueRender(); }
   });
   /* a fresh overlay asks any open deck for the current loop */
-  channel.on("broadcast",{event:"req"},function(){
+  SEAL.on(channel,"req",function(){
     if(IS_OVERLAY) return;
-    try{ channel.send({type:"broadcast",event:"state",payload:ST}); }catch(e){}
+    try{ SEAL.send(channel,"state",ST); }catch(e){}
   });
   channel.on("presence",{event:"sync"},function(){
     if(IS_OVERLAY) return;
@@ -216,8 +219,8 @@ function connect(){
   });
   channel.subscribe(function(status){
     if(status==="SUBSCRIBED"){
-      channel.track({role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
-      if(IS_OVERLAY){ try{ channel.send({type:"broadcast",event:"req",payload:{}}); }catch(e){} }
+      channel.track({locked:SEAL.locked,role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
+      if(IS_OVERLAY){ try{ SEAL.send(channel,"req",{}); }catch(e){} }
       else paintStatus();
     }
     if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
@@ -319,7 +322,7 @@ function paintStatus(){
 }
 function pushState(){
   saveState(ST);
-  if(channel){ try{ channel.send({type:"broadcast",event:"state",payload:ST}); }catch(e){} }
+  if(channel){ try{ SEAL.send(channel,"state",ST); }catch(e){} }
 }
 function paintList(){
   var ul=document.getElementById("list"); ul.innerHTML="";
@@ -385,8 +388,9 @@ function startEdit(li,tx,m){
 }
 function wireOvLink(){
   var f=document.getElementById("ovurl"); if(!f)return;
-  var u=location.origin+location.pathname+"#overlay";
+  var u=SEAL.link(location.origin+location.pathname,"#overlay");
   f.value=u;
+  SEAL.onKey(function(){ u=SEAL.link(location.origin+location.pathname,"#overlay"); f.value=u; });
   var b=document.getElementById("copyov");
   if(b) b.onclick=function(){
     f.select();
@@ -443,7 +447,7 @@ function bootDeck(){
 }
 
 /* ---------------- GATE ---------------- */
-function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){return r.error?null:r.data;}); }
+function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){var role=r.error?null:r.data; if(role==="owner"||role==="mod") return SEAL.fetchKey(sb,pin).then(function(){return role;}); return role;}); }
 function bootGate(){
   document.body.className="deck";
   document.getElementById("gate").style.display="block";
