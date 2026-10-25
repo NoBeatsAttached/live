@@ -1,0 +1,58 @@
+# Publishes this site to GitHub Pages.
+# The Supabase address + key are NOT in the code. They live in this repo's
+# Settings -> Secrets and variables -> Actions, and get plugged in here
+# at publish time. If a needed secret is missing, the publish stops and the
+# live site stays as it was.
+
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Plug in keys
+        env:
+          SB_STREAM: ${{ secrets.SB_STREAM }}
+          SB_FIX: ${{ secrets.SB_FIX }}
+          SB_OFFSTAGE: ${{ secrets.SB_OFFSTAGE }}
+        run: |
+          set -e
+          files=$(grep -rlI --exclude-dir=.git --exclude-dir=.github '__SB_' . || true)
+          for name in STREAM FIX OFFSTAGE; do
+            val=$(printenv "SB_$name" || true)
+            if grep -q "__SB_${name}_" $files /dev/null; then
+              if [ -z "$val" ]; then echo "::error::Secret SB_$name is missing in this repo's settings"; exit 1; fi
+              url="${val%%|*}"; key="${val#*|}"
+              case "$url" in https://*.supabase.co) ;; *) echo "::error::SB_$name should look like https://xxxx.supabase.co|sb_publishable_..."; exit 1;; esac
+              case "$key" in sb_publishable_*) ;; *) echo "::error::SB_$name key part must start with sb_publishable_"; exit 1;; esac
+              sed -i "s#__SB_${name}_URL__#${url}#g; s#__SB_${name}_KEY__#${key}#g" $files
+            fi
+          done
+          if grep -rnI --exclude-dir=.git --exclude-dir=.github '__SB_' .; then echo "::error::placeholders left over"; exit 1; fi
+          echo "Keys plugged in."
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4

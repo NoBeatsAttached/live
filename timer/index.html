@@ -98,8 +98,8 @@ body:not(.overlay)::after{
    #overlay -> clean OBS clock, live via Supabase (just use this plain URL in OBS) */
 (function(){
 "use strict";
-var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var SUPABASE_URL="__SB_STREAM_URL__";
+var SUPABASE_ANON_KEY="__SB_STREAM_KEY__";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 var app=document.getElementById("app");
 

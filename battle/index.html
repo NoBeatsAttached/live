@@ -423,8 +423,8 @@ body.overlay .ovl .mtr i{backface-visibility:hidden;translate:0 0}
 /* G's & VIP's BEAT BATTLE — same Supabase, same PINs as the queue. */
 (function(){
 "use strict";
-var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var SUPABASE_URL="__SB_STREAM_URL__";
+var SUPABASE_ANON_KEY="__SB_STREAM_KEY__";
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var app=document.getElementById("app");

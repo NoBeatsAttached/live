@@ -183,10 +183,10 @@ body.bridge{background:transparent}
 (function(){
 "use strict";
 
-var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var SUPABASE_URL="__SB_STREAM_URL__";
+var SUPABASE_ANON_KEY="__SB_STREAM_KEY__";
 var CHANNEL="ch-obs-4bn7yq2";
-var BUILD=15;   /* bump when the bridge gains a command */
+var BUILD=16;   /* bump when the bridge gains a command */
 var OBS_PORT=4455;
 var NUDGE=20;
 var SCALE_STEP=.06;
@@ -450,7 +450,9 @@ function runBridge(){
           });
         });
       })).then(function(rows){
-        send("audio",{list:rows.filter(Boolean)});
+        var clean=rows.filter(Boolean);
+        send("audio",{list:clean,scanned:ins.length});
+        if(!clean.length) note("audio: scanned "+ins.length+" sources, none had a volume control");
       });
     });
   }
@@ -970,11 +972,11 @@ var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
 var selId=null, bridgeUp=false, dragging=false, eyeOn=false, lastFrame=null;
 var pending={}, pendNew={}, pendScene="", urlTarget="", tgtName="", tgtProp="";
 var audioOn=false, audioRows=[], meters={}, lastMeter=0;
-var upAnchor=0, upTick=null, upManual=0;
+var upAnchor=0, upTick=null, upManual=0, audioScanned=0, audioAnswered=false;
 function metersLive(){ return (Date.now()-lastMeter)<2500; }
 function hasPending(){ var k; for(k in pending) return true; for(k in pendNew) return true; return false; }
 function boxOf(it){ return pending[it.id]||{x:it.x,y:it.y,w:it.w,h:it.h}; }
-var SLAM_OVERLAY="https://nobeatsattached.github.io/pr0cess-slam/#overlay";
+var SLAM_OVERLAY="https://pr0cess.grexofficial.com/slam/#overlay";
 
 function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){var role=r.error?null:r.data; if(role==="owner"||role==="mod") return SEAL.fetchKey(sb,pin).then(function(){return role;}); return role;}); }
 function cmd(p){ if(channel){ if(!p.scene) p.scene=ST.current; try{ SEAL.send(channel,"cmd",p); }catch(e){} } }
@@ -1020,6 +1022,8 @@ function deckConnect(){
   SEAL.on(channel,"audio",function(m){
     if(!m.payload)return;
     audioRows=m.payload.list||[];
+    audioScanned=m.payload.scanned||0;
+    audioAnswered=true;
     paintAudio();
   });
   SEAL.on(channel,"meters",function(m){
@@ -1195,7 +1199,8 @@ function renderDeck(){
     audioOn=!audioOn;
     this.className="eye"+(audioOn?" on":"");
     el("audiopanel").style.display=audioOn?"block":"none";
-    if(!audioOn){ audioRows=[]; meters={}; lastMeter=0; el("audiopanel").innerHTML=""; }
+    if(audioOn){ audioAnswered=false; audioRows=[]; }
+    else{ audioRows=[]; meters={}; lastMeter=0; audioAnswered=false; el("audiopanel").innerHTML=""; }
     cmd({cmd:"audio",on:audioOn});
     if(audioOn) paintAudio();
   };
@@ -1442,7 +1447,7 @@ function wireBuild(){
     el("b_name").value=""; el("b_val").value=""; bnote("Added");
   };
   el("b_slam").onclick=function(){
-    cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SEAL.link("https://nobeatsattached.github.io/pr0cess-slam/","#overlay")});
+    cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SEAL.link("https://pr0cess.grexofficial.com/slam/","#overlay")});
     bnote("Slam overlay added");
   };
 }
@@ -1697,10 +1702,10 @@ function paintAudio(){
   var live=metersLive();
   if(!audioRows.length){
     var his=(ST.build||0);
-    var why=(his<13)
-      ? "Audio needs bridge v13 or newer \u2014 his OBS is running v"+his+
-        ". Click the red badge up top to update it."
-      : "Waiting for his OBS\u2026";
+    var why;
+    if(his<13) why="Audio needs bridge v13 or newer \u2014 his OBS is running v"+his+". Click the badge up top to update it.";
+    else if(audioAnswered) why="Checked "+audioScanned+" sources on his end \u2014 none of them are audio. Try again once he\u2019s in OBS with his mic added.";
+    else why="Waiting for his OBS\u2026";
     w.innerHTML='<div class="mix"><div class="mixlab">Audio \u2014 '+why+'</div></div>';
     return;
   }

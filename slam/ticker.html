@@ -158,8 +158,8 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 (function(){
 "use strict";
 
-var SUPABASE_URL="https://tewcgwhumtmjvfxcvbxl.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn";
+var SUPABASE_URL="__SB_STREAM_URL__";
+var SUPABASE_ANON_KEY="__SB_STREAM_KEY__";
 var CHANNEL="ch-4vt8be2qmr7y";            /* own channel — never collides with the slam deck */
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{realtime:{params:{eventsPerSecond:10}}});
 

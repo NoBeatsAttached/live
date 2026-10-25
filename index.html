@@ -232,8 +232,8 @@ body:not(.overlay)::after{
 <script>
 (function(){
   var sb = window.supabase.createClient(
-    "https://tewcgwhumtmjvfxcvbxl.supabase.co",
-    "sb_publishable_1DZr_3nrtELGlEFIR3SIMA_F_ELXSdn"
+    "__SB_STREAM_URL__",
+    "__SB_STREAM_KEY__"
   );
   var crew = document.getElementById("crewlink");
   function withKey(path,k){
