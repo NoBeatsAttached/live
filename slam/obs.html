@@ -976,7 +976,6 @@ var upAnchor=0, upTick=null, upManual=0, audioScanned=0, audioAnswered=false;
 function metersLive(){ return (Date.now()-lastMeter)<2500; }
 function hasPending(){ var k; for(k in pending) return true; for(k in pendNew) return true; return false; }
 function boxOf(it){ return pending[it.id]||{x:it.x,y:it.y,w:it.w,h:it.h}; }
-var SLAM_OVERLAY="https://pr0cess.grexofficial.com/slam/#overlay";
 
 function getRole(pin){ return sb.rpc("pq_role",{p_pin:pin}).then(function(r){var role=r.error?null:r.data; if(role==="owner"||role==="mod") return SEAL.fetchKey(sb,pin).then(function(){return role;}); return role;}); }
 function cmd(p){ if(channel){ if(!p.scene) p.scene=ST.current; try{ SEAL.send(channel,"cmd",p); }catch(e){} } }
@@ -1165,7 +1164,6 @@ function renderDeck(){
               '<input class="tin" id="b_name" type="text" maxlength="40" placeholder="Name it">'+
               '<input class="tin" id="b_val" type="text" placeholder="URL for the page">'+
               '<button class="btn" id="b_add">Add to this scene</button>'+
-              '<button class="btn quiet" id="b_slam">Add the slam overlay</button>'+
             '<div class="lab" style="margin-top:22px">Scenes &amp; capture</div>'+
             '<input class="tin" id="s_name" type="text" maxlength="40" placeholder="New scene name">'+
             '<button class="btn quiet" id="s_make">Make the scene</button>'+
@@ -1445,10 +1443,6 @@ function wireBuild(){
     if((bKind==="browser"||bKind==="media")&&!/^https?:\/\//i.test(vl)){ bnote("Needs an http link"); return; }
     cmd({cmd:"create",kind:bKind,name:nm,val:vl});
     el("b_name").value=""; el("b_val").value=""; bnote("Added");
-  };
-  el("b_slam").onclick=function(){
-    cmd({cmd:"create",kind:"browser",name:"SLAM OVERLAY",val:SEAL.link("https://pr0cess.grexofficial.com/slam/","#overlay")});
-    bnote("Slam overlay added");
   };
 }
 function wireDrop(){

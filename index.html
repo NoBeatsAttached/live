@@ -54,10 +54,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;
 .tile.queue{--tilecol:var(--electric)}
 .tile.fix{--tilecol:var(--gold)}
 .tile.timer{--tilecol:var(--electric)}
-.tile.slam{--tilecol:var(--electric)}
 .tile.obs{--tilecol:var(--hot)}
 .tile.ticker{--tilecol:var(--electric)}
-.tile.clips{--tilecol:var(--electric)}
 .crewtag{display:block;text-align:center;margin-top:20px}
 .crewtag a{color:var(--dimmer);font-size:11px;letter-spacing:.16em;text-decoration:none;text-transform:uppercase}
 .crewtag a:hover{color:var(--electric)}
@@ -161,13 +159,6 @@ body:not(.overlay)::after{
       <span class="go">Open &rarr;</span>
     </a>
 
-    <a class="tile slam crewonly" id="slamtile" href="slam/" style="display:none" target="_blank" rel="noopener">
-      <span class="tnum">✦</span>
-      <h2>SLAM DECK</h2>
-      <div class="sub">Crew only — fire memes onto the stream in real time.</div>
-      <span class="go">Open &rarr;</span>
-    </a>
-
     <a class="tile obs owneronly" id="obstile" href="slam/obs.html" style="display:none" target="_blank" rel="noopener">
       <span class="tnum">◆</span>
       <h2>OBS CONTROL</h2>
@@ -179,13 +170,6 @@ body:not(.overlay)::after{
       <span class="tnum">≡</span>
       <h2>TICKER</h2>
       <div class="sub">Crew only — push messages to the scrolling bar on stream.</div>
-      <span class="go">Open &rarr;</span>
-    </a>
-
-    <a class="tile clips crewonly" id="clipstile" href="slam/clips.html" style="display:none" target="_blank" rel="noopener">
-      <span class="tnum">▶</span>
-      <h2>CLIP PLAYER</h2>
-      <div class="sub">Crew only — the reel that plays if the stream drops.</div>
       <span class="go">Open &rarr;</span>
     </a>
 
@@ -242,10 +226,7 @@ body:not(.overlay)::after{
   }
   function buildLinks(k){
     var base=location.origin+location.pathname.replace(/[^\/]*$/,"")+"slam/";
-    var rows=[["FOLLOW BAR","follow.html","440 \u00d7 200"],
-              ["TICKER","ticker.html#overlay","1920 \u00d7 1080"],
-              ["SLAM OVERLAY","index.html#overlay","1920 \u00d7 1080"],
-              ["CLIP PLAYER (BRB scene)","clips.html#overlay","1920 \u00d7 1080"]];
+    var rows=[["TICKER","ticker.html#overlay","1920 \u00d7 1080"]];
     if(k) rows.push(["OBS BRIDGE \u2014 add to the END of its current link","&k="+k,"keep the pw"]);
     var w=document.getElementById("lnks"); if(!w)return;
     w.innerHTML="";
