@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guess The Word</title>
+<style>
+@font-face{font-family:'Code';src:url(data:font/woff2;base64,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) format('woff2');font-display:swap;}
+:root{
+  --panel:rgba(5,5,6,.88);
+  --line:#212429;
+  --line2:#2E3238;
+  --bone:#EDEDEB;
+  --silver:#B4B9BF;
+  --steel:#9AA0A8;
+  --blue:#3A93D6;
+  --tile:30px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:transparent;overflow:hidden}
+body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;top:0;left:0;transform-origin:top left;padding:8px}
+.card{background:var(--panel);border:1px solid var(--line);padding:9px 12px 9px 14px;width:380px;position:relative}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue)}
+
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px;padding-right:8px}
+.cat{font-size:13px;letter-spacing:.12em;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title{font-size:12px;letter-spacing:.1em;color:var(--bone);white-space:nowrap}
+
+.tiles{display:flex;flex-wrap:nowrap;gap:4px;height:var(--tile)}
+.t{flex:0 0 var(--tile);height:var(--tile);display:flex;align-items:center;justify-content:center;
+   font-size:calc(var(--tile)*.58);border-bottom:2px solid var(--line2);background:rgba(255,255,255,.03);color:transparent;
+   transition:color .2s,border-color .2s,background .3s}
+.t.on{color:var(--bone);border-color:var(--steel)}
+.t.new{animation:pop .7s ease-out}
+.t.gap{flex-basis:calc(var(--tile)*.4);background:none;border:none}
+@keyframes pop{0%{color:var(--blue);border-color:var(--blue);transform:translateY(-3px)}100%{transform:none}}
+.card.won .t{color:var(--bone);border-color:var(--blue);background:rgba(58,147,214,.14)}
+.card.miss .t{color:var(--steel);border-color:var(--line2)}
+.card.miss .t.on{color:var(--silver)}
+
+.bar{height:2px;background:var(--line);margin:8px 0 7px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);width:100%}
+
+.msg{font-size:12px;letter-spacing:.1em;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg .who{color:var(--blue)}
+.msg .pts{color:var(--bone)}
+.board{margin-top:5px;font-size:11px;letter-spacing:.08em;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board:empty{display:none}
+.board b{color:var(--bone);font-weight:normal}
+.board .d{color:var(--line2);margin:0 6px}
+
+.live{position:absolute;top:6px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--line2)}
+.live.ok{background:var(--blue)}
+
+/* test-mode chat box (only shows with ?test=1) */
+#tester{display:none;margin-top:8px;gap:6px;width:380px}
+#tester.show{display:flex}
+#tester input{font-family:'Code',monospace;background:#0B0C0F;color:var(--bone);border:1px solid var(--line2);padding:8px 10px;font-size:13px;letter-spacing:.1em;outline:none}
+#tester input:focus{border-color:var(--blue)}
+#tester .u{width:120px}#tester .m{min-width:0}
+#tester .m{flex:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="card" id="card">
+    <div class="live" id="live" title="chat connection"></div>
+    <div class="head">
+      <div class="cat" id="cat"></div>
+      <div class="title">GUESS THE WORD</div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="msg" id="msg">TYPE YOUR GUESS IN CHAT</div>
+    <div class="board" id="board"></div>
+  </div>
+  <div id="tester">
+    <input class="u" id="tu" value="testuser" placeholder="username">
+    <input class="m" id="tm" placeholder="type a guess + enter">
+  </div>
+</div>
+
+<script>
+(() => {
+/* ---------------- settings (all optional URL params) ----------------
+   ?channel=grexbeatz   which Twitch chat to read
+   ?reveal=10           seconds between letter reveals
+   ?gap=8               seconds between rounds
+   ?scale=1             size multiplier for the whole overlay
+   ?ignore=a,b          extra usernames to ignore (bots are ignored already)
+   ?reset=1             wipe the leaderboard once, then remove it from the URL
+   ?test=1              shows a fake-chat box so you can play it in a normal browser
+---------------------------------------------------------------------- */
+const P = new URLSearchParams(location.search);
+const num = (k, d, lo, hi) => { const v = parseFloat(P.get(k)); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+const CHANNEL = (P.get('channel') || 'grexbeatz').toLowerCase().replace(/^#/, '');
+const REVEAL_S = num('reveal', 10, 3, 120);
+const GAP_S = num('gap', 8, 2, 120);
+const SCALE = num('scale', 1, .3, 4);
+const TEST = P.get('test') === '1';
+const IGNORE = new Set(['streamelements','nightbot','fossabot','moobot','streamlabs','soundalerts','sery_bot','wizebot','botrixoficial','kofistreambot',
+  ...(P.get('ignore') || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean)]);
+
+/* ---------------- word bank ---------------- */
+const BANK = {
+  'DRUMS': ['KICK','SNARE','HI HAT','CLAP','RIMSHOT','CRASH','RIDE','SHAKER','CONGA','BONGO','COWBELL','TAMBOURINE','BREAKBEAT','808','OPEN HAT','GHOST NOTE','DRUM ROLL','TOM'],
+  'GEAR': ['SYNTH','SAMPLER','SEQUENCER','MIXER','MONITORS','HEADPHONES','MICROPHONE','INTERFACE','CONTROLLER','TURNTABLE','VINYL','CROSSFADER','MPC','FADER','KNOB','PATCH CABLE','DRUM MACHINE','MIDI KEYBOARD','POP FILTER','SUBWOOFER'],
+  'SOUND DESIGN': ['OSCILLATOR','WAVETABLE','ENVELOPE','ATTACK','DECAY','SUSTAIN','RELEASE','FILTER','RESONANCE','CUTOFF','LFO','DETUNE','UNISON','WHITE NOISE','SAWTOOTH','SINE WAVE','WOBBLE','GRANULAR','FM SYNTHESIS','PORTAMENTO','GLIDE','PATCH','MODULATION','SUB BASS'],
+  'MIXING': ['COMPRESSOR','LIMITER','REVERB','DELAY','PHASER','FLANGER','DISTORTION','SATURATION','SIDECHAIN','GAIN','PANNING','MASTERING','HEADROOM','CLIPPING','STEREO','MONO','AUTOMATION','BUS','EQUALIZER','TRANSIENT','LOUDNESS','DITHER','BITCRUSHER','OVERDRIVE','TAPE STOP','VOCODER','AUTOTUNE'],
+  'THEORY': ['CHORD','MELODY','HARMONY','TEMPO','RHYTHM','TRIPLET','SYNCOPATION','OCTAVE','SCALE','MINOR','MAJOR','ARPEGGIO','INTERVAL','TRANSPOSE','SWING','GROOVE','BPM','DOWNBEAT','MEASURE','CADENCE','CHROMATIC','TIME SIGNATURE','KEY CHANGE','COUNTERMELODY','INVERSION','BASSLINE'],
+  'INSTRUMENTS': ['PIANO','KEYS','GUITAR','BASS GUITAR','VIOLIN','CELLO','ORGAN','RHODES','SAXOPHONE','TRUMPET','FLUTE','HARP','STRINGS','CHOIR','BRASS','MARIMBA','VIBRAPHONE','KALIMBA','SITAR','HARPSICHORD','UPRIGHT BASS','STEEL DRUM','GLOCKENSPIEL','BANJO'],
+  'IN THE STUDIO': ['SAMPLE','LOOP','CHOP','FLIP','STEMS','BOUNCE','EXPORT','PROJECT','PRESET','PLUGIN','VST','DAW','ABLETON','QUANTIZE','METRONOME','ARRANGEMENT','HOOK','VERSE','BRIDGE','INTRO','OUTRO','DROP','BUILDUP','BREAKDOWN','FILL','BEAT','REMIX','BOOTLEG','MASHUP','MIXTAPE','DEMO','TAKE','PUNCH IN','SESSION','WORKFLOW','RESAMPLE','PIANO ROLL','CRATE DIGGING','SCRATCH','TIME STRETCH'],
+  'GENRES': ['DUBSTEP','TRAP','DRILL','BOOM BAP','LOFI','HOUSE','TECHNO','JUNGLE','GARAGE','GRIME','RIDDIM','HALFTIME','FUNK','SOUL','JAZZ','GOSPEL','DISCO','PHONK','FOOTWORK','DRUM AND BASS','AMBIENT','HIP HOP','RNB','BREAKS','DEEP HOUSE','JERSEY CLUB','DETROIT TECHNO','GHETTOTECH','TRIP HOP','DOWNTEMPO']
+};
+const DECK_ALL = [];
+for (const [cat, words] of Object.entries(BANK)) for (const w of words) DECK_ALL.push({ cat, word: w });
+
+/* ---------------- helpers ---------------- */
+const $ = id => document.getElementById(id);
+const norm = s => s.toUpperCase().normalize('NFKD').replace(/[^A-Z0-9]+/g, ' ').trim();
+const compact = s => norm(s).replace(/ /g, '');
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+$('stage').style.transform = `scale(${SCALE})`;
+
+/* ---------------- storage (leaderboard survives OBS restarts) ---------------- */
+const KEY = 'gtw_scores_' + CHANNEL;
+const DKEY = 'gtw_deck_' + CHANNEL;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} }
+};
+if (P.get('reset') === '1') { store.del(KEY); store.del(DKEY); }
+let scores = store.get(KEY, {}); // { login: { name, pts } }
+
+function renderBoard() {
+  const top = Object.values(scores).sort((a, b) => b.pts - a.pts).slice(0, 3);
+  $('board').innerHTML = top.length
+    ? top.map((s, i) => `${i + 1} <b>${esc(s.name.length > 12 ? s.name.slice(0, 11) + '…' : s.name)}</b> ${s.pts}`).join('<span class="d">/</span>')
+    : '';
+}
+
+/* deck: every word gets played once before any repeats (remembered across restarts) */
+function nextWord() {
+  let deck = store.get(DKEY, null);
+  if (!Array.isArray(deck) || !deck.length || deck.some(i => !DECK_ALL[i])) deck = shuffle(DECK_ALL.map((_, i) => i));
+  const idx = deck.shift();
+  store.set(DKEY, deck);
+  return DECK_ALL[idx];
+}
+
+/* ---------------- game ---------------- */
+let round = null;   // { cat, word, chars, shown:Set, hiddenIdx:[], state }
+let tickT = null, barRAF = null;
+
+function letterIdx(word) { return [...word].map((c, i) => c === ' ' ? -1 : i).filter(i => i >= 0); }
+
+function drawTiles(newIdx = -1) {
+  const chars = [...round.word];
+  const len = chars.filter(c => c !== ' ').length;
+  const spaces = chars.length - len;
+  const inner = 380 - 26 - 2;            // card width minus padding/border
+  const fit = Math.floor((inner - 4 * (chars.length - 1)) / (len + spaces * .4));
+  const size = Math.max(16, Math.min(30, fit));
+  document.documentElement.style.setProperty('--tile', size + 'px');
+  $('tiles').innerHTML = chars.map((c, i) => c === ' '
+    ? '<div class="t gap"></div>'
+    : `<div class="t${round.shown.has(i) ? ' on' : ''}${i === newIdx ? ' new' : ''}">${esc(c)}</div>`).join('');
+}
+
+function runBar(seconds) {
+  cancelAnimationFrame(barRAF);
+  const start = performance.now(), el = $('bar');
+  const step = now => {
+    const p = Math.max(0, 1 - (now - start) / (seconds * 1000));
+    el.style.width = (p * 100) + '%';
+    if (p > 0) barRAF = requestAnimationFrame(step);
+  };
+  barRAF = requestAnimationFrame(step);
+}
+
+function startRound() {
+  clearTimeout(tickT);
+  const { cat, word } = nextWord();
+  const idx = letterIdx(word);
+  round = { cat, word, target: compact(word), shown: new Set(), state: 'live' };
+  // start with ~20% of letters showing (at least 1 on words of 4+)
+  const startCount = idx.length >= 4 ? Math.max(1, Math.round(idx.length * .2)) : 0;
+  shuffle([...idx]).slice(0, startCount).forEach(i => round.shown.add(i));
+  round.hidden = shuffle(idx.filter(i => !round.shown.has(i)));
+
+  $('card').classList.remove('won', 'miss');
+  $('cat').textContent = cat;
+  $('msg').innerHTML = `TYPE YOUR GUESS IN CHAT`;
+  drawTiles();
+  runBar(REVEAL_S);
+  tickT = setTimeout(tick, REVEAL_S * 1000);
+}
+
+function tick() {
+  if (!round || round.state !== 'live') return;
+  if (round.hidden.length <= 1) return endRound(null); // one letter left and nobody got it
+  const i = round.hidden.shift();
+  round.shown.add(i);
+  drawTiles(i);
+  runBar(REVEAL_S);
+  tickT = setTimeout(tick, REVEAL_S * 1000);
+}
+
+function pointsNow() {
+  // more hidden letters when you solve it = more points
+  return 5 + round.hidden.length * 3;
+}
+
+function endRound(winner) {
+  clearTimeout(tickT);
+  cancelAnimationFrame(barRAF);
+  round.state = 'done';
+  [...round.word].forEach((c, i) => c !== ' ' && round.shown.add(i));
+  drawTiles();
+  if (winner) {
+    const pts = pointsNow();
+    const rec = scores[winner.login] || { name: winner.name, pts: 0 };
+    rec.name = winner.name; rec.pts += pts;
+    scores[winner.login] = rec;
+    store.set(KEY, scores);
+    renderBoard();
+    $('card').classList.add('won');
+    $('msg').innerHTML = `<span class="who">${esc(winner.name)}</span> GOT IT <span class="pts">+${pts}</span>`;
+  } else {
+    $('card').classList.add('miss');
+    $('msg').innerHTML = `NOBODY. NEXT WORD`;
+  }
+  $('bar').style.width = '0%';
+  runBar(GAP_S);
+  tickT = setTimeout(startRound, GAP_S * 1000);
+}
+
+function onChat(login, name, text) {
+  if (!round || round.state !== 'live') return;
+  if (IGNORE.has(login)) return;
+  const n = norm(text);
+  if (!n) return;
+  // win if the whole message is the word, or the word appears inside it ("is it reverb?")
+  const hit = n.replace(/ /g, '') === round.target || (' ' + n + ' ').includes(' ' + norm(round.word) + ' ');
+  if (hit) {
+    endRound({ login, name: name || login });
+  }
+}
+
+/* ---------------- Twitch chat (read-only, anonymous, no keys) ---------------- */
+let ws = null, backoff = 1000, pingT = null;
+function connect() {
+  try { ws && ws.close(); } catch {}
+  ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+  ws.onopen = () => {
+    ws.send('CAP REQ :twitch.tv/tags');
+    ws.send('PASS SCHMOOPIIE');
+    ws.send('NICK justinfan' + (10000 + (Math.random() * 80000 | 0)));
+    ws.send('JOIN #' + CHANNEL);
+  };
+  ws.onmessage = e => {
+    for (const line of String(e.data).split('\r\n')) {
+      if (!line) continue;
+      if (line.startsWith('PING')) { ws.send('PONG' + line.slice(4)); continue; }
+      if (line.includes(' 366 ')) { $('live').classList.add('ok'); backoff = 1000; } // joined
+      const m = line.match(/^(?:@(\S+) )?:(\w+)!\S+ PRIVMSG #\S+ :(.*)$/);
+      if (!m) continue;
+      let name = m[2];
+      if (m[1]) { const dn = m[1].match(/(?:^|;)display-name=([^;]*)/); if (dn && dn[1]) name = dn[1]; }
+      onChat(m[2].toLowerCase(), name, m[3]);
+    }
+  };
+  ws.onclose = () => {
+    $('live').classList.remove('ok');
+    clearTimeout(pingT);
+    pingT = setTimeout(connect, backoff);
+    backoff = Math.min(backoff * 2, 30000);
+  };
+  ws.onerror = () => { try { ws.close(); } catch {} };
+}
+
+/* ---------------- test box ---------------- */
+if (TEST) {
+  $('tester').classList.add('show');
+  $('tm').addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const u = $('tu').value.trim() || 'testuser';
+    onChat(u.toLowerCase(), u, $('tm').value);
+    $('tm').value = '';
+  });
+  window.__answer = () => round && round.word; // console peek for testing
+  window.__force = (cat, word) => { const idx = letterIdx(word); round = { cat, word, target: compact(word), shown: new Set(idx.slice(0, 3)), state: 'live', hidden: idx.slice(3) }; $('cat').textContent = cat; drawTiles(); };
+}
+
+renderBoard();
+startRound();
+if (!TEST || P.get('channel')) connect();
+})();
+</script>
+</body>
+</html>
