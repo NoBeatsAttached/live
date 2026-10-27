@@ -39,7 +39,9 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
 .card.won .t.gap,.t.gap{background:none;border:none}
 
 
-.msg{margin-top:12px;font-size:15px;letter-spacing:.08em;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.foot{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:12px}
+.hint{font-size:13px;letter-spacing:.08em;color:var(--steel);white-space:nowrap}
+.msg{min-width:0;font-size:15px;letter-spacing:.08em;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .msg .who{color:var(--blue)}
 .msg .pts{color:var(--bone)}
 .msg .g{color:var(--steel)}
@@ -69,7 +71,7 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
       <div class="title">GUESS THE WORD</div>
     </div>
     <div class="tiles" id="tiles"></div>
-    <div class="msg" id="msg">TYPE YOUR GUESS IN CHAT</div>
+    <div class="foot"><div class="msg" id="msg">TYPE YOUR GUESS IN CHAT</div><div class="hint" id="hint"></div></div>
     <div class="board" id="board"></div>
   </div>
   <div id="tester">
@@ -82,6 +84,7 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
 (() => {
 /* ---------------- settings (all optional URL params) ----------------
    ?channel=grexbeatz   which Twitch chat to read
+   ?hint=20             seconds between free letter reveals (stops with 1 letter left)
    ?gap=8               seconds the answer stays up before the next word
    ?scale=1             size multiplier for the whole overlay
    ?ignore=a,b          extra usernames to ignore (bots are ignored already)
@@ -92,6 +95,7 @@ const P = new URLSearchParams(location.search);
 const num = (k, d, lo, hi) => { const v = parseFloat(P.get(k)); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
 const CHANNEL = (P.get('channel') || 'grexbeatz').toLowerCase().replace(/^#/, '');
 const GAP_S = num('gap', 8, 2, 120);
+const HINT_S = num('hint', 20, 5, 300);
 const SCALE = num('scale', 1, .3, 4);
 const TEST = P.get('test') === '1';
 const IGNORE = new Set(['streamelements','nightbot','fossabot','moobot','streamlabs','soundalerts','sery_bot','wizebot','botrixoficial','kofistreambot',
@@ -149,7 +153,7 @@ function nextWord() {
 
 /* ---------------- game ---------------- */
 let round = null;   // { cat, word, chars, shown:Set, hiddenIdx:[], state }
-let tickT = null;
+let tickT = null, hintAt = 0, hintT = null;
 
 function letterIdx(word) { return [...word].map((c, i) => c === ' ' ? -1 : i).filter(i => i >= 0); }
 
@@ -167,7 +171,7 @@ function drawTiles(fresh = []) {
 }
 
 function prompt() {
-  return `TYPE A <span class="pts">${round.target.length}-LETTER</span> GUESS IN CHAT`;
+  return `<span class="pts">${round.target.length} LETTERS</span> &middot; GUESS IN CHAT`;
 }
 
 function startRound() {
@@ -180,6 +184,26 @@ function startRound() {
   $('cat').textContent = cat;
   $('msg').innerHTML = prompt();
   drawTiles();
+  armHint();
+}
+
+function armHint() { hintAt = Date.now() + HINT_S * 1000; }
+function hintLoop() {
+  clearInterval(hintT);
+  hintT = setInterval(() => {
+    if (!round || round.state !== 'live') { $('hint').textContent = ''; return; }
+    const hidden = round.pos.filter(i => !round.shown.has(i));
+    if (hidden.length <= 1) { $('hint').textContent = 'LAST LETTER'; return; }
+    const left = Math.ceil((hintAt - Date.now()) / 1000);
+    if (left <= 0) {
+      const i = hidden[Math.random() * hidden.length | 0];
+      round.shown.add(i);
+      drawTiles([i]);
+      armHint();
+      return;
+    }
+    $('hint').textContent = 'HINT IN ' + left;
+  }, 250);
 }
 
 function hiddenCount() { return round.pos.filter(i => !round.shown.has(i)).length; }
@@ -195,6 +219,7 @@ function addPts(who, pts) {
 function endRound(winner, pts) {
   clearTimeout(tickT);
   round.state = 'done';
+  $('hint').textContent = '';
   round.pos.forEach(i => round.shown.add(i));
   drawTiles();
   addPts(winner, pts);
@@ -281,6 +306,7 @@ if (TEST) {
 
 renderBoard();
 startRound();
+hintLoop();
 if (!TEST || P.get('channel')) connect();
 })();
 </script>
