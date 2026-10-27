@@ -36,15 +36,12 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
 .t.gap{flex-basis:calc(var(--tile)*.4);background:none;border:none}
 @keyframes pop{0%{color:var(--blue);border-color:var(--blue);transform:translateY(-3px)}100%{transform:none}}
 .card.won .t{color:var(--bone);border-color:var(--blue);background:rgba(58,147,214,.14)}
-.card.miss .t{color:var(--steel);border-color:var(--line2)}
-.card.miss .t.on{color:var(--silver)}
 
-.bar{height:2px;background:var(--line);margin:8px 0 7px;position:relative;overflow:hidden}
-.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--blue);width:100%}
 
-.msg{font-size:12px;letter-spacing:.1em;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg{margin-top:9px;font-size:12px;letter-spacing:.1em;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .msg .who{color:var(--blue)}
 .msg .pts{color:var(--bone)}
+.msg .g{color:var(--steel)}
 .board{margin-top:5px;font-size:11px;letter-spacing:.08em;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .board:empty{display:none}
 .board b{color:var(--bone);font-weight:normal}
@@ -71,7 +68,6 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
       <div class="title">GUESS THE WORD</div>
     </div>
     <div class="tiles" id="tiles"></div>
-    <div class="bar"><i id="bar"></i></div>
     <div class="msg" id="msg">TYPE YOUR GUESS IN CHAT</div>
     <div class="board" id="board"></div>
   </div>
@@ -85,8 +81,7 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
 (() => {
 /* ---------------- settings (all optional URL params) ----------------
    ?channel=grexbeatz   which Twitch chat to read
-   ?reveal=10           seconds between letter reveals
-   ?gap=8               seconds between rounds
+   ?gap=8               seconds the answer stays up before the next word
    ?scale=1             size multiplier for the whole overlay
    ?ignore=a,b          extra usernames to ignore (bots are ignored already)
    ?reset=1             wipe the leaderboard once, then remove it from the URL
@@ -95,7 +90,6 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
 const P = new URLSearchParams(location.search);
 const num = (k, d, lo, hi) => { const v = parseFloat(P.get(k)); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
 const CHANNEL = (P.get('channel') || 'grexbeatz').toLowerCase().replace(/^#/, '');
-const REVEAL_S = num('reveal', 10, 3, 120);
 const GAP_S = num('gap', 8, 2, 120);
 const SCALE = num('scale', 1, .3, 4);
 const TEST = P.get('test') === '1';
@@ -154,11 +148,11 @@ function nextWord() {
 
 /* ---------------- game ---------------- */
 let round = null;   // { cat, word, chars, shown:Set, hiddenIdx:[], state }
-let tickT = null, barRAF = null;
+let tickT = null;
 
 function letterIdx(word) { return [...word].map((c, i) => c === ' ' ? -1 : i).filter(i => i >= 0); }
 
-function drawTiles(newIdx = -1) {
+function drawTiles(fresh = []) {
   const chars = [...round.word];
   const len = chars.filter(c => c !== ' ').length;
   const spaces = chars.length - len;
@@ -168,74 +162,43 @@ function drawTiles(newIdx = -1) {
   document.documentElement.style.setProperty('--tile', size + 'px');
   $('tiles').innerHTML = chars.map((c, i) => c === ' '
     ? '<div class="t gap"></div>'
-    : `<div class="t${round.shown.has(i) ? ' on' : ''}${i === newIdx ? ' new' : ''}">${esc(c)}</div>`).join('');
+    : `<div class="t${round.shown.has(i) ? ' on' : ''}${fresh.includes(i) ? ' new' : ''}">${esc(c)}</div>`).join('');
 }
 
-function runBar(seconds) {
-  cancelAnimationFrame(barRAF);
-  const start = performance.now(), el = $('bar');
-  const step = now => {
-    const p = Math.max(0, 1 - (now - start) / (seconds * 1000));
-    el.style.width = (p * 100) + '%';
-    if (p > 0) barRAF = requestAnimationFrame(step);
-  };
-  barRAF = requestAnimationFrame(step);
+function prompt() {
+  return `TYPE A <span class="pts">${round.target.length}-LETTER</span> GUESS IN CHAT`;
 }
 
 function startRound() {
   clearTimeout(tickT);
   const { cat, word } = nextWord();
   const idx = letterIdx(word);
-  round = { cat, word, target: compact(word), shown: new Set(), state: 'live' };
-  // start with ~20% of letters showing (at least 1 on words of 4+)
-  const startCount = idx.length >= 4 ? Math.max(1, Math.round(idx.length * .2)) : 0;
-  shuffle([...idx]).slice(0, startCount).forEach(i => round.shown.add(i));
-  round.hidden = shuffle(idx.filter(i => !round.shown.has(i)));
-
+  // pos[k] = index in `word` of the k-th letter (so spaces in two-word answers are skipped)
+  round = { cat, word, target: compact(word), pos: idx, shown: new Set(), state: 'live' };
   $('card').classList.remove('won', 'miss');
   $('cat').textContent = cat;
-  $('msg').innerHTML = `TYPE YOUR GUESS IN CHAT`;
+  $('msg').innerHTML = prompt();
   drawTiles();
-  runBar(REVEAL_S);
-  tickT = setTimeout(tick, REVEAL_S * 1000);
 }
 
-function tick() {
-  if (!round || round.state !== 'live') return;
-  if (round.hidden.length <= 1) return endRound(null); // one letter left and nobody got it
-  const i = round.hidden.shift();
-  round.shown.add(i);
-  drawTiles(i);
-  runBar(REVEAL_S);
-  tickT = setTimeout(tick, REVEAL_S * 1000);
+function hiddenCount() { return round.pos.filter(i => !round.shown.has(i)).length; }
+
+function addPts(who, pts) {
+  const rec = scores[who.login] || { name: who.name, pts: 0 };
+  rec.name = who.name; rec.pts += pts;
+  scores[who.login] = rec;
+  store.set(KEY, scores);
+  renderBoard();
 }
 
-function pointsNow() {
-  // more hidden letters when you solve it = more points
-  return 5 + round.hidden.length * 3;
-}
-
-function endRound(winner) {
+function endRound(winner, pts) {
   clearTimeout(tickT);
-  cancelAnimationFrame(barRAF);
   round.state = 'done';
-  [...round.word].forEach((c, i) => c !== ' ' && round.shown.add(i));
+  round.pos.forEach(i => round.shown.add(i));
   drawTiles();
-  if (winner) {
-    const pts = pointsNow();
-    const rec = scores[winner.login] || { name: winner.name, pts: 0 };
-    rec.name = winner.name; rec.pts += pts;
-    scores[winner.login] = rec;
-    store.set(KEY, scores);
-    renderBoard();
-    $('card').classList.add('won');
-    $('msg').innerHTML = `<span class="who">${esc(winner.name)}</span> GOT IT <span class="pts">+${pts}</span>`;
-  } else {
-    $('card').classList.add('miss');
-    $('msg').innerHTML = `NOBODY. NEXT WORD`;
-  }
-  $('bar').style.width = '0%';
-  runBar(GAP_S);
+  addPts(winner, pts);
+  $('card').classList.add('won');
+  $('msg').innerHTML = `<span class="who">${esc(winner.name)}</span> GOT IT <span class="pts">+${pts}</span>`;
   tickT = setTimeout(startRound, GAP_S * 1000);
 }
 
@@ -244,11 +207,30 @@ function onChat(login, name, text) {
   if (IGNORE.has(login)) return;
   const n = norm(text);
   if (!n) return;
-  // win if the whole message is the word, or the word appears inside it ("is it reverb?")
-  const hit = n.replace(/ /g, '') === round.target || (' ' + n + ' ').includes(' ' + norm(round.word) + ' ');
-  if (hit) {
-    endRound({ login, name: name || login });
+  const who = { login, name: name || login };
+
+  // exact word (or the word inside the message, e.g. "is it synth") = win
+  if (n.replace(/ /g, '') === round.target || (' ' + n + ' ').includes(' ' + norm(round.word) + ' ')) {
+    return endRound(who, 5 + hiddenCount() * 3);
   }
+
+  // otherwise it only counts as a guess if it's the same length (ignores normal chat)
+  const g = n.replace(/ /g, '');
+  if (n.split(' ').length > 3 || g.length !== round.target.length) return;
+
+  // any letter in the right spot stays revealed
+  const fresh = [];
+  for (let k = 0; k < g.length; k++) {
+    const i = round.pos[k];
+    if (g[k] === round.target[k] && !round.shown.has(i)) { round.shown.add(i); fresh.push(i); }
+  }
+  if (!fresh.length) return;
+  if (hiddenCount() === 0) return endRound(who, 5);   // chat filled in the last letter
+  drawTiles(fresh);
+  addPts(who, fresh.length);
+  $('msg').innerHTML = `<span class="who">${esc(who.name)}</span> <span class="g">${esc(g)}</span> +${fresh.length}`;
+  clearTimeout(tickT);
+  tickT = setTimeout(() => { if (round.state === 'live') $('msg').innerHTML = prompt(); }, 4000);
 }
 
 /* ---------------- Twitch chat (read-only, anonymous, no keys) ---------------- */
@@ -293,7 +275,7 @@ if (TEST) {
     $('tm').value = '';
   });
   window.__answer = () => round && round.word; // console peek for testing
-  window.__force = (cat, word) => { const idx = letterIdx(word); round = { cat, word, target: compact(word), shown: new Set(idx.slice(0, 3)), state: 'live', hidden: idx.slice(3) }; $('cat').textContent = cat; drawTiles(); };
+  window.__force = (cat, word) => { round = { cat, word, target: compact(word), pos: letterIdx(word), shown: new Set(), state: 'live' }; $('card').classList.remove('won','miss'); $('cat').textContent = cat; $('msg').innerHTML = prompt(); drawTiles(); };
 }
 
 renderBoard();
