@@ -115,6 +115,23 @@ const BANK = {
 const DECK_ALL = [];
 for (const [cat, words] of Object.entries(BANK)) for (const w of words) DECK_ALL.push({ cat, word: w });
 
+/* ---------------- real-word check (stops "aaaaa" spam) ----------------
+   words.txt sits next to this page: ~250k English words (MIT, from the word-list package).
+   Every word/part of a word in the game's own bank also counts, so slang like RIDDIM works. */
+const BANK_TOKENS = new Set();
+for (const d of DECK_ALL) for (const t of d.word.toLowerCase().split(' ')) BANK_TOKENS.add(t);
+let DICT = null;
+fetch('words.txt').then(r => r.ok ? r.text() : Promise.reject()).then(t => { DICT = new Set(t.split('\n')); }).catch(() => {});
+function looksReal(tok) {
+  tok = tok.toLowerCase();
+  if (BANK_TOKENS.has(tok)) return true;
+  if (DICT) return DICT.has(tok);
+  // backup rule if the list failed to load: needs a vowel and no letter spam
+  const counts = {}; for (const c of tok) counts[c] = (counts[c] || 0) + 1;
+  return /[aeiouy]/.test(tok) && Math.max(...Object.values(counts)) <= Math.max(2, Math.ceil(tok.length / 3));
+}
+const lastGuess = {};   // per-user cooldown so nobody machine-guns words
+
 /* ---------------- helpers ---------------- */
 const $ = id => document.getElementById(id);
 const norm = s => s.toUpperCase().normalize('NFKD').replace(/[^A-Z0-9]+/g, ' ').trim();
@@ -242,7 +259,12 @@ function onChat(login, name, text) {
 
   // otherwise it only counts as a guess if it's the same length (ignores normal chat)
   const g = n.replace(/ /g, '');
-  if (n.split(' ').length > 3 || g.length !== round.target.length) return;
+  const toks = n.split(' ');
+  if (toks.length > 3 || g.length !== round.target.length) return;
+  if (!toks.every(looksReal)) return;                       // must be real word(s)
+  const now = Date.now();
+  if (now - (lastGuess[login] || 0) < 2500) return;          // one guess per 2.5s per person
+  lastGuess[login] = now;
 
   // any letter in the right spot stays revealed
   const fresh = [];
