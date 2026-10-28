@@ -166,7 +166,11 @@ function push(){
   function ri(v){ return (v===null||v===undefined||isNaN(v)) ? null : Math.round(Number(v)); }
   return sb.rpc("tv_set",{p_pin:PIN,p_mode:T.mode,p_running:T.running,
     p_end:ri(T.end_ts),p_rem:ri(T.remaining_ms),p_start:ri(T.start_ts),p_el:ri(T.elapsed_ms)}).then(function(r){
-    if(r.error){ if(/bad pin/i.test(r.error.message)){PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render();} }
+    var sm=document.getElementById("savemsg");
+    if(r.error){
+      if(/bad pin/i.test(r.error.message)){PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render();}
+      else if(sm){ sm.textContent="NOT SAVED \u2014 the overlay did not change. Check your connection and press it again."; clearTimeout(window.__smt); window.__smt=setTimeout(function(){ var x=document.getElementById("savemsg"); if(x) x.textContent=""; },7000); }
+    } else if(sm){ sm.textContent=""; }
     return pull();
   });
 }
@@ -215,6 +219,7 @@ function renderControl(){
       '<button class="act ghost" id="pausebtn">Pause</button>'+
       '<button class="act ghost" id="resetbtn">Reset</button>'+
     '</div>'+
+    '<div id="savemsg" class="hint" style="color:var(--hot);min-height:18px"></div>'+
     '<div class="hint help">OBS overlay: add a Browser source pointing at this page\u2019s <b>#overlay</b> URL. '+
       'It updates live from here \u2014 start, pause, add time and OBS follows instantly. No relinking.'+
       '<br><a href="#overlay" target="_blank" style="color:var(--electric)">open overlay \u2197</a> <a href="#" id="testsnd" style="color:var(--electric);margin-left:14px">test sound</a> '+
@@ -238,6 +243,9 @@ function renderControl(){
         push(); }; });
       var sm=document.getElementById("setmin");
       if(sm) sm.onclick=function(){ var mins=parseInt(document.getElementById("minfield").value,10)||0;
+        if(mins<0) mins=0; if(mins>600) mins=600;
+        document.getElementById("minfield").value=mins||"";
+        try{ if(mins>0) localStorage.setItem("tv_preset",String(mins*60000)); }catch(e){}
         T.running=false; T.remaining_ms=mins*60000; push(); };
     } else { sr.style.display="none"; }
   }
@@ -257,7 +265,7 @@ function renderControl(){
     T.running=false; push();
   };
   document.getElementById("resetbtn").onclick=function(){
-    T.running=false; if(T.mode==="down") T.remaining_ms=600000; else T.elapsed_ms=0; push();
+    T.running=false; if(T.mode==="down"){ var pre=600000; try{ pre=parseInt(localStorage.getItem("tv_preset"),10)||600000; }catch(e){} T.remaining_ms=pre; } else T.elapsed_ms=0; push();
   };
   document.getElementById("testsnd").onclick=function(e){ e.preventDefault(); unlockAudio(); alarm(); };
   document.getElementById("lock").onclick=function(e){ e.preventDefault();

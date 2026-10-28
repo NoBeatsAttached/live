@@ -260,6 +260,8 @@ body.overlay .ovl .next{-webkit-font-smoothing:antialiased}
 body.overlay .ovl .mtr{will-change:transform;contain:layout paint}
 body.overlay .ovl .mtr i{backface-visibility:hidden;translate:0 0}
 </style>
+<style>/* phone: masthead wraps instead of pushing the page sideways */
+@media(max-width:560px){.mast{flex-wrap:wrap;row-gap:10px}.statuspill{max-width:100%;font-size:9.5px;letter-spacing:.1em}}</style>
 </head>
 <body>
 <div id="app"></div>

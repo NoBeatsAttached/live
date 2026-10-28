@@ -1,0 +1,46 @@
+name: Keep Supabase awake
+
+# Free Supabase projects pause after ~7 idle days. This pings the database
+# for the stream tools AND Project Fix every few days so neither pauses.
+# It uses the same repo secrets the site already uses (SB_STREAM, SB_FIX),
+# so no keys are written in this file.
+
+on:
+  schedule:
+    - cron: "17 13 * * 0,1,3,5"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping both databases
+        env:
+          SB_STREAM: ${{ secrets.SB_STREAM }}
+          SB_FIX: ${{ secrets.SB_FIX }}
+        run: |
+          fail=0
+          ping_one () {
+            name="$1"; val="$2"; table="$3"
+            if [ -z "$val" ]; then echo "::error::Secret SB_$name is missing"; fail=1; return; fi
+            url="${val%%|*}"; key="${val#*|}"
+            code=$(curl -sS -m 30 --retry 3 -o /dev/null -w "%{http_code}" \
+              "$url/rest/v1/$table?select=id&limit=1" \
+              -H "apikey: $key" -H "Authorization: Bearer $key")
+            echo "$name: HTTP $code"
+            case "$code" in 2*) ;; *) echo "::error::$name database did not answer ($code)"; fail=1;; esac
+          }
+          ping_one STREAM "$SB_STREAM" bb_battle
+          ping_one FIX "$SB_FIX" windows
+          exit $fail
+
+      # GitHub switches off scheduled workflows after 60 days with no repo
+      # activity. This re-enables this one each run so that never happens.
+      - name: Keep this schedule from being switched off
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow enable keepalive.yml --repo "${{ github.repository }}"
