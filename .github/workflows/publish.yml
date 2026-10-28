@@ -29,6 +29,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Refuses to publish if anything sensitive slipped into the code, or if
+      # the live overlays lost their PIN lock. Nothing goes live until fixed.
+      - name: Safety check
+        run: |
+          set -e
+          bad=0
+          src="--exclude-dir=.git --exclude-dir=.github -rnIE"
+          if grep $src 'sb_publishable_[A-Za-z0-9]|sb_secret_|service_role' .; then
+            echo "::error::A Supabase key is written into the code. Keys belong in repo Secrets only."; bad=1; fi
+          if grep $src '[?&]pw=[A-Za-z0-9_-]{4,}' . | grep -v 'pw=PASSWORD'; then
+            echo "::error::An OBS password (pw=) is written into the code."; bad=1; fi
+          if grep $src '[?&]k=[0-9a-fA-F]{16,}' .; then
+            echo "::error::An overlay key (k=) is written into the code."; bad=1; fi
+          for f in slam/obs.html slam/ticker.html; do
+            [ -f "$f" ] || continue
+            grep -q 'seal.js' "$f" || { echo "::error::$f no longer loads seal.js (PIN lock gone)"; bad=1; }
+            grep -q 'SEAL\.on(' "$f" || { echo "::error::$f no longer checks signatures"; bad=1; }
+            if grep -nE 'channel\.send\(|on\("broadcast"' "$f"; then
+              echo "::error::$f sends or listens without the lock"; bad=1; fi
+          done
+          [ -f slam/seal.js ] || { echo "::error::slam/seal.js is missing"; bad=1; }
+          [ $bad -eq 0 ] || exit 1
+          echo "Safety check passed."
+
       - name: Plug in keys
         env:
           SB_STREAM: ${{ secrets.SB_STREAM }}
