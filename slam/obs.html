@@ -186,7 +186,7 @@ body.bridge{background:transparent}
 var SUPABASE_URL="__SB_STREAM_URL__";
 var SUPABASE_ANON_KEY="__SB_STREAM_KEY__";
 var CHANNEL="ch-obs-4bn7yq2";
-var BUILD=16;   /* bump when the bridge gains a command */
+var BUILD=17;   /* bump when the bridge gains a command */
 var OBS_PORT=4455;
 var NUDGE=20;
 var SCALE_STEP=.06;
@@ -608,7 +608,8 @@ function runBridge(){
         if((si.inputKind||"").indexOf("browser")!==0){
           send("said",{t:p.name+" isn\u2019t a browser source."}); return;
         }
-        send("url",{name:p.name,url:(si.inputSettings&&si.inputSettings.url)||""});
+        var ss=si.inputSettings||{};
+        send("url",{name:p.name,url:ss.url||"",w:ss.width||1920,h:ss.height||1080});
       });
       return;
     }
@@ -623,18 +624,22 @@ function runBridge(){
         if((si.inputKind||"").indexOf("browser")!==0){
           send("said",{t:un+" isn\u2019t a browser source."}); return;
         }
-        var wasUrl=(si.inputSettings&&si.inputSettings.url)||"";
-        obs("SetInputSettings",{inputName:un,inputSettings:{url:nu},overlay:true}).then(function(r){
+        var was=si.inputSettings||{}, wasUrl=was.url||"";
+        var wasW=was.width||1920, wasH=was.height||1080;
+        var nw=parseInt(p.w,10), nh=parseInt(p.h,10);
+        var upd={url:nu};
+        if(nw>=1&&nw<=16384&&nh>=1&&nh<=16384){ upd.width=nw; upd.height=nh; }
+        obs("SetInputSettings",{inputName:un,inputSettings:upd,overlay:true}).then(function(r){
           if(!r){ note("url failed: "+lastErr); return; }
           pushUndo("url",function(){
-            obs("SetInputSettings",{inputName:un,inputSettings:{url:wasUrl},overlay:true}).then(function(){
+            obs("SetInputSettings",{inputName:un,inputSettings:{url:wasUrl,width:wasW,height:wasH},overlay:true}).then(function(){
               obs("PressInputPropertiesButton",{inputName:un,propertyName:"refreshnocache"});
               schedulePush();
             });
           });
           obs("PressInputPropertiesButton",{inputName:un,propertyName:"refreshnocache"});
           setRow("b_last","url \u2192 "+un);
-          send("said",{t:"Pointed "+un+" at the new link."});
+          send("said",{t:"Updated "+un+(upd.width?" ("+upd.width+"\u00d7"+upd.height+")":"")+"."});
           schedulePush();
         });
       });
@@ -723,7 +728,10 @@ function runBridge(){
       var kind="", settings={};
       if(p.kind==="browser"){
         kind=pickKind("browser_source");
-        settings={url:p.val,width:p.w||1920,height:p.h||1080};
+        var cw=parseInt(p.w,10), ch=parseInt(p.h,10);
+        if(!(cw>=1&&cw<=16384)) cw=1920;
+        if(!(ch>=1&&ch<=16384)) ch=1080;
+        settings={url:p.val,width:cw,height:ch};
       }else if(p.kind==="media"){
         kind=pickKind("ffmpeg_source");
         settings={is_local_file:false,input:p.val,looping:true,restart_on_activate:true};
@@ -1057,6 +1065,7 @@ function deckConnect(){
     urlTarget=m.payload.name;
     el("urlwho").textContent=m.payload.name;
     el("urlfield").value=m.payload.url||"";
+    el("urlw").value=m.payload.w||1920; el("urlh").value=m.payload.h||1080;
     box.style.display="block";
     el("urlfield").focus(); el("urlfield").select();
   });
@@ -1142,6 +1151,7 @@ function renderDeck(){
       'border-radius:9px;padding:12px 14px">'+
       '<div style="font-size:12px;color:var(--dimmer);margin-bottom:8px" id="urlwho"></div>'+
       '<input id="urlfield" class="tin" style="margin-bottom:8px" placeholder="https://\u2026">'+
+      '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--dimmer)">size</span><input id="urlw" class="tin" type="number" min="1" max="16384" style="width:84px;margin:0" placeholder="W"><span style="color:var(--dimmer)">\u00d7</span><input id="urlh" class="tin" type="number" min="1" max="16384" style="width:84px;margin:0" placeholder="H"><button class="cbtn quiet" data-sz="urlw|1920x1080">1080p</button><button class="cbtn quiet" data-sz="urlw|1280x720">720p</button><button class="cbtn quiet" data-sz="urlw|1000x1000">square</button></div>'+
       '<div style="display:flex;gap:8px">'+
         '<button class="cbtn quiet" id="urlcancel">cancel</button>'+
         '<button class="cbtn" id="urlsave">point it here</button>'+
@@ -1163,6 +1173,8 @@ function renderDeck(){
               '<div class="row" id="b_kind" style="padding:0 0 10px"></div>'+
               '<input class="tin" id="b_name" type="text" maxlength="40" placeholder="Name it">'+
               '<input class="tin" id="b_val" type="text" placeholder="URL for the page">'+
+              '<div id="b_sizebox">'+
+              '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--dimmer)">size</span><input id="b_w" class="tin" type="number" min="1" max="16384" style="width:84px;margin:0" placeholder="W"><span style="color:var(--dimmer)">\u00d7</span><input id="b_h" class="tin" type="number" min="1" max="16384" style="width:84px;margin:0" placeholder="H"><button class="cbtn quiet" data-sz="b_w|1920x1080">1080p</button><button class="cbtn quiet" data-sz="b_w|1280x720">720p</button><button class="cbtn quiet" data-sz="b_w|1000x1000">square</button></div>'+'</div>'+
               '<button class="btn" id="b_add">Add to this scene</button>'+
             '<div class="lab" style="margin-top:22px">Scenes &amp; capture</div>'+
             '<input class="tin" id="s_name" type="text" maxlength="40" placeholder="New scene name">'+
@@ -1250,7 +1262,9 @@ function renderDeck(){
     var v=el("urlfield").value.trim();
     if(!/^https?:\/\//i.test(v)){ said("That needs to start with https://"); return; }
     if(!urlTarget){ said("Nothing selected."); return; }
-    cmd({cmd:"seturl",name:urlTarget,url:v});
+    var uw=parseInt(el("urlw").value,10), uh=parseInt(el("urlh").value,10);
+    if(!(uw>=1&&uw<=16384&&uh>=1&&uh<=16384)){ said("Size must be whole numbers, 1\u201316384."); return; }
+    cmd({cmd:"seturl",name:urlTarget,url:v,w:uw,h:uh});
     el("urlbar").style.display="none"; urlTarget="";
   };
   el("urlfield").onkeydown=function(e){
@@ -1258,6 +1272,12 @@ function renderDeck(){
     if(e.key==="Escape"){ e.preventDefault(); el("urlcancel").click(); }
   };
 
+  document.addEventListener("click",function(e){
+    var t=e.target; if(!t||!t.getAttribute) return;
+    var d=t.getAttribute("data-sz"); if(!d) return;
+    var a=d.split("|"), wh=a[1].split("x"), pre=a[0].replace(/[wh]$/,"");
+    el(pre+"w").value=wh[0]; el(pre+"h").value=wh[1];
+  });
   wireMap(); wireKeys();
   paint(); paintStatus(); deckConnect();
 }
@@ -1422,6 +1442,7 @@ function discardAll(){
 /* ---------- build / drop ---------- */
 function wireBuild(){
   var bKind="browser", kw=el("b_kind");
+  el("b_w").value=1920; el("b_h").value=1080;
   var ph={browser:"URL for the page",media:"Direct .mp4 / .webm link",
           text:"What it should say",color:"(nothing needed)"};
   [["Browser","browser"],["Media","media"],["Text","text"],["Color","color"]].forEach(function(p){
@@ -1429,7 +1450,8 @@ function wireBuild(){
     b.className="pill"+(bKind===p[1]?" on":""); b.textContent=p[0];
     b.onclick=function(){ bKind=p[1];
       Array.prototype.forEach.call(kw.children,function(c){c.className="pill";});
-      b.className="pill on"; el("b_val").placeholder=ph[bKind]; };
+      b.className="pill on"; el("b_val").placeholder=ph[bKind];
+      el("b_sizebox").style.display=(bKind==="browser")?"block":"none"; };
     kw.appendChild(b);
   });
   function bnote(t){
@@ -1441,7 +1463,9 @@ function wireBuild(){
     if(!nm){ bnote("Give it a name"); return; }
     if(bKind!=="color"&&!vl){ bnote("Needs a value"); return; }
     if((bKind==="browser"||bKind==="media")&&!/^https?:\/\//i.test(vl)){ bnote("Needs an http link"); return; }
-    cmd({cmd:"create",kind:bKind,name:nm,val:vl});
+    var bw=parseInt(el("b_w").value,10), bh=parseInt(el("b_h").value,10);
+    if(bKind==="browser"&&!(bw>=1&&bw<=16384&&bh>=1&&bh<=16384)){ bnote("Size must be whole numbers"); return; }
+    cmd({cmd:"create",kind:bKind,name:nm,val:vl,w:bw,h:bh});
     el("b_name").value=""; el("b_val").value=""; bnote("Added");
   };
 }
