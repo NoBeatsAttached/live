@@ -121,6 +121,11 @@ const BANK = {
   'IN THE STUDIO': ['SAMPLE','LOOP','CHOP','FLIP','STEMS','BOUNCE','EXPORT','PROJECT','PRESET','PLUGIN','VST','DAW','ABLETON','QUANTIZE','METRONOME','ARRANGEMENT','HOOK','VERSE','BRIDGE','INTRO','OUTRO','DROP','BUILDUP','BREAKDOWN','FILL','BEAT','REMIX','BOOTLEG','MASHUP','MIXTAPE','DEMO','TAKE','PUNCH IN','SESSION','WORKFLOW','RESAMPLE','PIANO ROLL','CRATE DIGGING','SCRATCH','TIME STRETCH'],
   'GENRES': ['DUBSTEP','TRAP','DRILL','BOOM BAP','LOFI','HOUSE','TECHNO','JUNGLE','GARAGE','GRIME','RIDDIM','HALFTIME','FUNK','SOUL','JAZZ','GOSPEL','DISCO','PHONK','FOOTWORK','DRUM AND BASS','AMBIENT','HIP HOP','RNB','BREAKS','DEEP HOUSE','JERSEY CLUB','DETROIT TECHNO','GHETTOTECH','TRIP HOP','DOWNTEMPO']
 };
+const ALIASES = {                 // other ways chat writes the same answer
+  'RNB': ['R AND B','R N B','RANDB'], 'DRUM AND BASS': ['DNB','D AND B','DRUM N BASS','DRUMNBASS'],
+  'LOFI': ['LO FI'], 'HI HAT': ['HIHAT'], 'HIP HOP': ['HIPHOP'], '808': ['EIGHT O EIGHT'],
+  'FM SYNTHESIS': ['FM SYNTH'], 'AUTOTUNE': ['AUTO TUNE'], 'EQUALIZER': ['EQUALISER'], 'BPM': ['BEATS PER MINUTE']
+};
 const DECK_ALL = [];
 for (const [cat, words] of Object.entries(BANK)) for (const w of words) DECK_ALL.push({ cat, word: w });
 
@@ -143,7 +148,7 @@ const lastGuess = {};   // per-user cooldown so nobody machine-guns words
 
 /* ---------------- helpers ---------------- */
 const $ = id => document.getElementById(id);
-const norm = s => s.toUpperCase().normalize('NFKD').replace(/[^A-Z0-9]+/g, ' ').trim();
+const norm = s => s.toUpperCase().normalize('NFKD').replace(/&/g, ' AND ').replace(/[^A-Z0-9]+/g, ' ').trim();
 const compact = s => norm(s).replace(/ /g, '');
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -179,7 +184,7 @@ function nextWord() {
 
 /* ---------------- game ---------------- */
 let round = null;   // { cat, word, chars, shown:Set, hiddenIdx:[], state }
-let tickT = null, hintAt = 0, hintT = null;
+let tickT = null, msgT = null, hintAt = 0, hintT = null;
 
 function letterIdx(word) { return [...word].map((c, i) => c === ' ' ? -1 : i).filter(i => i >= 0); }
 
@@ -200,12 +205,19 @@ function prompt() {
   return `<span class="pts">${round.target.length} LETTERS</span> &middot; GUESS IN CHAT`;
 }
 
+function makeRound(cat, word) {
+  const ok = [word, ...(ALIASES[word] || [])].map(norm);
+  return { cat, word, target: compact(word), pos: letterIdx(word), shown: new Set(), state: 'live',
+           answers: new Set(ok), answersC: new Set(ok.map(a => a.replace(/ /g, ''))),
+           shape: norm(word).split(' ').map(t => t.length).join(',') };
+}
+
 function startRound() {
-  clearTimeout(tickT);
+  clearTimeout(tickT); clearTimeout(msgT);
   const { cat, word } = nextWord();
   const idx = letterIdx(word);
   // pos[k] = index in `word` of the k-th letter (so spaces in two-word answers are skipped)
-  round = { cat, word, target: compact(word), pos: idx, shown: new Set(), state: 'live' };
+  round = makeRound(cat, word);
   $('card').classList.remove('won', 'miss');
   $('cat').textContent = cat;
   $('msg').innerHTML = prompt();
@@ -243,7 +255,7 @@ function addPts(who, pts) {
 }
 
 function endRound(winner, pts) {
-  clearTimeout(tickT);
+  clearTimeout(tickT); clearTimeout(msgT);
   round.state = 'done';
   $('hint').textContent = '';
   round.pos.forEach(i => round.shown.add(i));
@@ -270,12 +282,12 @@ function onCommand(cmd) {
   if (cmd === '!newboard') {
     scores = {}; store.set(KEY, scores); renderBoard();
     $('msg').innerHTML = 'NEW BOARD. EVERYONE AT 0';
-    clearTimeout(tickT);
-    tickT = setTimeout(() => { if (round.state === 'live') $('msg').innerHTML = prompt(); }, 4000);
+    if (round && round.state === 'live') { clearTimeout(msgT); msgT = setTimeout(() => { if (round.state === 'live') $('msg').innerHTML = prompt(); }, 4000); }
+    else if (round) $('msg').innerHTML = 'NEW BOARD. NEXT WORD COMING';
     if ($('full').classList.contains('show')) showFull();
     return true;
   }
-  if (cmd === '!skip') { clearTimeout(tickT); round.state = 'done'; $('hint').textContent = ''; startRound(); return true; }
+  if (cmd === '!skip') { if (round) round.state = 'done'; $('hint').textContent = ''; startRound(); return true; }
   return false;
 }
 
@@ -287,19 +299,25 @@ function onChat(login, name, text, isMod) {
   if (!n) return;
   const who = { login, name: name || login };
 
-  // exact word (or the word inside the message, e.g. "is it synth") = win
-  if (n.replace(/ /g, '') === round.target || (' ' + n + ' ').includes(' ' + norm(round.word) + ' ')) {
-    return endRound(who, 5 + hiddenCount() * 3);
-  }
-
-  // otherwise it only counts as a guess if it's the same length (ignores normal chat)
-  const g = n.replace(/ /g, '');
   const toks = n.split(' ');
-  if (toks.length > 3 || g.length !== round.target.length) return;
-  if (!toks.every(looksReal)) return;                       // must be real word(s)
+  const g = toks.join('');
+  // a short sentence containing the answer still wins ("is it synth", "@grexbeatz synth"),
+  // but long messages don't, so pasting a list of every word gets nothing
+  const longest = Math.max(...[...round.answers].map(x => x.split(' ').length));
+  const sayIt = toks.length <= longest + 3 && [...round.answers].some(x => (' ' + n + ' ').includes(' ' + x + ' '));
+  const exact = round.answersC.has(g);
+  const partial = !exact && toks.map(t => t.length).join(',') === round.shape;
+  if (!exact && !sayIt && !partial) return;                  // normal chat, ignore
+
+  // one guess per 2.5s per person, wins included, so nobody can spray candidates
   const now = Date.now();
-  if (now - (lastGuess[login] || 0) < 2500) return;          // one guess per 2.5s per person
+  if (now - (lastGuess[login] || 0) < 2500) return;
   lastGuess[login] = now;
+
+  if (exact || sayIt) return endRound(who, 5 + hiddenCount() * 3);
+
+  // partial: same word lengths as the answer, every piece a real word
+  if (!toks.every(looksReal)) return;
 
   // any letter in the right spot stays revealed
   const fresh = [];
@@ -312,22 +330,25 @@ function onChat(login, name, text, isMod) {
   drawTiles(fresh);
   addPts(who, fresh.length);
   $('msg').innerHTML = `<span class="who">${esc(who.name)}</span> <span class="g">${esc(g)}</span> +${fresh.length}`;
-  clearTimeout(tickT);
-  tickT = setTimeout(() => { if (round.state === 'live') $('msg').innerHTML = prompt(); }, 4000);
+  clearTimeout(msgT);
+  msgT = setTimeout(() => { if (round.state === 'live') $('msg').innerHTML = prompt(); }, 4000);
 }
 
 /* ---------------- Twitch chat (read-only, anonymous, no keys) ---------------- */
-let ws = null, backoff = 1000, pingT = null;
+let ws = null, backoff = 1000, pingT = null, lastHeard = Date.now();
+setInterval(() => { if (ws && Date.now() - lastHeard > 7 * 60 * 1000) { lastHeard = Date.now(); try { ws.close(); } catch {} } }, 30000);
 function connect() {
   try { ws && ws.close(); } catch {}
   ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
   ws.onopen = () => {
+    lastHeard = Date.now();
     ws.send('CAP REQ :twitch.tv/tags');
     ws.send('PASS SCHMOOPIIE');
     ws.send('NICK justinfan' + (10000 + (Math.random() * 80000 | 0)));
     ws.send('JOIN #' + CHANNEL);
   };
   ws.onmessage = e => {
+    lastHeard = Date.now();
     for (const line of String(e.data).split('\r\n')) {
       if (!line) continue;
       if (line.startsWith('PING')) { ws.send('PONG' + line.slice(4)); continue; }
@@ -337,7 +358,7 @@ function connect() {
       let name = m[2];
       if (m[1]) { const dn = m[1].match(/(?:^|;)display-name=([^;]*)/); if (dn && dn[1]) name = dn[1]; }
       const badges = m[1] ? ((m[1].match(/(?:^|;)badges=([^;]*)/) || [])[1] || '') : '';
-      const isMod = /(^|,)(broadcaster|moderator)\//.test(badges);
+      const isMod = /(^|,)(broadcaster|moderator|lead_moderator)\//.test(badges) || /(?:^|;)mod=1(?:;|$)/.test(m[1] || '');
       onChat(m[2].toLowerCase(), name, m[3], isMod);
     }
   };
@@ -360,7 +381,7 @@ if (TEST) {
     $('tm').value = '';
   });
   window.__answer = () => round && round.word; // console peek for testing
-  window.__force = (cat, word) => { round = { cat, word, target: compact(word), pos: letterIdx(word), shown: new Set(), state: 'live' }; $('card').classList.remove('won','miss'); $('cat').textContent = cat; $('msg').innerHTML = prompt(); drawTiles(); };
+  window.__force = (cat, word) => { clearTimeout(tickT); clearTimeout(msgT); for (const k in lastGuess) delete lastGuess[k]; round = makeRound(cat, word); armHint(); $('card').classList.remove('won','miss'); $('cat').textContent = cat; $('msg').innerHTML = prompt(); drawTiles(); };
 }
 
 renderBoard();
