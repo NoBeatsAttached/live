@@ -176,13 +176,19 @@ function renderBoard() {
     : '';
 }
 
-/* deck: every word gets played once before any repeats (remembered across restarts) */
+/* deck: random pick from words not played yet; when everything's been played, start over.
+   Remembers played words by name (not position), so words added to BANK show up right away. */
 function nextWord() {
-  let deck = store.get(DKEY, null);
-  if (!Array.isArray(deck) || !deck.length || deck.some(i => !DECK_ALL[i])) deck = shuffle(DECK_ALL.map((_, i) => i));
-  const idx = deck.shift();
-  store.set(DKEY, deck);
-  return DECK_ALL[idx];
+  const keyOf = d => d.cat + '|' + d.word;
+  let played = store.get(DKEY, []);
+  if (!Array.isArray(played) || played.some(x => typeof x !== 'string')) played = [];   // old format -> fresh cycle
+  const done = new Set(played);
+  let left = DECK_ALL.filter(d => !done.has(keyOf(d)));
+  if (!left.length) { played = []; left = DECK_ALL.slice(); }
+  const pick = left[Math.random() * left.length | 0];
+  played.push(keyOf(pick));
+  store.set(DKEY, played.filter(k => DECK_ALL.some(d => keyOf(d) === k)));
+  return pick;
 }
 
 /* ---------------- game ---------------- */
