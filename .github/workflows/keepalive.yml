@@ -1,9 +1,10 @@
 name: Keep Supabase awake
 
-# Free Supabase projects pause after ~7 idle days. This pings the database
-# for the stream tools AND Project Fix every few days so neither pauses.
-# It uses the same repo secrets the site already uses (SB_STREAM, SB_FIX),
+# Free Supabase projects pause after ~7 idle days. This pings the stream
+# tools database every few days so it never pauses.
+# It uses the same repo secret the site already uses (SB_STREAM),
 # so no keys are written in this file.
+# Project Fix is not pinged: it is unused and its database is paused/gone.
 
 on:
   schedule:
@@ -17,10 +18,9 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping both databases
+      - name: Ping the stream database
         env:
           SB_STREAM: ${{ secrets.SB_STREAM }}
-          SB_FIX: ${{ secrets.SB_FIX }}
         run: |
           fail=0
           ping_one () {
@@ -34,7 +34,6 @@ jobs:
             case "$code" in 2*) ;; *) echo "::error::$name database did not answer ($code)"; fail=1;; esac
           }
           ping_one STREAM "$SB_STREAM" bb_battle
-          ping_one FIX "$SB_FIX" windows
           exit $fail
 
       # GitHub switches off scheduled workflows after 60 days with no repo
