@@ -978,7 +978,7 @@ function runBridge(){
 var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_role")||"";
 if(PIN&&!IS_BRIDGE) SEAL.fetchKey(sb,PIN);
 var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
-var selId=null, bridgeUp=false, dragging=false, eyeOn=false, lastFrame=null;
+var selId=null, bridgeUp=false, dragging=false, eyeOn=false, eyeQ="soft", lastFrame=null;
 var pending={}, pendNew={}, pendScene="", urlTarget="", tgtName="", tgtProp="";
 var audioOn=false, audioRows=[], meters={}, lastMeter=0;
 var upAnchor=0, upTick=null, upManual=0, audioScanned=0, audioAnswered=false;
