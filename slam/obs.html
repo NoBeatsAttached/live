@@ -262,6 +262,8 @@ function runBridge(){
   var ws=null, obsReady=false, reqId=0, pending={}, canvas={w:1920,h:1080};
   var curScene="", deckHere=false, lastErr="", textKind="", kinds=[];
   var eyeOn=false, imgFmt="", eyeTimer=null, eyeQ="soft";
+  /* OBS event bits: everything but high-volume (2047) + audio meters (65536) */
+  var SUB_BASE=2047, SUB_METERS=65536, meterTimer=null, meterPeaks={};
   var undoStack=[];
   function pushUndo(label,fn){
     undoStack.push({label:label,fn:fn});
