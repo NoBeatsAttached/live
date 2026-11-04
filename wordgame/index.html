@@ -182,16 +182,24 @@ function renderBoard() {
 
 /* deck: random pick from words not played yet; when everything's been played, start over.
    Remembers played words by name (not position), so words added to BANK show up right away. */
+const keyOf = d => d.cat + '|' + d.word;
+// played list lives in memory (works even if OBS won't save), and is saved to storage when it can be
+let PLAYED = store.get(DKEY, []);
+if (!Array.isArray(PLAYED) || PLAYED.some(x => typeof x !== 'string')) PLAYED = [];
 function nextWord() {
-  const keyOf = d => d.cat + '|' + d.word;
-  let played = store.get(DKEY, []);
-  if (!Array.isArray(played) || played.some(x => typeof x !== 'string')) played = [];   // old format -> fresh cycle
-  const done = new Set(played);
+  const done = new Set(PLAYED);
   let left = DECK_ALL.filter(d => !done.has(keyOf(d)));
-  if (!left.length) { played = []; left = DECK_ALL.slice(); }
+  if (!left.length) {
+    // full cycle done: start over, but keep the last 30 out so the new cycle doesn't open with a repeat
+    const recent = new Set(PLAYED.slice(-30));
+    PLAYED = [];
+    left = DECK_ALL.filter(d => !recent.has(keyOf(d)));
+  }
   const pick = left[Math.random() * left.length | 0];
-  played.push(keyOf(pick));
-  store.set(DKEY, played.filter(k => DECK_ALL.some(d => keyOf(d) === k)));
+  PLAYED.push(keyOf(pick));
+  const valid = new Set(DECK_ALL.map(keyOf));
+  PLAYED = PLAYED.filter(k => valid.has(k));
+  store.set(DKEY, PLAYED);
   return pick;
 }
 
