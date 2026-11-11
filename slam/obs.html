@@ -193,7 +193,7 @@ body.bridge{background:transparent}
 var SUPABASE_URL="__SB_STREAM_URL__";
 var SUPABASE_ANON_KEY="__SB_STREAM_KEY__";
 var CHANNEL="ch-obs-4bn7yq2";
-var BUILD=17;   /* bump when the bridge gains a command */
+var BUILD=18;   /* bump when the bridge gains a command */
 var OBS_PORT=4455;
 var NUDGE=20;
 var SCALE_STEP=.06;
@@ -268,7 +268,7 @@ function runBridge(){
   var pw=rawPw();
   var ws=null, obsReady=false, reqId=0, pending={}, canvas={w:1920,h:1080};
   var curScene="", deckHere=false, lastErr="", textKind="", kinds=[];
-  var eyeOn=false, imgFmt="", eyeTimer=null, eyeQ="soft";
+  var eyeOn=false, imgFmt="", eyeTimer=null, eyeQ="sharp";
   /* OBS event bits: everything but high-volume (2047) + audio meters (65536) */
   var SUB_BASE=2047, SUB_METERS=65536, meterTimer=null, meterPeaks={};
   var undoStack=[];
@@ -498,13 +498,24 @@ function runBridge(){
     if(!obsReady||!curScene){ setRow("b_shot","no scene","bad"); return; }
     if(!imgFmt){ setRow("b_shot","no image format","bad"); return; }
     lastErr="";
-    var sharp=(eyeQ==="sharp");
-    var req={sourceName:curScene,imageFormat:imgFmt,imageWidth:sharp?760:400};
-    if(imgFmt!=="png"&&imgFmt!=="bmp") req.imageCompressionQuality=sharp?72:32;
+    var lv=EYE[eyeQ]||EYE.sharp;
+    grab(lv[0],lv[1],0);
+  }
+  /* quality levels: [width, jpg quality, ms between frames]
+     each frame must fit the relay's size limit, so if one comes out too
+     big it retries once smaller instead of dropping the frame */
+  var EYE={soft:[480,45,1400],sharp:[960,72,1600],hd:[1280,82,2500]};
+  function eyeEvery(){ return (EYE[eyeQ]||EYE.sharp)[2]; }
+  function grab(w,q,tries){
+    var req={sourceName:curScene,imageFormat:imgFmt,imageWidth:w};
+    if(imgFmt!=="png"&&imgFmt!=="bmp") req.imageCompressionQuality=q;
     obs("GetSourceScreenshot",req).then(function(r){
       if(!r||!r.imageData){ setRow("b_shot",lastErr||"no image returned","bad"); return; }
       var kb=Math.round(r.imageData.length/1024);
-      if(kb>220){ setRow("b_shot",kb+"kb too big","bad"); return; }
+      if(kb>200){
+        if(tries<2){ grab(Math.round(w*0.85),Math.max(30,q-18),tries+1); return; }
+        setRow("b_shot",kb+"kb too big","bad"); return;
+      }
       try{
         SEAL.send(channel,"shot",{img:r.imageData});
         setRow("b_shot",kb+"kb","ok");
@@ -722,7 +733,7 @@ function runBridge(){
       eyeOn=!!p.on;
       if(p.q) eyeQ=p.q;
       clearInterval(eyeTimer); eyeTimer=null;
-      if(eyeOn){ shot(); eyeTimer=setInterval(shot,1400); }
+      if(eyeOn){ shot(); eyeTimer=setInterval(shot,eyeEvery()); }
       else setRow("b_shot","off");
       return;
     }
@@ -992,7 +1003,8 @@ function runBridge(){
 var PIN=localStorage.getItem("slam_pin")||"", ROLE=localStorage.getItem("slam_role")||"";
 if(PIN&&!IS_BRIDGE) SEAL.fetchKey(sb,PIN);
 var ST={ok:false,scenes:[],current:"",items:[],health:{},cw:1920,ch:1080};
-var selId=null, bridgeUp=false, dragging=false, eyeOn=false, eyeQ="soft", lastFrame=null;
+var selId=null, bridgeUp=false, dragging=false, eyeOn=false, eyeQ="sharp", lastFrame=null;
+try{ var _q=localStorage.getItem("obs_eyeq"); if(_q==="soft"||_q==="sharp"||_q==="hd") eyeQ=_q; }catch(e){}
 var pending={}, pendNew={}, pendScene="", urlTarget="", tgtName="", tgtProp="";
 var audioOn=false, audioRows=[], meters={}, lastMeter=0;
 var upAnchor=0, upTick=null, upManual=0, audioScanned=0, audioAnswered=false;
@@ -1141,7 +1153,7 @@ function renderDeck(){
       '<span class="spacer"></span>'+
       '<button class="eye" id="audiotog">audio</button>'+
       '<button class="eye" id="eye">live view</button>'+
-      '<button class="eye qbtn" id="eyeq" style="display:none">soft</button>'+
+      '<button class="eye qbtn on" id="eyeq" style="display:none">sharp</button>'+
       '<span id="stale" style="display:none;background:var(--red);color:#0A0A0A;font-size:11px;'+
         'font-weight:500;padding:5px 10px;border-radius:6px;cursor:help">BRIDGE OUTDATED</span>'+
       '<button class="undo" id="undo" disabled>undo</button>'+
@@ -1233,6 +1245,7 @@ function renderDeck(){
     eyeOn=!eyeOn;
     this.className="eye"+(eyeOn?" on":"");
     el("eyeq").style.display=eyeOn?"":"none";
+    el("eyeq").textContent=eyeQ; el("eyeq").className="eye qbtn"+(eyeQ!=="soft"?" on":"");
     if(!eyeOn){
       lastFrame=null;
       var fr=document.querySelector(".mapframe");
@@ -1242,9 +1255,10 @@ function renderDeck(){
     cmd({cmd:"eye",on:eyeOn,q:eyeQ});
   };
   el("eyeq").onclick=function(){
-    eyeQ=(eyeQ==="soft")?"sharp":"soft";
+    eyeQ={soft:"sharp",sharp:"hd",hd:"soft"}[eyeQ]||"sharp";
+    try{ localStorage.setItem("obs_eyeq",eyeQ); }catch(e){}
     this.textContent=eyeQ;
-    this.className="eye qbtn"+(eyeQ==="sharp"?" on":"");
+    this.className="eye qbtn"+(eyeQ!=="soft"?" on":"");
     if(eyeOn) cmd({cmd:"eye",on:true,q:eyeQ});
   };
   el("refresh").onclick=function(e){ e.preventDefault(); cmd({cmd:"ping"}); };
