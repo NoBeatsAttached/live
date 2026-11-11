@@ -61,6 +61,36 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
 .full .r i{font-style:normal;color:var(--steel);width:26px;display:inline-block}
 .full .r span:last-child{color:var(--blue)}
 .full .none{color:var(--steel)}
+.btag{display:none;font-size:14px;line-height:1;letter-spacing:.08em;color:var(--blue);border:1px solid var(--blue);padding:4px 7px 3px;margin-left:10px;vertical-align:middle}
+.card.blitz .btag{display:inline-block}
+.card.multi .ttl,.card.blitz .ttl,.card.teams .ttl{display:none}
+.card.multi .mult,.card.blitz .btag,.card.teams .ttag{margin-left:0}
+.card.blitz .ttag,.card.multi .ttag{margin-left:8px}
+.ttag{display:none;font-size:14px;line-height:1;letter-spacing:.08em;color:var(--bone);border:1px solid var(--steel);padding:4px 7px 3px;margin-left:10px;vertical-align:middle}
+.card.teams .ttag{display:inline-block}
+.tbar{display:none;margin:-2px 0 12px}
+.card.teams .tbar{display:block}
+.tbar .lab{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.1em;margin-bottom:5px}
+.tbar .lab .r{color:var(--bone)} .tbar .lab .b{color:var(--blue)}
+.tbar .track{height:8px;background:var(--blue);position:relative}
+.tbar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--bone);width:50%;transition:width .6s ease}
+.tbar .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:#050506}
+.card.blitz{border-color:var(--blue)}
+.hint.fire{color:var(--bone)}
+.hint.urgent{color:var(--bone)}
+.fl{margin-left:4px}
+.recap{display:none}
+.card.recapping > :not(.recap):not(.live){display:none}
+.card.recapping .recap{display:block}
+.recap .rt{font-size:17px;letter-spacing:.1em;color:var(--blue);margin-bottom:12px}
+.recap .rr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line);font-size:22px;letter-spacing:.06em;color:var(--bone)}
+.recap .rr:first-of-type{font-size:26px}
+.recap .rr i{font-style:normal;color:var(--steel);display:inline-block;width:34px}
+.recap .rr .p{color:var(--blue);white-space:nowrap}
+.recap .rr .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.recap .rs{margin-top:12px;font-size:13px;letter-spacing:.08em;color:var(--steel);display:flex;justify-content:space-between;gap:12px}
+.recap .rs b{color:var(--bone);font-weight:normal}
+.recap .none{font-size:15px;color:var(--steel);padding:8px 0}
 .live{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--line2)}
 .live.ok{background:var(--blue)}
 
@@ -79,12 +109,14 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
     <div class="live" id="live" title="chat connection"></div>
     <div class="head">
       <div class="cat" id="cat"></div>
-      <div class="title">GUESS THE WORD<span class="mult" id="mult"></span></div>
+      <div class="title"><span class="ttl">GUESS THE WORD</span><span class="mult" id="mult"></span><span class="btag" id="btag"></span><span class="ttag" id="ttag"></span></div>
     </div>
+    <div class="tbar"><div class="lab"><span class="r" id="tr">RAP 0</span><span class="b" id="tb">BASS 0</span></div><div class="track"><div class="fill" id="tf"></div><div class="mid"></div></div></div>
     <div class="tiles" id="tiles"></div>
     <div class="foot"><div class="msg" id="msg">TYPE YOUR GUESS IN CHAT</div><div class="hint" id="hint"></div></div>
     <div class="board" id="board"></div>
     <div class="full" id="full"></div>
+    <div class="recap" id="recap"></div>
   </div>
   <div id="tester">
     <input class="u" id="tu" value="testuser" placeholder="username">
@@ -100,7 +132,16 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
    ?gap=8               seconds the answer stays up before the next word
    ?scale=1             size multiplier for the whole overlay
    ?ignore=a,b          extra usernames to ignore (bots are ignored already)
-   chat (mods + broadcaster only): !board  !newboard  !skip  !multi 3 (next word worth 3x, max 10, !multi off cancels)
+   chat (mods + broadcaster only):
+     !board            top 10 for 15s
+     !newboard         wipe the all-time board
+     !skip             next word
+     !multi 3          next word worth 3x (max 10), !multi off cancels
+     !blitz 5          speed round: 5 short words, 20s each (max 10), !blitz stop ends it
+     !recap            TONIGHT'S TOP 3 card for 20s (tonight = since 6+ hours of no play)
+     !teams 10         RAP vs BASS for the next 10 words (max 25), !teams stop ends it
+   chat (anyone, during RAP vs BASS): !rap  !bass   pick a side (locked once picked;
+     scoring without a side puts you on the smaller team)
    ?reset=1             wipe the leaderboard once, then remove it from the URL
    ?test=1              shows a fake-chat box so you can play it in a normal browser
 ---------------------------------------------------------------------- */
@@ -173,10 +214,11 @@ const store = {
 if (P.get('reset') === '1') store.del(KEY);
 let scores = store.get(KEY, {}); // { login: { name, pts } }
 
+const fire = login => streak.n >= 3 && streak.login === login ? '<span class="fl">🔥</span>' : '';
 function renderBoard() {
-  const top = Object.values(scores).sort((a, b) => b.pts - a.pts).slice(0, 3);
+  const top = Object.entries(scores).map(([login, v]) => ({ ...v, login })).sort((a, b) => b.pts - a.pts).slice(0, 3);
   $('board').innerHTML = top.length
-    ? top.map((s, i) => `${i + 1} <b>${esc(s.name.length > 12 ? s.name.slice(0, 11) + '…' : s.name)}</b> ${s.pts}`).join('<span class="d">/</span>')
+    ? top.map((s, i) => `${i + 1} <b>${esc(s.name.length > 12 ? s.name.slice(0, 11) + '…' : s.name)}</b>${fire(s.login)} ${s.pts}`).join('<span class="d">/</span>')
     : '';
 }
 
@@ -186,6 +228,15 @@ const keyOf = d => d.cat + '|' + d.word;
 // played list lives in memory (works even if OBS won't save), and is saved to storage when it can be
 let PLAYED = store.get(DKEY, []);
 if (!Array.isArray(PLAYED) || PLAYED.some(x => typeof x !== 'string')) PLAYED = [];
+function nextShortWord() {
+  const ok = d => { const n = compact(d.word).length; return n >= 3 && n <= 5; };
+  const done = new Set(PLAYED);
+  let left = DECK_ALL.filter(d => ok(d) && !done.has(keyOf(d)));
+  if (!left.length) { const recent = new Set(PLAYED.slice(-30)); left = DECK_ALL.filter(d => ok(d) && !recent.has(keyOf(d))); }
+  const pick = left[Math.random() * left.length | 0];
+  PLAYED.push(keyOf(pick)); store.set(DKEY, PLAYED);
+  return pick;
+}
 function nextWord() {
   const done = new Set(PLAYED);
   let left = DECK_ALL.filter(d => !done.has(keyOf(d)));
@@ -205,6 +256,16 @@ function nextWord() {
 
 /* ---------------- game ---------------- */
 let round = null;   // { cat, word, chars, shown:Set, hiddenIdx:[], state }
+const BLITZ_S = 20, BLITZ_HINT_S = 6;
+const SKEY = 'gtw_streak_' + CHANNEL, TKEY = 'gtw_tonight_' + CHANNEL;
+let streak = store.get(SKEY, { login: null, name: '', n: 0 });
+let tonight = store.get(TKEY, null);
+if (!tonight || !tonight.scores || Date.now() - (tonight.last || 0) > 6 * 3600 * 1000)
+  tonight = { last: Date.now(), scores: {}, solved: 0, best: { name: '', n: 0 } };
+let blitz = null;          // { i, total, mult }
+let teams = null;          // { i, total, rap, bass, members: {login: 'rap'|'bass'} }
+const TEAM_WIN_BONUS = 10;
+let paused = false, recapT = null;
 let pendingMult = 1, tickT = null, msgT = null, hintAt = 0, hintT = null;
 
 function letterIdx(word) { return [...word].map((c, i) => c === ' ' ? -1 : i).filter(i => i >= 0); }
@@ -235,11 +296,30 @@ function makeRound(cat, word) {
 
 function startRound() {
   clearTimeout(tickT); clearTimeout(msgT);
-  const { cat, word } = nextWord();
-  const idx = letterIdx(word);
-  // pos[k] = index in `word` of the k-th letter (so spaces in two-word answers are skipped)
+  if (blitz && blitz.i >= blitz.total) {            // blitz finished -> back to normal
+    blitz = null;
+    $('card').classList.remove('blitz');
+    $('msg').innerHTML = 'BLITZ OVER';
+    $('hint').textContent = '';
+    tickT = setTimeout(startRound, 3000);
+    return;
+  }
+  if (teams && teams.i >= teams.total) {            // team match finished
+    endTeams(true);
+    tickT = setTimeout(startRound, 7000);
+    return;
+  }
+  if (teams) { teams.i++; drawTeams(); }
+  $('card').classList.toggle('teams', !!teams);
+  const { cat, word } = blitz ? nextShortWord() : nextWord();
   round = makeRound(cat, word);
-  round.mult = pendingMult; pendingMult = 1;
+  if (blitz) {
+    blitz.i++;
+    round.mult = blitz.mult;
+    round.deadline = Date.now() + BLITZ_S * 1000;
+    $('btag').textContent = `BLITZ ${blitz.i}/${blitz.total}`;
+  } else { round.mult = pendingMult; pendingMult = 1; }
+  $('card').classList.toggle('blitz', !!blitz);
   $('card').classList.remove('won', 'miss');
   $('card').classList.toggle('multi', round.mult > 1);
   $('mult').textContent = round.mult > 1 ? '×' + round.mult : '';
@@ -249,13 +329,21 @@ function startRound() {
   armHint();
 }
 
-function armHint() { hintAt = Date.now() + HINT_S * 1000; }
+function armHint() { hintAt = Date.now() + (round && round.deadline ? BLITZ_HINT_S : HINT_S) * 1000; }
 function hintLoop() {
   clearInterval(hintT);
   hintT = setInterval(() => {
-    if (!round || round.state !== 'live') { $('hint').textContent = ''; return; }
+    if (paused) { hintAt += 250; if (round && round.deadline) round.deadline += 250; return; }
+    if (!round || round.state !== 'live') return;
+    const h = $('hint'); h.classList.remove('fire');
+    if (round.deadline) {                               // blitz: hard clock
+      const t = Math.ceil((round.deadline - Date.now()) / 1000);
+      if (t <= 0) return timeUp();
+      h.classList.toggle('urgent', t <= 5);
+    } else h.classList.remove('urgent');
+    const clock = round.deadline ? Math.ceil((round.deadline - Date.now()) / 1000) + 's' : '';
     const hidden = round.pos.filter(i => !round.shown.has(i));
-    if (hidden.length <= 1) { $('hint').textContent = 'LAST LETTER'; return; }
+    if (hidden.length <= 1) { h.textContent = clock || 'LAST LETTER'; return; }
     const left = Math.ceil((hintAt - Date.now()) / 1000);
     if (left <= 0) {
       const i = hidden[Math.random() * hidden.length | 0];
@@ -264,46 +352,157 @@ function hintLoop() {
       armHint();
       return;
     }
-    $('hint').textContent = 'HINT IN ' + left;
+    h.textContent = clock || 'HINT IN ' + left;
   }, 250);
 }
 
 function hiddenCount() { return round.pos.filter(i => !round.shown.has(i)).length; }
 
+function teamOf(login) {
+  if (!teams) return null;
+  if (!teams.members[login]) {
+    const r = Object.values(teams.members).filter(t => t === 'rap').length;
+    const b = Object.values(teams.members).filter(t => t === 'bass').length;
+    teams.members[login] = r < b ? 'rap' : b < r ? 'bass' : (Math.random() < .5 ? 'rap' : 'bass');
+  }
+  return teams.members[login];
+}
+function drawTeams() {
+  if (!teams) return;
+  $('tr').textContent = 'RAP ' + teams.rap;
+  $('tb').textContent = teams.bass + ' BASS';
+  const tot = teams.rap + teams.bass;
+  $('tf').style.width = (tot ? teams.rap / tot * 100 : 50) + '%';
+  $('ttag').textContent = `RAP vs BASS ${Math.max(1, teams.i)}/${teams.total}`;
+}
+function endTeams(announce) {
+  const t = teams; teams = null;
+  if (!announce || !t) { $('card').classList.remove('teams'); return false; }
+  $('ttag').textContent = 'RAP vs BASS · FINAL';
+  let line;
+  if (t.rap + t.bass === 0) line = 'RAP vs BASS ENDED';
+  else if (t.rap === t.bass) line = `RAP vs BASS · <span class="pts">TIE ${t.rap}–${t.bass}</span>`;
+  else {
+    const win = t.rap > t.bass ? 'rap' : 'bass';
+    for (const [login, side] of Object.entries(t.members)) if (side === win && scores[login]) {
+      scores[login].pts += TEAM_WIN_BONUS;
+      if (tonight.scores[login]) tonight.scores[login].pts += TEAM_WIN_BONUS;
+    }
+    store.set(KEY, scores); store.set(TKEY, tonight); renderBoard();
+    line = `<span class="pts">${win === 'rap' ? 'RAP' : 'BASS'} WINS</span> ${Math.max(t.rap, t.bass)}–${Math.min(t.rap, t.bass)} · +${TEAM_WIN_BONUS} EACH`;
+  }
+  $('msg').innerHTML = line; $('hint').textContent = '';
+  return true;
+}
+
 function addPts(who, pts) {
   pts *= (round && round.mult) || 1;
+  if (teams) { teams[teamOf(who.login)] += pts; drawTeams(); }
   const rec = scores[who.login] || { name: who.name, pts: 0 };
   rec.name = who.name; rec.pts += pts;
   scores[who.login] = rec;
   store.set(KEY, scores);
+  const t = tonight.scores[who.login] || { name: who.name, pts: 0 };
+  t.name = who.name; t.pts += pts; tonight.scores[who.login] = t;
+  tonight.last = Date.now(); store.set(TKEY, tonight);
   renderBoard();
+}
+
+function timeUp() {
+  round.state = 'done';
+  round.pos.forEach(i => round.shown.add(i));
+  drawTiles();
+  $('card').classList.add('won');
+  $('msg').innerHTML = `TIME. <span class="g">NOBODY GOT IT</span>`;
+  $('hint').textContent = '';
+  tickT = setTimeout(startRound, 2500);
 }
 
 function endRound(winner, pts) {
   clearTimeout(tickT); clearTimeout(msgT);
   round.state = 'done';
-  $('hint').textContent = '';
   round.pos.forEach(i => round.shown.add(i));
   drawTiles();
-  addPts(winner, pts);
+  // streaks: 3+ wins in a row = ON FIRE (+5 each win); ending someone's fire = STREAK BREAKER (+10)
+  let bonus = 0, tag = '';
+  if (streak.login === winner.login) streak.n++;
+  else {
+    if (streak.n >= 3) { bonus += 10; tag = 'STREAK BREAKER +10'; }
+    streak = { login: winner.login, name: winner.name, n: 1 };
+  }
+  streak.name = winner.name;
+  if (streak.n >= 3) { bonus += 5; tag = `🔥 ON FIRE ×${streak.n}`; }
+  store.set(SKEY, streak);
+  if (streak.n > tonight.best.n) tonight.best = { name: winner.name, n: streak.n };
+  tonight.solved++;
+  addPts(winner, pts + bonus);
   $('card').classList.add('won');
   const m = round.mult || 1;
-  $('msg').innerHTML = `<span class="who">${esc(winner.name)}</span> GOT IT <span class="pts">+${pts * m}</span>${m > 1 ? ' <span class="g">×' + m + '</span>' : ''}`;
-  tickT = setTimeout(startRound, GAP_S * 1000);
+  $('msg').innerHTML = `<span class="who">${esc(winner.name)}</span> GOT IT <span class="pts">+${(pts + bonus) * m}</span>${m > 1 ? ' <span class="g">×' + m + '</span>' : ''}`;
+  const h = $('hint'); h.classList.remove('urgent'); h.classList.toggle('fire', !!tag); h.textContent = tag;
+  tickT = setTimeout(startRound, blitz ? 2500 : GAP_S * 1000);
 }
 
 let fullT = null;
 function showFull() {
-  const all = Object.values(scores).sort((a, b) => b.pts - a.pts).slice(0, 10);
+  const all = Object.entries(scores).map(([login, v]) => ({ ...v, login })).sort((a, b) => b.pts - a.pts).slice(0, 10);
   $('full').innerHTML = '<div class="ft">LEADERBOARD</div>' + (all.length
-    ? all.map((s, i) => `<div class="r"><span><i>${i + 1}</i>${esc(s.name)}</span><span>${s.pts}</span></div>`).join('')
+    ? all.map((s, i) => `<div class="r"><span><i>${i + 1}</i>${esc(s.name)}${fire(s.login)}</span><span>${s.pts}</span></div>`).join('')
     : '<div class="none">NO SCORES YET</div>');
   $('full').classList.add('show');
   clearTimeout(fullT);
   fullT = setTimeout(() => $('full').classList.remove('show'), 15000);
 }
 
+function showRecap() {
+  const top = Object.values(tonight.scores).sort((a, b) => b.pts - a.pts).slice(0, 3);
+  $('recap').innerHTML = `<div class="rt">TONIGHT'S TOP 3</div>` + (top.length
+    ? top.map((s, i) => `<div class="rr"><span class="n"><i>${i + 1}</i>${esc(s.name)}</span><span class="p">${s.pts}</span></div>`).join('')
+    : '<div class="none">NO WINNERS YET TONIGHT</div>') +
+    `<div class="rs"><span>WORDS SOLVED <b>${tonight.solved}</b></span>${tonight.best.n >= 2 ? `<span>BEST STREAK <b>${esc(tonight.best.name)} ×${tonight.best.n}</b></span>` : ''}</div>`;
+  $('card').classList.add('recapping');
+  paused = true;
+  clearTimeout(recapT);
+  recapT = setTimeout(() => { $('card').classList.remove('recapping'); paused = false; }, 20000);
+}
+
 function onCommand(cmd, arg) {
+  if (cmd === '!recap') return showRecap(), true;
+  if (cmd === '!teams') {
+    if (arg === 'stop' || arg === 'off') {
+      if (teams) { teams.total = teams.i; if (round && round.state === 'live') { round.state = 'done'; startRound(); } }
+      return true;
+    }
+    const n = Math.round(parseFloat(arg || '10'));
+    if (!isFinite(n) || n < 1) return true;
+    teams = { i: 0, total: Math.min(25, n), rap: 0, bass: 0, members: {} };
+    if (round) round.state = 'done';
+    $('card').classList.add('teams'); $('card').classList.remove('won');
+    drawTeams(); $('ttag').textContent = `RAP vs BASS · ${teams.total} WORDS`;
+    $('cat').textContent = 'PICK A SIDE'; $('tiles').innerHTML = '';
+    $('msg').innerHTML = 'TYPE <span class="pts">!rap</span> OR <span class="who">!bass</span>';
+    $('hint').textContent = '';
+    clearTimeout(tickT); clearTimeout(msgT);
+    tickT = setTimeout(startRound, 10000);
+    return true;
+  }
+  if (cmd === '!blitz') {
+    if (arg === 'stop' || arg === 'off') {
+      if (blitz) { blitz.total = blitz.i; if (!round || round.state !== 'live') return true; round.state = 'done'; startRound(); }
+      return true;
+    }
+    const n = Math.round(parseFloat(arg || '5'));
+    if (!isFinite(n) || n < 1) return true;
+    blitz = { i: 0, total: Math.min(10, n), mult: pendingMult }; pendingMult = 1;
+    if (round) round.state = 'done';
+    $('mult').textContent = ''; $('card').classList.remove('multi');
+    $('hint').textContent = '';
+    $('msg').innerHTML = `<span class="pts">BLITZ</span> · ${blitz.total} WORDS · ${BLITZ_S}s EACH`;
+    $('cat').textContent = 'GET READY'; $('tiles').innerHTML = '';
+    clearTimeout(tickT); clearTimeout(msgT);
+    tickT = setTimeout(startRound, 3000);
+    return true;
+  }
   if (cmd === '!board') return showFull(), true;
   if (cmd === '!newboard') {
     scores = {}; store.set(KEY, scores); renderBoard();
@@ -330,7 +529,11 @@ function onCommand(cmd, arg) {
 function onChat(login, name, text, isMod) {
   const parts = text.trim().toLowerCase().split(/\s+/);
   if (isMod && onCommand(parts[0], parts[1])) return;
-  if (!round || round.state !== 'live') return;
+  if (teams && (parts[0] === '!rap' || parts[0] === '!bass') && !IGNORE.has(login)) {
+    if (!teams.members[login]) teams.members[login] = parts[0].slice(1);   // locked once picked
+    return;
+  }
+  if (!round || round.state !== 'live' || paused) return;
   if (IGNORE.has(login)) return;
   const n = norm(text);
   if (!n) return;
@@ -418,7 +621,7 @@ if (TEST) {
     $('tm').value = '';
   });
   window.__answer = () => round && round.word; // console peek for testing
-  window.__force = (cat, word) => { clearTimeout(tickT); clearTimeout(msgT); for (const k in lastGuess) delete lastGuess[k]; round = makeRound(cat, word); armHint(); $('card').classList.remove('won','miss'); $('cat').textContent = cat; $('msg').innerHTML = prompt(); drawTiles(); };
+  window.__force = (cat, word) => { clearTimeout(tickT); clearTimeout(msgT); for (const k in lastGuess) delete lastGuess[k]; round = makeRound(cat, word); round.mult = 1; armHint(); $('card').classList.remove('won','miss'); $('cat').textContent = cat; $('msg').innerHTML = prompt(); drawTiles(); };
 }
 
 renderBoard();
