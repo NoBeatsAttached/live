@@ -138,6 +138,7 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
      !skip             next word
      !multi 3          next word worth 3x (max 10), !multi off cancels
      !blitz 5          speed round: 5 short words, 20s each (max 10), !blitz stop ends it
+     !version          shows which build OBS is running + how many words played this cycle
      !recap            TONIGHT'S TOP 3 card for 20s (tonight = since 6+ hours of no play)
      !teams 10         RAP vs BASS for the next 10 words (max 25), !teams stop ends it
    chat (anyone, during RAP vs BASS): !rap  !bass   pick a side (locked once picked;
@@ -198,7 +199,8 @@ const lastGuess = {};   // per-user cooldown so nobody machine-guns words
 const $ = id => document.getElementById(id);
 const norm = s => s.toUpperCase().normalize('NFKD').replace(/&/g, ' AND ').replace(/[^A-Z0-9]+/g, ' ').trim();
 const compact = s => norm(s).replace(/ /g, '');
-const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const rnd = () => { try { const u = new Uint32Array(1); crypto.getRandomValues(u); return u[0] / 4294967296; } catch { return Math.random(); } };
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
 $('stage').style.transform = `scale(${SCALE})`;
@@ -233,7 +235,7 @@ function nextShortWord() {
   const done = new Set(PLAYED);
   let left = DECK_ALL.filter(d => ok(d) && !done.has(keyOf(d)));
   if (!left.length) { const recent = new Set(PLAYED.slice(-30)); left = DECK_ALL.filter(d => ok(d) && !recent.has(keyOf(d))); }
-  const pick = left[Math.random() * left.length | 0];
+  const pick = left[rnd() * left.length | 0];
   PLAYED.push(keyOf(pick)); store.set(DKEY, PLAYED);
   return pick;
 }
@@ -246,7 +248,7 @@ function nextWord() {
     PLAYED = [];
     left = DECK_ALL.filter(d => !recent.has(keyOf(d)));
   }
-  const pick = left[Math.random() * left.length | 0];
+  const pick = left[rnd() * left.length | 0];
   PLAYED.push(keyOf(pick));
   const valid = new Set(DECK_ALL.map(keyOf));
   PLAYED = PLAYED.filter(k => valid.has(k));
@@ -355,7 +357,7 @@ function hintLoop() {
     if (hidden.length <= 1) { h.textContent = clock || 'LAST LETTER'; return; }
     const left = Math.ceil((hintAt - Date.now()) / 1000);
     if (left <= 0) {
-      const i = hidden[Math.random() * hidden.length | 0];
+      const i = hidden[rnd() * hidden.length | 0];
       round.shown.add(i);
       drawTiles([i]);
       armHint();
@@ -372,7 +374,7 @@ function teamOf(login) {
   if (!teams.members[login]) {
     const r = Object.values(teams.members).filter(t => t === 'rap').length;
     const b = Object.values(teams.members).filter(t => t === 'bass').length;
-    teams.members[login] = r < b ? 'rap' : b < r ? 'bass' : (Math.random() < .5 ? 'rap' : 'bass');
+    teams.members[login] = r < b ? 'rap' : b < r ? 'bass' : (rnd() < .5 ? 'rap' : 'bass');
   }
   return teams.members[login];
 }
@@ -477,7 +479,13 @@ function showRecap() {
   recapT = setTimeout(() => { $('card').classList.remove('recapping'); paused = false; }, 20000);
 }
 
+const BUILD = '2026-11-18b';
 function onCommand(cmd, arg) {
+  if (cmd === '!version') {
+    $('msg').innerHTML = `BUILD <span class="pts">${BUILD}</span> · ${PLAYED.length}/${DECK_ALL.length} PLAYED`;
+    if (round && round.state === 'live') { clearTimeout(msgT); msgT = setTimeout(() => { if (round.state === 'live') $('msg').innerHTML = prompt(); }, 6000); }
+    return true;
+  }
   if (cmd === '!recap') return showRecap(), true;
   if (cmd === '!teams') {
     if (arg === 'stop' || arg === 'off') {
@@ -595,7 +603,7 @@ function connect() {
     lastHeard = Date.now();
     ws.send('CAP REQ :twitch.tv/tags');
     ws.send('PASS SCHMOOPIIE');
-    ws.send('NICK justinfan' + (10000 + (Math.random() * 80000 | 0)));
+    ws.send('NICK justinfan' + (10000 + (rnd() * 80000 | 0)));
     ws.send('JOIN #' + CHANNEL);
   };
   ws.onmessage = e => {
