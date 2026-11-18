@@ -134,7 +134,7 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
    ?ignore=a,b          extra usernames to ignore (bots are ignored already)
    chat (mods + broadcaster only):
      !board            top 10 for 15s
-     !newboard         wipe the all-time board
+     !newboard         wipe the board now (it also resets on its own each stream: 6+ hours of no scoring)
      !skip             next word
      !multi 3          next word worth 3x (max 10), !multi off cancels
      !blitz 5          speed round: 5 short words, 20s each (max 10), !blitz stop ends it
@@ -260,8 +260,16 @@ const BLITZ_S = 20, BLITZ_HINT_S = 6;
 const SKEY = 'gtw_streak_' + CHANNEL, TKEY = 'gtw_tonight_' + CHANNEL;
 let streak = store.get(SKEY, { login: null, name: '', n: 0 });
 let tonight = store.get(TKEY, null);
-if (!tonight || !tonight.scores || Date.now() - (tonight.last || 0) > 6 * 3600 * 1000)
+// NEW STREAM = 6+ hours with nobody scoring. Board, streaks and tonight's recap all start at 0.
+const STREAM_GAP = 6 * 3600 * 1000;
+function newStreamCheck() {
+  if (tonight && tonight.scores && Date.now() - (tonight.last || 0) <= STREAM_GAP) return;
   tonight = { last: Date.now(), scores: {}, solved: 0, best: { name: '', n: 0 } };
+  scores = {}; streak = { login: null, name: '', n: 0 };
+  store.set(KEY, scores); store.set(SKEY, streak); store.set(TKEY, tonight);
+  if (typeof renderBoard === 'function') renderBoard();
+}
+newStreamCheck();
 let blitz = null;          // { i, total, mult }
 let teams = null;          // { i, total, rap, bass, members: {login: 'rap'|'bass'} }
 const TEAM_WIN_BONUS = 10;
@@ -296,6 +304,7 @@ function makeRound(cat, word) {
 
 function startRound() {
   clearTimeout(tickT); clearTimeout(msgT);
+  newStreamCheck();
   if (blitz && blitz.i >= blitz.total) {            // blitz finished -> back to normal
     blitz = null;
     $('card').classList.remove('blitz');
@@ -396,6 +405,7 @@ function endTeams(announce) {
 }
 
 function addPts(who, pts) {
+  newStreamCheck();
   pts *= (round && round.mult) || 1;
   if (teams) { teams[teamOf(who.login)] += pts; drawTeams(); }
   const rec = scores[who.login] || { name: who.name, pts: 0 };
@@ -423,6 +433,7 @@ function endRound(winner, pts) {
   round.state = 'done';
   round.pos.forEach(i => round.shown.add(i));
   drawTiles();
+  newStreamCheck();
   // streaks: 3+ wins in a row = ON FIRE (+5 each win); ending someone's fire = STREAK BREAKER (+10)
   let bonus = 0, tag = '';
   if (streak.login === winner.login) streak.n++;
