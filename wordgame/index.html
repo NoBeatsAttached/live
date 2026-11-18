@@ -141,6 +141,7 @@ body{font-family:'Code',monospace;color:var(--bone);-webkit-font-smoothing:antia
      !version          shows which build OBS is running + how many words played this cycle
      !recap            TONIGHT'S TOP 3 card for 20s (tonight = since 6+ hours of no play)
      !teams 10         RAP vs BASS for the next 10 words (max 25), !teams stop ends it
+   chat (anyone): !dug or !completed   how many words have been played this cycle (once per 20s)
    chat (anyone, during RAP vs BASS): !rap  !bass   pick a side (locked once picked;
      scoring without a side puts you on the smaller team)
    ?reset=1             wipe the leaderboard once, then remove it from the URL
@@ -479,7 +480,8 @@ function showRecap() {
   recapT = setTimeout(() => { $('card').classList.remove('recapping'); paused = false; }, 20000);
 }
 
-const BUILD = '2026-11-18b';
+const BUILD = '2026-11-18c';
+let dugAt = 0;
 function onCommand(cmd, arg) {
   if (cmd === '!version') {
     $('msg').innerHTML = `BUILD <span class="pts">${BUILD}</span> · ${PLAYED.length}/${DECK_ALL.length} PLAYED`;
@@ -548,6 +550,17 @@ function onCommand(cmd, arg) {
 function onChat(login, name, text, isMod) {
   const parts = text.trim().toLowerCase().split(/\s+/);
   if (isMod && onCommand(parts[0], parts[1])) return;
+  if ((parts[0] === '!dug' || parts[0] === '!completed') && !IGNORE.has(login)) {   // anyone; once per 20s
+    const now = Date.now();
+    if (now - dugAt < 20000 && !isMod) return;
+    dugAt = now;
+    const cyc = Math.max(0, PLAYED.length - (round && round.state === 'live' ? 1 : 0));   // the word on screen isn't dug yet
+    const left = DECK_ALL.length - cyc;
+    $('msg').innerHTML = `<span class="pts">${cyc}/${DECK_ALL.length}</span> DUG · ${left ? left + ' LEFT' : 'CRATE EMPTY'}`;
+    clearTimeout(msgT);
+    msgT = setTimeout(() => { if (round && round.state === 'live') $('msg').innerHTML = prompt(); }, 6000);
+    return;
+  }
   if (teams && (parts[0] === '!rap' || parts[0] === '!bass') && !IGNORE.has(login)) {
     if (!teams.members[login]) teams.members[login] = parts[0].slice(1);   // locked once picked
     return;
