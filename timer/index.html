@@ -227,7 +227,7 @@ function curMs(){
 function renderOverlay(){
   document.body.className="overlay";
   app.innerHTML='<div class="ovwrap" id="ovwrap"><div class="clock" id="clock">00:00</div></div>';
-  var firedO=false, cfg=colorsFromUrl(), lastLen=0;
+  var firedO=false, urlCfg=colorsFromUrl(), lastLen=0;
   function refit(){ fitClock(document.getElementById("clock"),document.getElementById("ovwrap"),
     Math.min(260,Math.max(80,window.innerWidth*0.22))); }
   window.addEventListener("resize",refit);
@@ -242,7 +242,7 @@ function renderOverlay(){
     var low=(T.mode==="down"&&ms>0&&ms<=60000);
     el.classList.toggle("done",done);
     el.classList.toggle("low",low);
-    paintClock(el,cfg,low||done,true);
+    paintClock(el,T.colors?cleanColors(T.colors):urlCfg,low||done,true);
     if(txt.length!==lastLen){ lastLen=txt.length; refit(); }
   }
   // OBS: try to unlock audio on load (works in OBS CEF which allows autoplay)
@@ -278,8 +278,8 @@ function renderControl(){
         '<label class="cbox"><input type="color" id="col_b">Edge right</label>'+
         '<label class="cbox"><input type="checkbox" id="col_g">Glitch edges</label>'+
       '</div>'+
-      '<div class="linkrow"><input id="obslink" readonly><button class="chip" id="copylink">Copy OBS link</button><button class="chip" id="colreset">Reset</button></div>'+
-      '<div class="hint" id="colhint">The preview above shows these colors. To put them on stream, copy the OBS link and paste it as the timer Browser source URL in OBS.</div>'+
+      '<div class="linkrow"><button class="chip" id="colreset">Reset to default</button></div>'+
+      '<div class="hint" id="colhint">Changes go straight to the overlay in OBS.</div>'+
     '</div>'+
     '<div class="hint help">OBS overlay: add a Browser source pointing at this page\u2019s <b>#overlay</b> URL. '+
       'It updates live from here \u2014 start, pause, add time and OBS follows instantly. No relinking.'+
@@ -352,30 +352,38 @@ function renderControl(){
 
   on(paintMode);
 
-  var cfg=DEF_COLORS; try{ cfg=cleanColors(JSON.parse(localStorage.getItem("tv_colors")||"null")); }catch(e){ cfg=cleanColors(null); }
-  function obsLink(){
-    var base=location.origin+location.pathname, q=[];
-    ["c","w","a","b"].forEach(function(k){ if(cfg[k]!==DEF_COLORS[k]) q.push(k+"="+cfg[k]); });
-    if(!cfg.g) q.push("g=0");
-    return base+(q.length?"?"+q.join("&"):"")+"#overlay";
-  }
+  var cfg=cleanColors(T.colors||null);
+  if(!T.colors){ try{ cfg=cleanColors(JSON.parse(localStorage.getItem("tv_colors")||"null")); }catch(e){} }
+  var editAt=0, saveT=null;
+  function hint(t,bad){ var h=document.getElementById("colhint"); if(h){ h.textContent=t; h.style.color=bad?"var(--hot)":""; } }
   function paintColors(){
     ["c","w","a","b"].forEach(function(k){ document.getElementById("col_"+k).value="#"+cfg[k]; });
     document.getElementById("col_g").checked=!!cfg.g;
-    document.getElementById("obslink").value=obsLink();
-    document.getElementById("openov").href=obsLink();
     try{ localStorage.setItem("tv_colors",JSON.stringify(cfg)); }catch(e){}
   }
+  function saveColors(){
+    clearTimeout(saveT);
+    saveT=setTimeout(function(){
+      sb.rpc("tv_colors",{p_pin:PIN,p_colors:cfg}).then(function(r){
+        if(!r.error){ hint("Live on the overlay."); return; }
+        var m=r.error.message||"";
+        if(/bad pin/i.test(m)){ PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render(); return; }
+        if(/tv_colors|function|schema cache|could not find/i.test(m)) hint("Live colors need the one-time database step first.",true);
+        else hint("NOT SAVED \u2014 the overlay did not change. Check your connection and try again.",true);
+      });
+    },250);
+  }
+  function edited(){ editAt=Date.now(); cfg=cleanColors(cfg); paintColors(); saveColors(); }
   ["c","w","a","b"].forEach(function(k){ document.getElementById("col_"+k).oninput=function(){
-    cfg[k]=this.value.replace("#","").toUpperCase(); cfg=cleanColors(cfg); paintColors(); }; });
-  document.getElementById("col_g").onchange=function(){ cfg.g=this.checked?1:0; paintColors(); };
-  document.getElementById("colreset").onclick=function(){ cfg=cleanColors(null); paintColors(); };
-  document.getElementById("copylink").onclick=function(){
-    var f=document.getElementById("obslink"), b=this, v=f.value;
-    function ok(){ b.textContent="Copied"; setTimeout(function(){ b.textContent="Copy OBS link"; },1600); }
-    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(ok,function(){ f.select(); document.execCommand("copy"); ok(); });
-    else { f.select(); document.execCommand("copy"); ok(); }
-  };
+    cfg[k]=this.value.replace("#","").toUpperCase(); edited(); }; });
+  document.getElementById("col_g").onchange=function(){ cfg.g=this.checked?1:0; edited(); };
+  document.getElementById("colreset").onclick=function(){ cfg=cleanColors(null); edited(); };
+  /* someone else changed the colors: follow, unless we're mid-edit */
+  on(function(){
+    if(!T.colors||Date.now()-editAt<3000) return;
+    var n=cleanColors(T.colors);
+    if(JSON.stringify(n)!==JSON.stringify(cfg)){ cfg=n; paintColors(); }
+  });
   paintColors();
   var pvLen=0;
   function pvFit(){ fitClock(document.getElementById("pv"),document.querySelector(".preview"),
