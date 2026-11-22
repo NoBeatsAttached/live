@@ -37,7 +37,7 @@ body{background:var(--void);color:var(--text);
 /* scan lines over everything, very low key */
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
   background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.14) 2px 3px)}
-body.overlay::after{background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.10) 2px 3px)}
+body.overlay::after{content:none;display:none}
 a{color:inherit}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,textarea{font-family:inherit}
