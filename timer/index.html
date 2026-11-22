@@ -20,7 +20,7 @@ body{background:var(--void);color:var(--text);font-family:'JetBrains Mono',ui-mo
 body.overlay{background:transparent}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;
   background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.22) 2px 3px)}
-body.overlay::after{background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.10) 2px 3px)}
+body.overlay::after{content:none;display:none}
 .wrap{max-width:640px;margin:0 auto;padding:7vh 24px 40px;display:flex;flex-direction:column;gap:22px}
 .mast{text-align:center}
 .brand{font-family:'Code','JetBrains Mono',monospace;font-size:clamp(16px,3.4vw,22px);letter-spacing:.2em;color:#FFF}
@@ -43,7 +43,7 @@ body.overlay::after{background:repeating-linear-gradient(0deg,transparent 0 2px,
 .setlab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:4px}
 .chip{background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:13px;padding:9px 14px;cursor:pointer;transition:.15s}
 .chip:hover{border-color:var(--electric);color:var(--electric)}
-#minfield{width:80px;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:14px;padding:9px 10px;text-align:center}
+#minfield,#hrfield{width:72px;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:14px;padding:9px 10px;text-align:center}
 .btnrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .act{background:var(--electric);color:#000;border:none;font:inherit;font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:14px 30px;cursor:pointer;transition:.15s}
 .act:hover{filter:brightness(1.12)}
@@ -53,6 +53,14 @@ body.overlay::after{background:repeating-linear-gradient(0deg,transparent 0 2px,
 .gatebox input{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);font:inherit;font-size:15px;padding:12px;text-align:center}
 .hint{font-size:12px;color:var(--dim);line-height:1.6}
 .help{text-align:center;border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+.colors{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:12px}
+.colors .setlab{text-align:center}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.cbox{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line2);padding:8px 10px;font-size:12px;color:var(--dim);cursor:pointer}
+.cbox input[type=color]{width:34px;height:28px;border:1px solid var(--line2);background:transparent;padding:0;cursor:pointer;flex:none}
+.cbox input[type=checkbox]{width:18px;height:18px;accent-color:var(--electric);flex:none}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap}
+.linkrow input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line2);color:var(--dim);font:inherit;font-size:12px;padding:10px}
 
 </style>
 
@@ -152,6 +160,40 @@ function alarm(){
 function fmt(ms){ if(ms<0)ms=0; var s=Math.round(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;
   function p(n){return(n<10?"0":"")+n;} return (h>0?h+":"+p(m)+":"+p(x):p(m)+":"+p(x)); }
 
+/* --- clock colors ----------------------------------------------
+   The overlay takes its colors from its own link (?c=..&w=..), so OBS
+   keeps them through restarts and nobody else can change them. */
+var DEF_COLORS={c:"FFFFFF",w:"D8455F",a:"D8455F",b:"3A93D6",g:1};
+function hexOk(v){ return typeof v==="string"&&/^[0-9a-fA-F]{6}$/.test(v); }
+function cleanColors(o){
+  var r={}; o=o||{};
+  ["c","w","a","b"].forEach(function(k){ r[k]=hexOk(o[k])?o[k].toUpperCase():DEF_COLORS[k]; });
+  r.g=(o.g===0||o.g==="0")?0:1; return r;
+}
+function colorsFromUrl(){
+  var q={}; location.search.replace(/^\?/,"").split("&").forEach(function(kv){
+    var i=kv.indexOf("="); if(i>0) q[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1)); });
+  return cleanColors(q);
+}
+function rgba(hex,al){ var n=parseInt(hex,16); return "rgba("+(n>>16&255)+","+(n>>8&255)+","+(n&255)+","+al+")"; }
+function paintClock(el,cfg,warn,big){
+  el.style.color="#"+(warn?cfg.w:cfg.c);
+  var off=big?3:2, sh=[];
+  if(cfg.g){ sh.push((-off)+"px 0 "+rgba(cfg.a,.85)); sh.push(off+"px 0 "+rgba(cfg.b,.85)); }
+  if(big) sh.push("0 4px 30px rgba(0,0,0,.9)");
+  el.style.textShadow=sh.length?sh.join(","):"none";
+}
+/* shrink the clock so long times (23:59:59) always fit the box */
+function fitClock(el,box,maxPx){
+  if(!el||!box) return;
+  el.style.fontSize=maxPx+"px";
+  var w=el.scrollWidth, avail=box.clientWidth*0.94, hh=box.clientHeight*0.86, sz=maxPx;
+  if(w>avail&&w>0) sz=maxPx*avail/w;
+  if(hh>0&&sz>hh) sz=hh;
+  el.style.fontSize=Math.max(10,Math.floor(sz))+"px";
+}
+var MAX_MS=48*3600000;   /* longest countdown: 48 hours */
+
 function pull(){
   return sb.from("tv_timer").select("*").eq("id",1).single().then(function(r){
     if(!r.error&&r.data){ T=r.data; emit(); }
@@ -184,17 +226,24 @@ function curMs(){
 /* ---------- OVERLAY ---------- */
 function renderOverlay(){
   document.body.className="overlay";
-  app.innerHTML='<div class="ovwrap"><div class="clock" id="clock">00:00</div></div>';
-  var firedO=false;
+  app.innerHTML='<div class="ovwrap" id="ovwrap"><div class="clock" id="clock">00:00</div></div>';
+  var firedO=false, cfg=colorsFromUrl(), lastLen=0;
+  function refit(){ fitClock(document.getElementById("clock"),document.getElementById("ovwrap"),
+    Math.min(260,Math.max(80,window.innerWidth*0.22))); }
+  window.addEventListener("resize",refit);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(refit);
   function tick(){
     var el=document.getElementById("clock"); if(!el)return;
     var ms=curMs(), done=false;
     if(T.mode==="down"&&ms<=0){ms=0;done=true;}
     if(T.mode==="down"&&T.running&&done&&!firedO){ firedO=true; alarm(); }
     if(!(T.mode==="down"&&done)) firedO=false;
-    el.textContent=fmt(ms);
+    var txt=fmt(ms); el.textContent=txt;
+    var low=(T.mode==="down"&&ms>0&&ms<=60000);
     el.classList.toggle("done",done);
-    el.classList.toggle("low",T.mode==="down"&&ms>0&&ms<=60000);
+    el.classList.toggle("low",low);
+    paintClock(el,cfg,low||done,true);
+    if(txt.length!==lastLen){ lastLen=txt.length; refit(); }
   }
   // OBS: try to unlock audio on load (works in OBS CEF which allows autoplay)
   initAudio(); if(AC&&AC.state==="suspended"){ AC.resume().catch(function(){}); }
@@ -220,9 +269,21 @@ function renderControl(){
       '<button class="act ghost" id="resetbtn">Reset</button>'+
     '</div>'+
     '<div id="savemsg" class="hint" style="color:var(--hot);min-height:18px"></div>'+
+    '<div class="colors">'+
+      '<div class="setlab">Overlay colors</div>'+
+      '<div class="cgrid">'+
+        '<label class="cbox"><input type="color" id="col_c">Time</label>'+
+        '<label class="cbox"><input type="color" id="col_w">Last minute</label>'+
+        '<label class="cbox"><input type="color" id="col_a">Edge left</label>'+
+        '<label class="cbox"><input type="color" id="col_b">Edge right</label>'+
+        '<label class="cbox"><input type="checkbox" id="col_g">Glitch edges</label>'+
+      '</div>'+
+      '<div class="linkrow"><input id="obslink" readonly><button class="chip" id="copylink">Copy OBS link</button><button class="chip" id="colreset">Reset</button></div>'+
+      '<div class="hint" id="colhint">The preview above shows these colors. To put them on stream, copy the OBS link and paste it as the timer Browser source URL in OBS.</div>'+
+    '</div>'+
     '<div class="hint help">OBS overlay: add a Browser source pointing at this page\u2019s <b>#overlay</b> URL. '+
       'It updates live from here \u2014 start, pause, add time and OBS follows instantly. No relinking.'+
-      '<br><a href="#overlay" target="_blank" style="color:var(--electric)">open overlay \u2197</a> <a href="#" id="testsnd" style="color:var(--electric);margin-left:14px">test sound</a> '+
+      '<br><a href="#overlay" id="openov" target="_blank" style="color:var(--electric)">open overlay \u2197</a> <a href="#" id="testsnd" style="color:var(--electric);margin-left:14px">test sound</a> '+
       '<a href="#" id="lock" style="color:var(--dim);margin-left:14px">lock</a></div>'+
   '</div>';
 
@@ -231,22 +292,40 @@ function renderControl(){
     var sr=document.getElementById("setrow");
     if(T.mode==="down"){
       sr.style.display="";
-      sr.innerHTML='<span class="setlab">Set / add</span>'+
+      sr.innerHTML='<span class="setlab">Add</span>'+
+        '<button class="chip" data-add="-5">\u22125</button>'+
+        '<button class="chip" data-add="-1">\u22121</button>'+
         '<button class="chip" data-add="1">+1</button>'+
         '<button class="chip" data-add="5">+5</button>'+
         '<button class="chip" data-add="10">+10</button>'+
-        '<input id="minfield" type="number" min="0" placeholder="min">'+
-        '<button class="chip" id="setmin">Set</button>';
+        '<button class="chip" data-add="60">+1h</button>'+
+        '<span style="flex-basis:100%;height:0"></span>'+
+        '<span class="setlab">Set</span>'+
+        '<input id="hrfield" type="number" min="0" max="48" placeholder="hrs">'+
+        '<input id="minfield" type="number" min="0" max="59" placeholder="min">'+
+        '<button class="chip" id="setmin">Set</button>'+
+        '<button class="chip" id="set24">24h</button>';
       sr.querySelectorAll("[data-add]").forEach(function(b){ b.onclick=function(){
         var add=parseInt(b.getAttribute("data-add"),10)*60000;
-        if(T.running){ T.end_ts=(T.end_ts||now())+add; } else { T.remaining_ms=Math.max(0,(T.remaining_ms||0)+add); }
+        if(T.running){ T.end_ts=Math.min(now()+MAX_MS,Math.max(now(),(T.end_ts||now())+add)); }
+        else { T.remaining_ms=Math.min(MAX_MS,Math.max(0,(T.remaining_ms||0)+add)); }
         push(); }; });
       var sm=document.getElementById("setmin");
-      if(sm) sm.onclick=function(){ var mins=parseInt(document.getElementById("minfield").value,10)||0;
-        if(mins<0) mins=0; if(mins>600) mins=600;
-        document.getElementById("minfield").value=mins||"";
+      function setTo(mins){
+        if(mins<0) mins=0; if(mins>MAX_MS/60000) mins=MAX_MS/60000;
+        document.getElementById("hrfield").value=Math.floor(mins/60)||"";
+        document.getElementById("minfield").value=(mins%60)||"";
         try{ if(mins>0) localStorage.setItem("tv_preset",String(mins*60000)); }catch(e){}
-        T.running=false; T.remaining_ms=mins*60000; push(); };
+        T.running=false; T.remaining_ms=mins*60000; push();
+      }
+      if(sm) sm.onclick=function(){
+        var h=parseInt(document.getElementById("hrfield").value,10)||0;
+        var m=parseInt(document.getElementById("minfield").value,10)||0;
+        setTo(h*60+m);
+      };
+      document.getElementById("minfield").onkeydown=document.getElementById("hrfield").onkeydown=
+        function(e){ if(e.key==="Enter") sm.onclick(); };
+      document.getElementById("set24").onclick=function(){ setTo(24*60); };
     } else { sr.style.display="none"; }
   }
   document.querySelectorAll(".mbtn").forEach(function(b){ b.onclick=function(){
@@ -272,6 +351,37 @@ function renderControl(){
     PIN="";ROLE="";localStorage.removeItem("pq_pin");localStorage.removeItem("pq_role");render(); };
 
   on(paintMode);
+
+  var cfg=DEF_COLORS; try{ cfg=cleanColors(JSON.parse(localStorage.getItem("tv_colors")||"null")); }catch(e){ cfg=cleanColors(null); }
+  function obsLink(){
+    var base=location.origin+location.pathname, q=[];
+    ["c","w","a","b"].forEach(function(k){ if(cfg[k]!==DEF_COLORS[k]) q.push(k+"="+cfg[k]); });
+    if(!cfg.g) q.push("g=0");
+    return base+(q.length?"?"+q.join("&"):"")+"#overlay";
+  }
+  function paintColors(){
+    ["c","w","a","b"].forEach(function(k){ document.getElementById("col_"+k).value="#"+cfg[k]; });
+    document.getElementById("col_g").checked=!!cfg.g;
+    document.getElementById("obslink").value=obsLink();
+    document.getElementById("openov").href=obsLink();
+    try{ localStorage.setItem("tv_colors",JSON.stringify(cfg)); }catch(e){}
+  }
+  ["c","w","a","b"].forEach(function(k){ document.getElementById("col_"+k).oninput=function(){
+    cfg[k]=this.value.replace("#","").toUpperCase(); cfg=cleanColors(cfg); paintColors(); }; });
+  document.getElementById("col_g").onchange=function(){ cfg.g=this.checked?1:0; paintColors(); };
+  document.getElementById("colreset").onclick=function(){ cfg=cleanColors(null); paintColors(); };
+  document.getElementById("copylink").onclick=function(){
+    var f=document.getElementById("obslink"), b=this, v=f.value;
+    function ok(){ b.textContent="Copied"; setTimeout(function(){ b.textContent="Copy OBS link"; },1600); }
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(ok,function(){ f.select(); document.execCommand("copy"); ok(); });
+    else { f.select(); document.execCommand("copy"); ok(); }
+  };
+  paintColors();
+  var pvLen=0;
+  function pvFit(){ fitClock(document.getElementById("pv"),document.querySelector(".preview"),
+    Math.min(120,Math.max(56,window.innerWidth*0.15))); }
+  window.addEventListener("resize",pvFit);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(pvFit);
   var firedC=false;
   setInterval(function(){
     var pv=document.getElementById("pv"); if(!pv)return;
@@ -279,8 +389,11 @@ function renderControl(){
     if(T.mode==="down"&&ms<0)ms=0; pv.textContent=fmt(ms);
     if(T.mode==="down"&&T.running&&done&&!firedC){ firedC=true; alarm(); }
     if(!done) firedC=false;
-    pv.classList.toggle("low",T.mode==="down"&&T.running&&ms>0&&ms<=60000);
+    var lowC=(T.mode==="down"&&T.running&&ms>0&&ms<=60000);
+    pv.classList.toggle("low",lowC);
     pv.classList.toggle("done",done);
+    paintClock(pv,cfg,lowC||done,false);
+    if(pv.textContent.length!==pvLen){ pvLen=pv.textContent.length; pvFit(); }
   },200);
 }
 function renderGate(){
