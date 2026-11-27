@@ -42,7 +42,7 @@ jobs:
             echo "::error::An OBS password (pw=) is written into the code."; bad=1; fi
           if grep $src '[?&]k=[0-9a-fA-F]{16,}' .; then
             echo "::error::An overlay key (k=) is written into the code."; bad=1; fi
-          for f in slam/obs.html slam/ticker.html; do
+          for f in slam/obs.html slam/ticker.html slam/segments.html; do
             [ -f "$f" ] || continue
             grep -q 'seal.js' "$f" || { echo "::error::$f no longer loads seal.js (PIN lock gone)"; bad=1; }
             grep -q 'SEAL\.on(' "$f" || { echo "::error::$f no longer checks signatures"; bad=1; }

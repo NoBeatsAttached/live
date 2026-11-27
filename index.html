@@ -56,6 +56,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;
 .tile.timer{--tilecol:var(--electric)}
 .tile.obs{--tilecol:var(--hot)}
 .tile.ticker{--tilecol:var(--electric)}
+.tile.segments{--tilecol:var(--electric)}
 .crewtag{display:block;text-align:center;margin-top:20px}
 .crewtag a{color:var(--dimmer);font-size:11px;letter-spacing:.16em;text-decoration:none;text-transform:uppercase}
 .crewtag a:hover{color:var(--electric)}
@@ -173,6 +174,13 @@ body:not(.overlay)::after{
       <span class="go">Open &rarr;</span>
     </a>
 
+    <a class="tile segments crewonly" id="segtile" href="slam/segments.html" style="display:none" target="_blank" rel="noopener">
+      <span class="tnum">▣</span>
+      <h2>SEGMENTS</h2>
+      <div class="sub">Crew only — NOW / NEXT, BLIND // DEAF // MUTE and CHAIR SWAP overlays.</div>
+      <span class="go">Open &rarr;</span>
+    </a>
+
   </div>
 
   <div class="crewonly" id="obslinks" style="display:none;max-width:900px;margin:34px auto 0;
@@ -226,7 +234,7 @@ body:not(.overlay)::after{
   }
   function buildLinks(k){
     var base=location.origin+location.pathname.replace(/[^\/]*$/,"")+"slam/";
-    var rows=[["TICKER","ticker.html#overlay","1920 \u00d7 1080"]];
+    var rows=[["TICKER","ticker.html#overlay","1920 \u00d7 1080"],["SEGMENTS","segments.html#overlay","1920 \u00d7 1080"]];
     if(k) rows.push(["OBS BRIDGE \u2014 add to the END of its current link","&k="+k,"keep the pw"]);
     var w=document.getElementById("lnks"); if(!w)return;
     w.innerHTML="";
@@ -284,7 +292,7 @@ body:not(.overlay)::after{
   if(lockbtn) lockbtn.addEventListener("click",function(e){
     e.preventDefault();
     if(!confirm("Lock crew tools and forget the saved PIN on this browser? Other open tools (timer, decks) will ask for the PIN again.")) return;
-    ["pq_pin","pq_role","slam_pin","slam_role","tk_pin","tk_role","cl_pin","cl_role"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(x){} });
+    ["pq_pin","pq_role","slam_pin","slam_role","tk_pin","tk_role","cl_pin","cl_role","sg_pin","sg_role"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(x){} });
     var els=document.querySelectorAll(".crewonly,.owneronly");
     for(var i=0;i<els.length;i++) els[i].style.display="none";
     lockbtn.style.display="none"; crew.style.display="";
