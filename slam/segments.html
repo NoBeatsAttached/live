@@ -47,14 +47,14 @@ body:not(.backing) .cardo{text-shadow:0 2px 12px rgba(0,0,0,.9)}
 .eta{font-size:18px;letter-spacing:.16em;color:var(--steel)}
 .title{font-size:40px;line-height:40px;letter-spacing:.06em}
 .title .z{color:var(--acc)}
-.roles{display:flex;flex-direction:column;gap:10px}
-.role{display:flex;align-items:baseline;gap:18px}
-.role .rn{font-size:26px;letter-spacing:.1em;color:var(--acc);width:120px}
+.roles{display:grid;grid-template-columns:max-content max-content max-content;column-gap:22px;row-gap:10px;align-items:baseline}
+.role{display:contents}
+.role .rn{font-size:26px;letter-spacing:.1em;color:var(--acc)}
 .role .pn{font-size:26px;letter-spacing:.08em;color:var(--text)}
 .role .rd{font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.12em;color:var(--dim)}
 .bar{height:6px;background:var(--line);position:relative}
 .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);width:0}
-.order{display:flex;gap:8px;align-items:center;flex-wrap:wrap;max-width:700px}
+.order{display:flex;gap:8px;align-items:center;flex-wrap:wrap;max-width:820px}
 .chip{font-size:20px;letter-spacing:.1em;padding:6px 12px;border:1px solid var(--line2);color:var(--dim)}
 .chip.done{color:var(--steel)}
 .chip.cur{border-color:var(--acc);background:var(--accsoft);color:var(--text)}
@@ -117,11 +117,11 @@ button:active{transform:translateY(1px)}
   <div class="cardo" id="cNow">
     <div class="wm">PR<span class="z">0</span>CESS_LIVE <span class="z">//</span> 24HR</div>
     <div class="rowo" style="gap:48px">
-      <div class="col"><div class="lab b">NOW</div><div class="bignow up" id="oNow"></div></div>
+      <div class="col"><div class="lab b">NOW</div><div class="bignow up" id="oNow" data-fit="760" data-fs="52"></div></div>
       <div class="col r" id="oHourBox" style="padding-bottom:4px"><div class="lab">HOUR</div><div class="mid"><span id="oHour">01</span><span style="color:var(--steel)">/24</span></div></div>
     </div>
     <div class="hair" id="oNextHair"></div>
-    <div class="nextl" id="oNextRow"><div class="lab">NEXT</div><div class="nextv up" id="oNext"></div><div class="eta up" id="oEta"></div></div>
+    <div class="nextl" id="oNextRow"><div class="lab">NEXT</div><div class="nextv up" id="oNext" data-fit="520" data-fs="30"></div><div class="eta up" id="oEta"></div></div>
   </div>
 
   <div class="cardo" id="cBdm">
@@ -129,9 +129,9 @@ button:active{transform:translateY(1px)}
     <div class="title">BLIND <span class="z">//</span> DEAF <span class="z">//</span> MUTE</div>
     <div class="hair"></div>
     <div class="roles">
-      <div class="role"><span class="rn">BLIND</span><span class="pn up" id="oBlind"></span><span class="rd">HEARS THE BEAT · CAN'T SEE</span></div>
-      <div class="role"><span class="rn">MUTE</span><span class="pn up" id="oMute"></span><span class="rd">SEES THE SCREEN · CAN'T TALK</span></div>
-      <div class="role"><span class="rn">DEAF</span><span class="pn up" id="oDeaf"></span><span class="rd">ON THE DAW · HEARS NOTHING</span></div>
+      <div class="role"><span class="rn">BLIND</span><span class="pn up" id="oBlind" data-fit="340" data-fs="26"></span><span class="rd">HEARS THE BEAT · CAN'T SEE</span></div>
+      <div class="role"><span class="rn">MUTE</span><span class="pn up" id="oMute" data-fit="340" data-fs="26"></span><span class="rd">SEES THE SCREEN · CAN'T TALK</span></div>
+      <div class="role"><span class="rn">DEAF</span><span class="pn up" id="oDeaf" data-fit="340" data-fs="26"></span><span class="rd">ON THE DAW · HEARS NOTHING</span></div>
     </div>
     <div class="hair"></div>
     <div class="rowo">
@@ -141,14 +141,14 @@ button:active{transform:translateY(1px)}
     </div>
   </div>
 
-  <div class="cardo" id="cSwap" style="width:720px">
+  <div class="cardo" id="cSwap" style="min-width:720px">
     <div class="wm">PR<span class="z">0</span>CESS_LIVE <span class="z">//</span> CHAIR SWAP</div>
-    <div class="rowo" style="justify-content:space-between;gap:32px">
-      <div class="col"><div class="lab b">ON THE DAW</div><div class="bignow up" style="font-size:60px;line-height:58px" id="oCur"></div></div>
-      <div class="col r"><div class="lab">SWAP IN</div><div class="clock" id="oSwapClock">10:00</div></div>
+    <div class="col"><div class="lab b">ON THE DAW</div><div class="bignow up" id="oCur" data-fit="820" data-fs="60"></div></div>
+    <div class="rowo" style="justify-content:space-between;gap:40px">
+      <div class="col"><div class="lab">SWAP IN</div><div class="clock" id="oSwapClock">10:00</div></div>
+      <div class="col r"><div class="lab">UP NEXT</div><div class="nextv up" id="oUpNext" data-fit="420" data-fs="32"></div></div>
     </div>
     <div class="bar"><i id="oBar"></i></div>
-    <div class="nextl"><div class="lab">UP NEXT</div><div class="nextv up" style="font-size:32px" id="oUpNext"></div></div>
     <div class="hair"></div>
     <div class="order" id="oOrder"></div>
   </div>
@@ -282,10 +282,17 @@ var DEFAULTS={
 };
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function loadState(){
-  try{ var s=JSON.parse(localStorage.getItem("sg_state")||"null"); if(s&&s.now&&s.bdm&&s.swap) return s; }catch(e){}
+  try{
+    var s=JSON.parse(localStorage.getItem("sg_state")||"null");
+    if(s&&s.now&&s.bdm&&s.swap){
+      var gone=Math.max(0,Date.now()-(s.at||Date.now()));
+      [s.bdm.t,s.swap.t].forEach(function(t){ if(t&&t.running) t.remain=Math.max(0,(t.remain||0)-gone); delete t.end; });
+      return s;
+    }
+  }catch(e){}
   return clone(DEFAULTS);
 }
-function saveState(s){ try{ localStorage.setItem("sg_state",JSON.stringify(s)); }catch(e){} }
+function saveState(){ try{ var o=snapshot(); o.at=Date.now(); localStorage.setItem("sg_state",JSON.stringify(o)); }catch(e){} }
 var ST=loadState();
 
 /* ---------- timers ----------
@@ -320,18 +327,20 @@ function connect(){
   SEAL.on(channel,"state",function(m){
     var p=m.payload;
     if(!p||!p.now||!p.bdm||!p.swap) return;
+    if((p.rev||0)<(ST.rev||0)) return;      /* older than what we have: a stale deck answered */
     p.bdm.t=unwire(p.bdm.t||{}); p.swap.t=unwire(p.swap.t||{});
-    ST=p; saveState(ST);
+    ST=p; saveState();
     if(IS_OVERLAY) paintOverlay(); else paintDeck();
   });
   SEAL.on(channel,"fx",function(m){
     if(!IS_OVERLAY) return;
     var p=m.payload||{};
     if(p.k==="reload"){ location.reload(); return; }
-    if(p.k==="strike") flash("STRIKE",p.sub||"MUTE TALKED");
+    if(p.k==="strike"&&ST.mode==="bdm") flash("STRIKE",p.sub||"MUTE TALKED");
   });
+  /* anyone asked for state: answer with ours. Receivers keep whichever has the higher rev,
+     so a fresh deck catches up to the overlay instead of being ignored by it */
   SEAL.on(channel,"req",function(){
-    if(IS_OVERLAY) return;
     try{ SEAL.send(channel,"state",snapshot()); }catch(e){}
   });
   channel.on("presence",{event:"sync"},function(){
@@ -343,8 +352,8 @@ function connect(){
   channel.subscribe(function(status){
     if(status==="SUBSCRIBED"){
       channel.track({locked:SEAL.locked,role:IS_OVERLAY?"overlay":"deck",at:Date.now()});
-      if(IS_OVERLAY){ try{ SEAL.send(channel,"req",{}); }catch(e){} }
-      else paintStatus();
+      try{ SEAL.send(channel,"req",{}); }catch(e){}   /* overlay AND decks pull the newest state */
+      if(!IS_OVERLAY) paintStatus();
     }
     if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
       overlayUp=false; if(!IS_OVERLAY) paintStatus();
@@ -366,6 +375,14 @@ function flash(big,sub){
 function txt(id,v){ var e=$(id); if(e.textContent!==v) e.textContent=v; }
 function show(id,on){ $(id).classList.toggle("on",!!on); }
 
+function fitAll(){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-fit]"),function(el){
+    var max=+el.dataset.fit, fs=+el.dataset.fs;
+    el.style.fontSize=fs+"px"; el.style.lineHeight=fs+"px";
+    var w=el.scrollWidth, guard=0;
+    while(w>max&&fs>14&&guard<40){ fs=Math.max(14,Math.floor(fs*max/w*0.98)); el.style.fontSize=fs+"px"; el.style.lineHeight=fs+"px"; w=el.scrollWidth; guard++; }
+  });
+}
 function paintOverlay(){
   document.body.classList.toggle("backing",!!ST.backing);
   show("cNow",ST.mode==="now"); show("cBdm",ST.mode==="bdm"); show("cSwap",ST.mode==="swap");
@@ -393,6 +410,7 @@ function paintOverlay(){
     html+='<span class="'+c+'">'+String(x).replace(/[&<>]/g,"").toUpperCase()+'</span>';
   });
   if(ord.innerHTML!==html) ord.innerHTML=html;
+  fitAll();
   tickOverlay();
 }
 function tickOverlay(){
@@ -416,6 +434,7 @@ function bootOverlay(){
   ST.bdm.t=unwire(ST.bdm.t); ST.swap.t=unwire(ST.swap.t);
   paintOverlay();           /* cached state paints before the socket is up */
   setInterval(tickOverlay,250);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitAll);
   connect();
 }
 
@@ -426,7 +445,8 @@ function paintStatus(){
   t.textContent=overlayUp?"OVERLAY LIVE":"OVERLAY OFF";
 }
 function push(){
-  saveState(ST);
+  ST.rev=(ST.rev||0)+1;
+  saveState();
   if(channel){ try{ SEAL.send(channel,"state",snapshot()); }catch(e){} }
   paintDeck();
 }
@@ -534,7 +554,9 @@ function bootDeck(){
   $("dStrPlus").onclick=function(){ ST.bdm.strikes=(ST.bdm.strikes||0)+1; push(); };
   $("dStrMinus").onclick=function(){ ST.bdm.strikes=Math.max(0,(ST.bdm.strikes||0)-1); push(); };
   function newRound(d){
-    var b=ST.bdm; b.round=Math.min(b.rounds||3,Math.max(1,(b.round||1)+d));
+    var b=ST.bdm, r=Math.min(b.rounds||3,Math.max(1,(b.round||1)+d));
+    if(r===(b.round||1)) return;
+    b.round=r;
     b.strikes=0; pauseT(b.t); b.t.remain=(b.len||25)*60000; push();
   }
   $("dRndPlus").onclick=function(){ newRound(1); };
