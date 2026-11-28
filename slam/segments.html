@@ -206,11 +206,11 @@ button:active{transform:translateY(1px)}
       <div class="pv" id="dBdmClock">25:00</div>
       <div class="row">
         <button class="pri" id="dBdmGo">START</button>
-        <button id="dBdmReset">RESET CLOCK</button>
+        <button id="dBdmReset">RESET ROUND</button>
       </div>
       <button class="arm" id="dStrike" style="padding:20px;font-size:14px">MUTE TALKED — STRIKE</button>
       <div class="row">
-        <div><label>STRIKES</label><div class="row"><button class="n" id="dStrMinus">−</button><span id="dStrikes" style="text-align:center;font-size:16px">0</span><button class="n" id="dStrPlus">+</button></div></div>
+        <div><label>STRIKES</label><div class="row"><button class="n" id="dStrMinus" title="undo one strike, gives the time back">−</button><span id="dStrikes" style="text-align:center;font-size:16px">0</span><button class="n" id="dStrClear" title="clear all strikes, gives the time back">CLEAR</button></div></div>
         <div><label>ROUND</label><div class="row"><button class="n" id="dRndMinus">−</button><span id="dRound" style="text-align:center;font-size:16px">1</span><button class="n" id="dRndPlus">+</button></div></div>
       </div>
       <div class="row">
@@ -218,7 +218,7 @@ button:active{transform:translateY(1px)}
         <div><label>ROUND MIN</label><input type="number" id="dBdmLen" min="1" max="120" /></div>
         <div><label>STRIKE SEC</label><input type="number" id="dPen" min="0" max="600" /></div>
       </div>
-      <div class="small">ROUND + resets the clock and strikes. STRIKE takes the penalty off the clock and fires the flash.</div>
+      <div class="small">STRIKE takes the penalty off the clock and flashes it. − undoes one strike, CLEAR undoes all of them (time comes back). RESET ROUND and ROUND +/− put the full clock back and clear strikes.</div>
     </div>
 
     <!-- CHAIR SWAP -->
@@ -544,15 +544,23 @@ function bootDeck(){
     var b=ST.bdm, x=b.blind; b.blind=b.deaf; b.deaf=b.mute; b.mute=x; push();
   };
   $("dBdmGo").onclick=function(){ var t=ST.bdm.t; if(t.running) pauseT(t); else startT(t); push(); };
-  $("dBdmReset").onclick=function(){ var t=ST.bdm.t; pauseT(t); t.remain=(ST.bdm.len||25)*60000; push(); };
+  /* full clock back = no penalty left, so strikes go too */
+  $("dBdmReset").onclick=function(){ var t=ST.bdm.t; pauseT(t); t.remain=(ST.bdm.len||25)*60000; ST.bdm.strikes=0; push(); };
   $("dStrike").onclick=function(){
     var b=ST.bdm; b.strikes=(b.strikes||0)+1;
     var pen=(b.pen||0)*1000; setT(b.t,left(b.t)-pen);
     push();
     if(channel){ try{ SEAL.send(channel,"fx",{k:"strike",sub:"MUTE TALKED"+(pen?" · −"+mmss(pen):"")}); }catch(e){} }
   };
-  $("dStrPlus").onclick=function(){ ST.bdm.strikes=(ST.bdm.strikes||0)+1; push(); };
-  $("dStrMinus").onclick=function(){ ST.bdm.strikes=Math.max(0,(ST.bdm.strikes||0)-1); push(); };
+  /* taking strikes off gives their penalty time back (capped at the round length) */
+  function unstrike(k){
+    var b=ST.bdm, n=Math.min(k,b.strikes||0); if(!n) return;
+    b.strikes-=n;
+    setT(b.t,Math.min((b.len||25)*60000,left(b.t)+n*(b.pen||0)*1000));
+    push();
+  }
+  $("dStrMinus").onclick=function(){ unstrike(1); };
+  $("dStrClear").onclick=function(){ unstrike(ST.bdm.strikes||0); };
   function newRound(d){
     var b=ST.bdm, r=Math.min(b.rounds||3,Math.max(1,(b.round||1)+d));
     if(r===(b.round||1)) return;
